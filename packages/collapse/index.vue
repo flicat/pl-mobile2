@@ -1,5 +1,5 @@
 <template>
-  <div class="pl-collapse" v-bind="$props" v-on="$listeners">
+  <div class="pl-collapse" v-bind="$attrs">
     <div class="pl-collapse-top" @click="toggle">
       <div class="pl-collapse-title">
         <slot name="title">{{title}}</slot>

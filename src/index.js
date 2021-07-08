@@ -72,7 +72,6 @@ function install(App) {
   App.use(Datetime);
 }
 
-// TODO 添加开关 Switch
 export default {
   version: '1.0.0',
   install,

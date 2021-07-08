@@ -25,12 +25,20 @@
 
     <h3>图标填充</h3>
     <pl-input label="请输入：" placeholder="姓名、手机、电话" type="text" v-model="value" required clearable>
-      <pl-icon name="icon-dingwei" fill="#999" slot="prepend"></pl-icon>
-      <pl-icon name="icon-people_fill" fill="#999" slot="append"></pl-icon>
+      <template v-slot:prepend></template>
+      <pl-icon name="icon-dingwei" fill="#999"></pl-icon>
+</template>
+      <template v-slot:append>
+  <pl-icon name="icon-people_fill" fill="#999"></pl-icon>
+</template>
     </pl-input>
     <pl-input label="请输入：" placeholder="姓名、手机、电话" type="textarea" rows="5" v-model="value" required wrap clearable>
-      <pl-icon name="icon-dingwei" fill="#999" slot="prepend"></pl-icon>
-      <pl-icon name="icon-people_fill" fill="#999" slot="append"></pl-icon>
+      <template v-slot:prepend>
+  <pl-icon name="icon-dingwei" fill="#999"></pl-icon>
+</template>
+      <template v-slot:append>
+  <pl-icon name="icon-people_fill" fill="#999"></pl-icon>
+</template>
     </pl-input>
   </div>
 </template>

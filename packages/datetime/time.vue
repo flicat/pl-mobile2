@@ -253,7 +253,7 @@ export default {
         time = 0
       }
 
-      this.$set(this, this.currentPointer.name, time)
+      this[this.currentPointer.name] = time
     },
 
     // 提交结果

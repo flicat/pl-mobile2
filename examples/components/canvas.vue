@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <pl-canvas class="canvas" ref="canvas" :penId="0" orientation="right">
-      <span slot="placeholder">请在此处签名</span>
+      <template v-slot:placeholder>请在此处签名</template>
     </pl-canvas>
     <pl-cell :span="[1,1,1]" gap="10px">
       <pl-button @click="clear" type="primary">清除画布</pl-button>
@@ -15,28 +15,38 @@
 </template>
 
 <script>
-  export default {
-    data () {
-      return {
-        src: ''
-      }
-    },
-    methods: {
-      clear () {
-        this.$refs.canvas.clear()
-      },
-      getImageDataUrl () {
-        let result = this.$refs.canvas.getImageDataUrl()
-        console.log('getImageDataUrl:: ', result)
-        this.src = result
-      },
-      getImageBlob () {
-        let result = this.$refs.canvas.getImageBlob()
-        console.log('getImageBlob:: ', result)
-        this.src = URL.createObjectURL(result)
-      }
+import { ref } from 'vue'
+
+export default {
+  setup() {
+    let src = ref('')
+    let canvas = ref(null)
+
+    function clear() {
+      canvas.value.clear()
+    }
+
+    function getImageDataUrl() {
+      let result = canvas.value.getImageDataUrl()
+      console.log('getImageDataUrl:: ', result)
+      src.value = result
+    }
+
+    function getImageBlob() {
+      let result = canvas.value.getImageBlob()
+      console.log('getImageBlob:: ', result)
+      src.value = URL.createObjectURL(result)
+    }
+
+    return {
+      src,
+      canvas,
+      clear,
+      getImageDataUrl,
+      getImageBlob
     }
   }
+}
 </script>
 
 <style lang="less" scoped>

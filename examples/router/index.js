@@ -47,7 +47,12 @@ export default createRouter({
           redirect: { name: 'home' },
           component: () => import('../layout/docs.vue'),
           children: [
-            { path: '/docs/home', component: () => import('../../README.md'), name: 'home', meta: { title: '介绍', type: 'docs' } },
+            {
+              path: '/docs/home',
+              component: () => import('../../README.md'),
+              name: 'home',
+              meta: { title: '介绍', type: 'docs' }
+            },
             ...components.map(router => {
               return {
                 path: `/docs/${router.name}`,

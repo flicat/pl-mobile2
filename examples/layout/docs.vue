@@ -25,7 +25,7 @@
 <script>
 import { ref, reactive, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import qrCode from './qrcode'
+import qrCode from './qrcode.vue'
 
 export default {
   components: {
@@ -35,10 +35,10 @@ export default {
     let route = useRoute()
     let router = useRouter()
 
-    let QRCodeValue = ref('')
+    let QRCodeValue = ref(window.location.href.split('#')[0] + '#/examples/' + route.meta.name)
     let routes = reactive(router.options.routes[0].children[0].children.filter(route => route.meta && route.meta.type === 'docs'))
 
-    watch(route.meta.name, (val) => {
+    watch(() => route.meta.name, val => {
       QRCodeValue.value = window.location.href.split('#')[0] + '#/examples/' + val
     })
 
@@ -50,26 +50,6 @@ export default {
     }
   }
 }
-
-// export default {
-//   data() {
-//     return {
-//       routes: [],
-//       QRCodeValue: null
-//     }
-//   },
-//   created() {
-//     this.routes = this.$router.options.routes[0].children[0].children.filter(route => route.meta && route.meta.type === 'docs');
-//   },
-//   watch: {
-//     '$route.meta.name': {
-//       handler(val) {
-//         this.QRCodeValue = window.location.href.split('#')[0] + '#/examples/' + val
-//       },
-//       immediate: true
-//     }
-//   }
-// }
 </script>
 
 <style lang="less" scoped>

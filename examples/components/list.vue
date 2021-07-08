@@ -6,10 +6,10 @@
     <div class="list">
       <pl-list class="pl-list" :autoLoad="100" :loading="loading" :finished="finished" @refresh="reload" @load="load" refreshText="松开刷新" loadingText="加载中..." finishedText="加载完成" errorText="加载失败">
         <p v-for="item in data" :key="item.value">{{item.label}}</p>
-        <!--<span slot="top-loading">努力重刷中...</span>-->
-        <!--<span slot="top-refresh">放开重刷</span>-->
-        <!--<span slot="bottom-loading">努力加载中...</span>-->
-        <!--<span slot="bottom-finished">全部加载完啦</span>-->
+        <!--<template v-slot:top-loading>努力重刷中...</template>-->
+        <!--<template v-slot:top-refresh>放开重刷</template>-->
+        <!--<template v-slot:bottom-loading>努力加载中...</template>-->
+        <!--<template v-slot:bottom-finished>全部加载完啦</template>-->
       </pl-list>
     </div>
   </div>

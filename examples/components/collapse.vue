@@ -7,7 +7,7 @@
 
     <h3>自定义标题</h3>
     <pl-collapse v-model="active">
-      <div slot="title">自定义标题</div>
+      <template v-slot:title>自定义标题</template>
       <p>面板内容</p>
       <p>面板内容</p>
       <p>面板内容</p>

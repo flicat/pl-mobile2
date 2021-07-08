@@ -47,7 +47,6 @@ function getHandler(options) {
 }
 
 export default function (App) {
-  console.log(App)
   App.config.globalProperties.$fetch = API
 
   // 设置默认配置信息

@@ -3,8 +3,6 @@ import App from './App.vue'
 import router from './router'
 import PlMobile from '../src'
 import platform from './assets/js/platform'
-import "/node_modules/highlight.js/styles/foundation.css";
-import "/node_modules/github-markdown-css/github-markdown.css";
 
 // 测试环境加载 VConsole
 if (platform.isFromAndroid || platform.isFromIos) {
