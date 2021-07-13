@@ -1,26 +1,38 @@
 {
-  "name": "ui-mobile2",
-  "version": "0.0.0",
+  "name": "pl-mobile2",
+  "version": "1.0.0",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lib": "node build.js"
+    "start": "npm run build & npm run build:docs",
+    "dev": "vite --host",
+    "build:docs": "vite build",
+    "build": "node build.js"
   },
   "dependencies": {
     "async-validator": "^3.5.2",
-    "vue": "^3.0.4",
+    "vue": "^3.0.5",
     "vue-router": "^4.0.10"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.2.4",
-    "@vitejs/plugin-vue-jsx": "^1.1.6",
-    "@vue/compiler-sfc": "^3.0.4",
+    "@vue/compiler-sfc": "^3.0.5",
     "github-markdown-css": "^4.0.0",
     "highlight.js": "^11.0.1",
     "less": "^4.1.1",
     "qrious": "^4.0.2",
-    "vite": "^2.4.1",
+    "vite": "^2.4.2",
     "vite-plugin-md2vue": "^1.0.0",
     "whatwg-fetch": "^3.6.2"
+  },
+  "files": [
+    "lib"
+  ],
+  "main": "./lib/pl-mobile2.umd.js",
+  "module": "./lib/pl-mobile2.es.js",
+  "style": "./lib/style.css",
+  "exports": {
+    ".": {
+      "import": "./lib/pl-mobile2.es.js",
+      "require": "./lib/pl-mobile2.umd.js"
+    }
   }
 }

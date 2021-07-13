@@ -4,104 +4,136 @@
  * @description Description
  */
 
-import Loading from '../packages/loading'
-import Alert from '../packages/alert'
-import Confirm from '../packages/confirm'
-import Toast from '../packages/toast'
-import Button from '../packages/button'
-import Canvas from '../packages/canvas'
-import Cell from '../packages/cell'
-import Checkbox from '../packages/checkbox'
-import Collapse from '../packages/collapse'
-import Datetime from '../packages/datetime'
-import Fetch from '../packages/fetch'
-import Form from '../packages/form'
-import GoTopButton from '../packages/goTopButton'
-import Icon from '../packages/icon'
-import Input from '../packages/input'
-import List from '../packages/list'
-import Picker from '../packages/picker'
-import Popup from '../packages/popup'
-import Progress from '../packages/progress'
-import Radio from '../packages/radio'
-import Range from '../packages/range'
-import Select from '../packages/select'
-import StepItem from '../packages/stepItem'
-import Steps from '../packages/steps'
-import SwipeItem from '../packages/swipeItem'
-import Swipe from '../packages/swipe'
-import TabItem from '../packages/tabItem'
-import Tabs from '../packages/tabs'
-import Upload from '../packages/upload'
+import loading from '../packages/loading'
+import alert from '../packages/alert'
+import confirm from '../packages/confirm'
+import toast from '../packages/toast'
+import button from '../packages/button'
+import canvas from '../packages/canvas'
+import cell from '../packages/cell'
+import checkbox from '../packages/checkbox'
+import collapse from '../packages/collapse'
+import datetime from '../packages/datetime'
+import fetch from '../packages/fetch'
+import form from '../packages/form'
+import goTopButton from '../packages/goTopButton'
+import icon from '../packages/icon'
+import input from '../packages/input'
+import list from '../packages/list'
+import picker from '../packages/picker'
+import popup from '../packages/popup'
+import progress from '../packages/progress'
+import radio from '../packages/radio'
+import range from '../packages/range'
+import select from '../packages/select'
+import stepItem from '../packages/stepItem'
+import steps from '../packages/steps'
+import swipeItem from '../packages/swipeItem'
+import swipe from '../packages/swipe'
+import tabItem from '../packages/tabItem'
+import tabs from '../packages/tabs'
+import upload from '../packages/upload'
 import './assets/less/variables.less'
 
 function install(App) {
   [
-    Button,
-    Canvas,
-    Cell,
-    Checkbox,
-    Collapse,
-    Form,
-    GoTopButton,
-    Icon,
-    Input,
-    List,
-    Picker,
-    Popup,
-    Progress,
-    Radio,
-    Range,
-    Select,
-    StepItem,
-    Steps,
-    SwipeItem,
-    Swipe,
-    TabItem,
-    Tabs,
-    Upload
+    button,
+    canvas,
+    cell,
+    checkbox,
+    collapse,
+    form,
+    goTopButton,
+    icon,
+    input,
+    list,
+    picker,
+    popup,
+    progress,
+    radio,
+    range,
+    select,
+    stepItem,
+    steps,
+    swipeItem,
+    swipe,
+    tabItem,
+    tabs,
+    upload
   ].forEach(component => {
     App.component(component.name, component);
   });
 
-  App.use(Loading);
-  App.use(Fetch);
-  App.use(Alert);
-  App.use(Confirm);
-  App.use(Toast);
-  App.use(Datetime);
+  App.use(loading);
+  App.use(alert);
+  App.use(confirm);
+  App.use(toast);
+  App.use(datetime);
+  App.use(fetch);
+}
+
+export {
+  loading,
+  alert,
+  confirm,
+  toast,
+  button,
+  canvas,
+  cell,
+  checkbox,
+  collapse,
+  datetime,
+  fetch,
+  form,
+  goTopButton,
+  icon,
+  input,
+  list,
+  picker,
+  popup,
+  progress,
+  radio,
+  range,
+  select,
+  stepItem,
+  steps,
+  swipeItem,
+  swipe,
+  tabItem,
+  tabs,
+  upload
 }
 
 export default {
   version: '1.0.0',
   install,
-  Button,
-  Canvas,
-  Cell,
-  Checkbox,
-  Collapse,
-  Datetime,
-  Fetch,
-  Form,
-  GoTopButton,
-  Icon,
-  Input,
-  List,
-  Picker,
-  Popup,
-  Progress,
-  Radio,
-  Range,
-  Select,
-  StepItem,
-  Steps,
-  SwipeItem,
-  Swipe,
-  TabItem,
-  Tabs,
-  Upload,
-  Loading,
-  Alert,
-  Confirm,
-  Toast
+  loading,
+  alert,
+  confirm,
+  toast,
+  button,
+  canvas,
+  cell,
+  checkbox,
+  collapse,
+  datetime,
+  fetch,
+  form,
+  goTopButton,
+  icon,
+  input,
+  list,
+  picker,
+  popup,
+  progress,
+  radio,
+  range,
+  select,
+  stepItem,
+  steps,
+  swipeItem,
+  swipe,
+  tabItem,
+  tabs,
+  upload
 };
