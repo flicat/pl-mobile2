@@ -28,20 +28,17 @@ export default {
     action: Function        // 确认回调
   },
   methods: {
-    // TODO 返回Promise
-    confirm() {
-      new Promise((resolve, reject) => {
+    async confirm() {
+      await new Promise((resolve, reject) => {
         if (this.$refs.child && typeof this.$refs.child.submit === 'function') {
           resolve(this.$refs.child.submit())
         } else {
           resolve()
         }
-      }).then(() => {
-        if (typeof this.action === 'function') {
-          this.action()
-        }
-        this.$emit('hide')
       })
+      if (typeof this.action === 'function') {
+        await this.action()
+      }
     }
   }
 }

@@ -3,19 +3,21 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "lib": "node build.js"
   },
   "dependencies": {
+    "async-validator": "^3.5.2",
     "vue": "^3.0.4",
     "vue-router": "^4.0.10"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.2.4",
+    "@vitejs/plugin-vue-jsx": "^1.1.6",
     "@vue/compiler-sfc": "^3.0.4",
     "github-markdown-css": "^4.0.0",
     "highlight.js": "^11.0.1",
     "less": "^4.1.1",
-    "less-loader": "^10.0.1",
     "qrious": "^4.0.2",
     "vite": "^2.4.1",
     "vite-plugin-md2vue": "^1.0.0",

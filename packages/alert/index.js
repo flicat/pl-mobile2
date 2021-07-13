@@ -23,11 +23,6 @@ export default function (App) {
             html: this.html,
             buttonText: this.buttonText,
             action: this.action
-          },
-          on: {
-            hide: () => {
-              this.hide()
-            }
           }
         })
       ]) || null
@@ -53,17 +48,20 @@ export default function (App) {
           this.visible = true
         })
       },
-      hide() {
-        this.visible = false
-        setTimeout(() => {
-          this.display = false
-        }, 300)
+      async hide() {
+        await new Promise((resolve) => {
+          this.visible = false
+          setTimeout(() => {
+            this.display = false
+            resolve()
+          }, 300)
+        })
       }
     }
   })
 
 
-  function showAlert({ title, message, component, componentProps, html, buttonText, action }) {
+  async function showAlert({ title, message, component, componentProps, html, buttonText, action }) {
     Alert.title = title || ''
     Alert.component = component
     Alert.componentProps = componentProps || {}
@@ -72,6 +70,12 @@ export default function (App) {
     Alert.buttonText = buttonText || '好'
     Alert.action = action || null
     Alert.show()
+    await new Promise((resolve, reject) => {
+      Alert.action = async () => {
+        await Alert.hide()
+        resolve(typeof action === 'function' ? action() : null)
+      }
+    })
   }
 
   App.config.globalProperties.$alert = showAlert

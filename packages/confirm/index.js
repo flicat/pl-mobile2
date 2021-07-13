@@ -24,11 +24,6 @@ export default function (App) {
             cancelText: this.cancelText,
             submit: this.submit,
             cancel: this.cancel
-          },
-          on: {
-            hide: () => {
-              this.hide()
-            }
           }
         })
       ]) || null
@@ -56,17 +51,20 @@ export default function (App) {
           this.visible = true
         })
       },
-      hide() {
-        this.visible = false
-        setTimeout(() => {
-          this.display = false
-        }, 300)
+      async hide() {
+        await new Promise((resolve) => {
+          this.visible = false
+          setTimeout(() => {
+            this.display = false
+            resolve()
+          }, 300)
+        })
       }
     }
   })
 
 
-  function showConfirm({ title, message, component, componentProps, html, submitText, cancelText, submit, cancel }) {
+  async function showConfirm({ title, message, component, componentProps, html, submitText, cancelText, submit, cancel }) {
     Confirm.component = component
     Confirm.componentProps = componentProps || {}
     Confirm.html = !!html && !component
@@ -74,9 +72,18 @@ export default function (App) {
     Confirm.title = title || ''
     Confirm.submitText = submitText || '确认'
     Confirm.cancelText = cancelText || '取消'
-    Confirm.submit = submit || null
-    Confirm.cancel = cancel || null
     Confirm.show()
+
+    await new Promise((resolve, reject) => {
+      Confirm.submit = async () => {
+        await Confirm.hide()
+        resolve(typeof submit === 'function' ? submit() : null)
+      }
+      Confirm.cancel = async () => {
+        await Confirm.hide()
+        reject(typeof cancel === 'function' ? cancel() : null)
+      }
+    })
   }
 
   App.config.globalProperties.$confirm = showConfirm

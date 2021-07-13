@@ -1,5 +1,5 @@
 import plToast from './index.vue'
-import { createApp, h } from 'vue'
+import { createApp, h, nextTick } from 'vue'
 
 // toast
 export default function (App) {
@@ -28,7 +28,6 @@ export default function (App) {
         visible: false,
         timer: null,
 
-        duration: 3000,
         html: false,               // 是否显示为HTML
         text: ''
       }
@@ -36,32 +35,39 @@ export default function (App) {
     methods: {
       show() {
         this.display = true
-        this.$nextTick(() => {
+        nextTick(() => {
           this.visible = true
         })
-
-        clearTimeout(this.timer)
-        this.timer = setTimeout(() => {
-          this.hide()
-        }, this.duration)
       },
-      // TODO 返回Promise
-      hide() {
-        this.visible = false
-        setTimeout(() => {
-          this.display = false
-        }, 300)
+      async hide() {
+        await new Promise((resolve) => {
+          this.visible = false
+          setTimeout(() => {
+            this.display = false
+            resolve()
+          }, 300)
+        })
       }
     }
   })
 
-  function showToast(text, duration, html = false) {
+  async function showToast(text, duration, html = false) {
     Toast.text = text
     Toast.html = html
-    if (typeof duration === 'number') {
-      Toast.duration = duration
-    }
     Toast.show()
+    duration |= 0
+
+    if (!duration || !/\d+/.test(duration)) {
+      duration = 3000
+    }
+
+    await new Promise((resolve, reject) => {
+      clearTimeout(Toast.timer)
+      Toast.timer = setTimeout(async () => {
+        await Toast.hide()
+        resolve()
+      }, duration)
+    })
   }
 
   App.config.globalProperties.$toast = showToast

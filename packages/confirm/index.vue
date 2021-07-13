@@ -33,34 +33,29 @@ export default {
     cancel: Function               // 取消回调
   },
   methods: {
-    // TODO 返回Promise
-    onSubmit() {
-      new Promise((resolve, reject) => {
+    async onSubmit() {
+      await new Promise((resolve, reject) => {
         if (this.$refs.child && typeof this.$refs.child.submit === 'function') {
           resolve(this.$refs.child.submit())
         } else {
           resolve()
         }
-      }).then(() => {
-        if (typeof this.submit === 'function') {
-          this.submit()
-        }
-        this.$emit('hide')
       })
+      if (typeof this.submit === 'function') {
+        await this.submit()
+      }
     },
-    onCancel() {
-      new Promise((resolve, reject) => {
+    async onCancel() {
+      await new Promise((resolve, reject) => {
         if (this.$refs.child && typeof this.$refs.child.cancel === 'function') {
           resolve(this.$refs.child.cancel())
         } else {
           resolve()
         }
-      }).then(() => {
-        if (typeof this.cancel === 'function') {
-          this.cancel()
-        }
-        this.$emit('hide')
       })
+      if (typeof this.cancel === 'function') {
+        await this.cancel()
+      }
     }
   }
 }

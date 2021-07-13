@@ -9,12 +9,12 @@
       'pl-input--error': ruleMessage
     }
     ]">
-    <div class="pl-input-cell" :class="{'pl-input-cell--label': label && !wrap, 'pl-input-cell--wrap': label && wrap}">
+    <div class="pl-input-cell" :class="{'pl-input-cell--label': (label || $slots.label) && !wrap, 'pl-input-cell--wrap': (label || $slots.label) && wrap}">
       <div :class="['pl-input-title', {'pl-input-title--require': required, 'pl-input-title--start': type === 'textarea' && !wrap}]">
         <div class="pl-input-prepend" v-if="$slots.prepend">
           <slot name="prepend"></slot>
         </div>
-        <div class="pl-input-label" v-if="label" :style="{width: calcLabelWidth}">
+        <div class="pl-input-label" v-if="label || $slots.label" :style="{width: calcLabelWidth}">
           <slot name="label">{{label}}</slot>
         </div>
       </div>
@@ -43,8 +43,8 @@
 
 <script>
 import icon from '../icon/index.vue'
-import { validate } from '../../src/assets/utils'
-// TODO label有slot但是没显示
+import validate from '../../src/assets/utils/validate'
+
 export default {
   name: 'plInput',
   componentName: 'plInput',
@@ -112,12 +112,11 @@ export default {
   methods: {
     // 手动验证方法
     validate() {
-      return Promise.all(this.rules.map(rule => validate(rule, this.value))).then(() => {
+      return validate(this.rules, this.currentValue).then(() => {
         this.ruleMessage = ''
-        return Promise.resolve()
-      }).catch(e => {
-        this.ruleMessage = e
-        return Promise.reject(e)
+      }).catch(result => {
+        this.ruleMessage = result.errors[0].message
+        return Promise.reject(this.ruleMessage)
       })
     },
     clearValidate() {
@@ -134,6 +133,7 @@ export default {
         return false
       }
       this.currentValue = value
+      this.validate()
     },
     clear() {
       this.$emit('input', '')
