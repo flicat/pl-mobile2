@@ -4,9 +4,6 @@ import { createApp, h, nextTick } from 'vue'
 // toast
 export default function (App) {
   let Toast = createApp({
-    components: {
-      plToast
-    },
     render() {
       return this.display && h('div', {
         style: {
@@ -14,11 +11,9 @@ export default function (App) {
           opacity: this.visible ? 1 : 0
         }
       }, [
-        h('plToast', {
-          props: {
-            text: this.text,
-            html: this.html
-          }
+        h(plToast, {
+          text: this.text,
+          html: this.html
         })
       ]) || null
     },
@@ -51,10 +46,14 @@ export default function (App) {
     }
   })
 
-  async function showToast(text, duration, html = false) {
-    Toast.text = text
-    Toast.html = html
-    Toast.show()
+  const toastDom = document.createElement('div')
+  document.body.appendChild(toastDom)
+  const vm = Toast.mount(toastDom)
+
+  App.config.globalProperties.$toast = async function (text, duration, html = false) {
+    vm.text = text
+    vm.html = html
+    vm.show()
     duration |= 0
 
     if (!duration || !/\d+/.test(duration)) {
@@ -62,17 +61,12 @@ export default function (App) {
     }
 
     await new Promise((resolve, reject) => {
-      clearTimeout(Toast.timer)
-      Toast.timer = setTimeout(async () => {
-        await Toast.hide()
+      clearTimeout(vm.timer)
+      vm.timer = setTimeout(async () => {
+        await vm.hide()
         resolve()
       }, duration)
     })
   }
 
-  App.config.globalProperties.$toast = showToast
-
-  let toastDom = document.createElement('div')
-  Toast.mount(toastDom)
-  document.body.appendChild(toastDom)
 }

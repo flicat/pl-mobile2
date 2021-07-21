@@ -3,9 +3,6 @@ import { createApp, h, nextTick } from 'vue'
 // confirm
 export default function (App) {
   let Confirm = createApp({
-    components: {
-      plConfirm
-    },
     render() {
       return this.display && h('div', {
         style: {
@@ -13,18 +10,16 @@ export default function (App) {
           opacity: this.visible ? 1 : 0
         }
       }, [
-        h('plConfirm', {
-          props: {
-            title: this.title,
-            message: this.message,
-            html: this.html,
-            component: this.component,
-            componentProps: this.componentProps,
-            submitText: this.submitText,
-            cancelText: this.cancelText,
-            submit: this.submit,
-            cancel: this.cancel
-          }
+        h(plConfirm, {
+          title: this.title,
+          message: this.message,
+          html: this.html,
+          component: this.component,
+          componentProps: this.componentProps,
+          submitText: this.submitText,
+          cancelText: this.cancelText,
+          submit: this.submit,
+          cancel: this.cancel
         })
       ]) || null
     },
@@ -63,32 +58,29 @@ export default function (App) {
     }
   })
 
+  const confirmDom = document.createElement('div')
+  document.body.appendChild(confirmDom)
+  const vm = Confirm.mount(confirmDom)
 
-  async function showConfirm({ title, message, component, componentProps, html, submitText, cancelText, submit, cancel }) {
-    Confirm.component = component
-    Confirm.componentProps = componentProps || {}
-    Confirm.html = !!html && !component
-    Confirm.message = !component && message || ''
-    Confirm.title = title || ''
-    Confirm.submitText = submitText || '确认'
-    Confirm.cancelText = cancelText || '取消'
-    Confirm.show()
+  App.config.globalProperties.$confirm = async function ({ title, message, component, componentProps, html, submitText, cancelText, submit, cancel }) {
+    vm.component = component
+    vm.componentProps = componentProps || {}
+    vm.html = !!html && !component
+    vm.message = !component && message || ''
+    vm.title = title || ''
+    vm.submitText = submitText || '确认'
+    vm.cancelText = cancelText || '取消'
+    vm.show()
 
     await new Promise((resolve, reject) => {
-      Confirm.submit = async () => {
-        await Confirm.hide()
+      vm.submit = async () => {
+        await vm.hide()
         resolve(typeof submit === 'function' ? submit() : null)
       }
-      Confirm.cancel = async () => {
-        await Confirm.hide()
+      vm.cancel = async () => {
+        await vm.hide()
         reject(typeof cancel === 'function' ? cancel() : null)
       }
     })
   }
-
-  App.config.globalProperties.$confirm = showConfirm
-
-  let confirmDom = document.createElement('div')
-  Confirm.mount(confirmDom)
-  document.body.appendChild(confirmDom)
 }

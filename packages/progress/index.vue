@@ -77,7 +77,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .pl-progress {
   padding: 1em 0;
 

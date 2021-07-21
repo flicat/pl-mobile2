@@ -1,4 +1,5 @@
-function factory () { 'use strict';
+export default function () {
+  'use strict';
 
   var classCallCheck = function (instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -314,5 +315,3 @@ function factory () { 'use strict';
   })(typeof self !== 'undefined' ? self : global);
 
 }
-
-export default factory()

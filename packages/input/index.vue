@@ -25,7 +25,7 @@
             <input v-bind="$attrs" v-on="{input: emit, focus: emit, blur: emit, change: 'emit'}" v-if="type !== 'textarea'" :type="type" :disabled="calcDisabled" :value="currentValue" ref="input">
           </div>
           <div class="pl-input-clear" @touchstart="clear" @mousedown="clear" v-show="showClear">
-            <icon name="icon-roundclosefill" fill="#ccc"></icon>
+            <iconClose class="pl-input-clear-icon"></iconClose>
           </div>
           <div class="pl-input-append" v-if="$slots.append">
             <slot name="append"></slot>
@@ -42,14 +42,14 @@
 </template>
 
 <script>
-import icon from '../icon/index.vue'
+import iconClose from '../../src/assets/images/icon-close.svg'
 import validate from '../../src/assets/utils/validate'
 
 export default {
   name: 'plInput',
   componentName: 'plInput',
   components: {
-    icon
+    iconClose
   },
   props: {
     rules: {          // 验证规则
@@ -209,7 +209,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .pl-input {
   background-color: var(--input-bg);
   padding: 0 1.2rem;
@@ -303,12 +303,11 @@ export default {
     padding-right: 0.4em;
   }
   &-clear {
+    line-height: 0;
     margin-left: 0.4em;
 
-    .icon-clear {
-      width: 1.2em;
-      height: 1.2em;
-      vertical-align: bottom;
+    &-icon {
+      color: #ccc;
     }
   }
   &-error {

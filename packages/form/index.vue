@@ -6,7 +6,6 @@
 
 <script>
 // form
-// TODO 验证插件替换为 async-validator
 export default {
   name: 'plForm',
   componentName: 'plForm',
@@ -54,7 +53,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .pl-form {
   * {
     box-sizing: border-box;

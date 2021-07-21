@@ -66,7 +66,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .pl-cell {
   display: grid;
   line-height: normal;

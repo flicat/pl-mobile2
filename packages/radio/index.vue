@@ -19,7 +19,8 @@
       <div class="pl-radio-value">
         <div class="pl-radio-inner">
           <div class="pl-radio-item" v-for="(item, i) in options" :key="i" :class="{'is-active': item[prop.value] === currentValue, 'is-disabled': calcDisabled || item[prop.disabled], 'is-button': button, 'is-vertical': vertical}" @click="!(calcDisabled || item[prop.disabled]) && emit(item[prop.value])">
-            <icon v-if="!button" class="pl-radio-icon" :name="item[prop.value] === currentValue ? 'icon-btn_choose' : 'icon-btn_cicle_unchoose'" :fill="calcDisabled || item[prop.disabled] ? '#ebedf0' : item[prop.value] === currentValue ? '@primary' : '#dcdfe6'"></icon>
+            <iconCicleChoose v-if="!button" v-show="item[prop.value] === currentValue" :class="['pl-radio-icon', 'icon-checked', (calcDisabled || item[prop.disabled]) ? 'disabled' : '' ]"></iconCicleChoose>
+            <iconCicleUnchoose v-if="!button" v-show="item[prop.value] !== currentValue" :class="['pl-radio-icon', 'icon-unchecked', (calcDisabled || item[prop.disabled]) ? 'disabled' : '' ]"></iconCicleUnchoose>
             <span>
               <slot :item="item">{{item[prop.label]}}</slot>
             </span>
@@ -33,14 +34,16 @@
 
 <script>
 import validate from '../../src/assets/utils/validate'
-import icon from '../icon/index.vue'
+import iconCicleChoose from '../../src/assets/images/icon-cicle-choose.svg'
+import iconCicleUnchoose from '../../src/assets/images/icon-cicle-unchoose.svg'
 
 // radio
 export default {
   name: 'plRadio',
   componentName: 'plRadio',
   components: {
-    icon
+    iconCicleChoose,
+    iconCicleUnchoose
   },
   model: {
     event: '-pl-change'
@@ -149,7 +152,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 @import "../../src/assets/less/mixin.less";
 
 .pl-radio {
@@ -246,6 +249,15 @@ export default {
       margin-right: 0.5em;
       font-size: 1em;
 
+      &.disabled {
+        color: #ebedf0;
+      }
+      &.icon-checked {
+        color: var(--primary);
+      }
+      &.icon-unchecked {
+        color: #dcdfe6;
+      }
       & + span {
         display: inline-block;
         vertical-align: middle;

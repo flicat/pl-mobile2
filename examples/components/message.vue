@@ -8,75 +8,81 @@
   </div>
 </template>
 <script>
+import { getCurrentInstance } from 'vue'
 import swipe from './swipe.vue'
 
 export default {
-  methods: {
-    alert() {
-      this.$alert({
+  setup() {
+    const app = getCurrentInstance()
+    const { $alert, $confirm, $toast } = app.appContext.config.globalProperties
+
+    function alert() {
+      $alert({
         title: '提示',
         message: '这个一个弹窗！',
         buttonText: '确定',
         action: () => {
           // 确定
-          console.log('确定')
+          $toast('确定')
         }
       })
-    },
-    confirm() {
-      this.$confirm({
+    }
+    function confirm() {
+      $confirm({
         title: '提示',
         message: '这个一个确认弹窗！',
         submitText: '确定',
         cancelText: '取消',
         submit: () => {
           // 确定
-          console.log('确定')
+          $toast('确定')
         },
         cancel: () => {
           // 取消
-          console.log('取消')
+          $toast('取消')
         }
       })
-    },
-    dialog1() {
-      this.$alert({
+    }
+    async function dialog1() {
+      await $alert({
         component: swipe,
         componentProps: {
           isMsg: true
         },
         submitText: '确定',
-        cancelText: '取消',
-        action: () => {
-          // 确定
-          console.log('确定')
-        }
+        cancelText: '取消'
       })
-    },
-    dialog2() {
-      this.$confirm({
-        //          title: '提示',
-        component: swipe,
-        componentProps: {
-          isMsg: true
-        },
-        //          message: '这个一个确认弹窗！',
-        submitText: '确定',
-        cancelText: '取消',
-        submit: () => {
-          // 确定
-          console.log('确定')
-        },
-        cancel: () => {
-          // 取消
-          console.log('取消')
-        }
-      })
-    },
-    toast() {
-      this.$toast('消息提醒', 3000)    // 提示信息， 持续时间（可选，默认3000毫秒）
+      $toast('确定')
+    }
+    async function dialog2() {
+      try {
+        await $confirm({
+          //          title: '提示',
+          component: swipe,
+          componentProps: {
+            isMsg: true
+          },
+          //          message: '这个一个确认弹窗！',
+          submitText: '确定',
+          cancelText: '取消'
+        })
+        $toast('确定')
+      } catch (e) {
+        $toast('取消')
+      }
+    }
+    async function toast() {
+      await $toast('消息提醒1', 3000)    // 提示信息， 持续时间（可选，默认3000毫秒）
+      await $toast('消息提醒2', 3000)    // 提示信息， 持续时间（可选，默认3000毫秒）
     }
 
+    return {
+      alert,
+      confirm,
+      dialog1,
+      dialog2,
+      toast
+    }
   }
 }
 </script>

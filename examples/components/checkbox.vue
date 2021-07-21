@@ -21,10 +21,14 @@
 
     <h3>前置图标</h3>
     <pl-checkbox v-model="value" :options="data" :rules="rules" label="请选择：">
-      <pl-icon name="icon-dingwei" fill="#999" slot="prepend"></pl-icon>
+      <template v-slot:prepend>
+        <pl-icon name="icon-dingwei" fill="#999"></pl-icon>
+      </template>
     </pl-checkbox>
     <pl-checkbox v-model="value" :options="data" :rules="rules" label="请选择：" wrap ref="box2" required>
-      <pl-icon name="icon-dingwei" fill="#999" slot="prepend"></pl-icon>
+      <template v-slot:prepend>
+        <pl-icon name="icon-dingwei" fill="#999"></pl-icon>
+      </template>
     </pl-checkbox>
 
     <h3>竖排样式</h3>

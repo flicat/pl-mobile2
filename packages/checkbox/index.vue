@@ -21,8 +21,8 @@
           <template v-if="options && options.length">
             <div v-for="(item, i) in options" :key="i" class="pl-checkbox-item" :class="{'is-button': button, 'is-vertical': vertical}">
               <input type="checkbox" :disabled="calcDisabled || item[prop.disabled]" v-model="currentValue" :value="item[prop.value]" @change="emit">
-              <icon v-if="!button" class="pl-checkbox-icon icon-unchecked" name="icon-kongjianweixuan"></icon>
-              <icon v-if="!button" class="pl-checkbox-icon icon-checked" name="icon-kongjianxuanzhong"></icon>
+              <iconCheck v-if="!button" class="pl-checkbox-icon icon-checked"></iconCheck>
+              <iconUnCheck v-if="!button" class="pl-checkbox-icon icon-unchecked"></iconUnCheck>
               <span class="pl-checkbox-text">
                 <slot :item="item">{{item[prop.label]}}</slot>
               </span>
@@ -31,8 +31,8 @@
           <template v-else>
             <div class="pl-checkbox-item pl-toggle-box" :class="{'is-toggle': button, 'is-vertical': !button && vertical}">
               <input type="checkbox" :disabled="calcDisabled" v-model="currentValue" :true-value="trueValue" :false-value="falseValue" @change="emit">
-              <icon v-if="!button" class="pl-checkbox-icon icon-unchecked" name="icon-kongjianweixuan"></icon>
-              <icon v-if="!button" class="pl-checkbox-icon icon-checked" name="icon-kongjianxuanzhong"></icon>
+              <iconCheck v-if="!button" class="pl-checkbox-icon icon-checked"></iconCheck>
+              <iconUnCheck v-if="!button" class="pl-checkbox-icon icon-unchecked"></iconUnCheck>
               <span class="pl-checkbox-text">
                 <slot></slot>
               </span>
@@ -47,14 +47,16 @@
 
 <script>
 import validate from '../../src/assets/utils/validate'
-import icon from '../icon/index.vue'
+import iconCheck from '../../src/assets/images/icon-check.svg'
+import iconUnCheck from '../../src/assets/images/icon-uncheck.svg'
 
 // checkbox
 export default {
   name: 'plCheckbox',
   componentName: 'plCheckbox',
   components: {
-    icon
+    iconCheck,
+    iconUnCheck
   },
   model: {
     event: '-pl-change'
@@ -176,7 +178,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 @import "../../src/assets/less/mixin.less";
 
 .pl-checkbox {
@@ -291,9 +293,7 @@ export default {
           display: inline-block;
         }
         & ~ .pl-checkbox-icon {
-          :deep(svg) {
-            fill: var(--primary);
-          }
+          color: var(--primary);
         }
       }
       &:disabled {
@@ -302,9 +302,7 @@ export default {
           border-color: var(--checkbox-disabled-border);
         }
         & ~ .pl-checkbox-icon {
-          :deep(svg) {
-            fill: var(--checkbox-disabled-bg);
-          }
+          color: var(--checkbox-disabled-bg);
         }
       }
     }
@@ -315,6 +313,7 @@ export default {
       vertical-align: middle;
     }
     .pl-checkbox-icon {
+      color: var(--checkbox-bg);
       font-size: 1em;
 
       &.icon-unchecked {
@@ -322,9 +321,6 @@ export default {
       }
       &.icon-checked {
         display: none;
-      }
-      :deep(svg) {
-        fill: var(--checkbox-bg);
       }
     }
     &.is-vertical {

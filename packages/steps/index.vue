@@ -5,24 +5,26 @@
     </div>
     <div class="pl-steps-toggle" v-if="direction === 'vertical' && items.length > 1" @click="toggle">
       <span v-if="isFold">
-        <icon fill="#C2C5CE" name="icon-icon_more_down"></icon>展开
+        <iconMoreDown class="pl-steps-icon"></iconMoreDown>展开
       </span>
       <span v-else>
-        <icon fill="#C2C5CE" name="icon-icon_more_up"></icon>收起
+        <iconMoreUp class="pl-steps-icon"></iconMoreUp>收起
       </span>
     </div>
   </div>
 </template>
 
 <script>
-import icon from '../icon/index.vue'
+import iconMoreDown from '../../src/assets/images/icon-more-down.svg'
+import iconMoreUp from '../../src/assets/images/icon-more-up.svg'
 
 // steps
 export default {
   name: 'plSteps',
   componentName: 'plSteps',
   components: {
-    icon
+    iconMoreDown,
+    iconMoreUp
   },
   provide() {
     return {
@@ -95,7 +97,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 @import "../../src/assets/less/mixin.less";
 .pl-steps {
   overflow: hidden;
@@ -117,9 +119,10 @@ export default {
     color: var(--steps-toggle-text);
     padding: 1em 0;
 
-    :deep(.pl-icon) {
+    .pl-steps-icon {
       vertical-align: text-bottom;
       margin-right: 0.2em;
+      color: #c2c5ce;
     }
   }
 

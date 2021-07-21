@@ -1,5 +1,5 @@
 {
-  "name": "pl-mobile2",
+  "name": "index",
   "version": "1.0.0",
   "scripts": {
     "start": "npm run build & npm run build:docs",
@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "async-validator": "^3.5.2",
-    "vue": "^3.0.5",
+    "vue": "^3.1.4",
     "vue-router": "^4.0.10"
   },
   "devDependencies": {
@@ -21,18 +21,18 @@
     "qrious": "^4.0.2",
     "vite": "^2.4.2",
     "vite-plugin-md2vue": "^1.0.0",
-    "whatwg-fetch": "^3.6.2"
+    "vite-svg-loader": "^2.1.0"
   },
   "files": [
     "lib"
   ],
-  "main": "./lib/pl-mobile2.umd.js",
-  "module": "./lib/pl-mobile2.es.js",
+  "main": "./lib/index.umd.js",
+  "module": "./lib/index.es.js",
   "style": "./lib/style.css",
   "exports": {
     ".": {
-      "import": "./lib/pl-mobile2.es.js",
-      "require": "./lib/pl-mobile2.umd.js"
+      "import": "./lib/index.es.js",
+      "require": "./lib/index.umd.js"
     }
   }
 }

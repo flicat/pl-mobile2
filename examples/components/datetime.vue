@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <h3>基础用法</h3>
-    <pl-datetime placeholder="请选择日期" v-model="date" type="date"></pl-datetime>
+    <pl-datetime placeholder="请选择日期" v-model="date" type="date" clearable></pl-datetime>
 
     <h3>时间选择</h3>
     <pl-datetime label="请选择时间：" v-model="time" type="time" @change="onChange" valueFormat="H:I" clearable></pl-datetime>

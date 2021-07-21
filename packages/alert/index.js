@@ -4,9 +4,6 @@ import { createApp, h, nextTick } from 'vue'
 // alert
 export default function (App) {
   let Alert = createApp({
-    components: {
-      plAlert
-    },
     render() {
       return this.display && h('div', {
         style: {
@@ -14,16 +11,14 @@ export default function (App) {
           opacity: this.visible ? 1 : 0
         }
       }, [
-        h('plAlert', {
-          props: {
-            title: this.title,
-            message: this.message,
-            component: this.component,
-            componentProps: this.componentProps,
-            html: this.html,
-            buttonText: this.buttonText,
-            action: this.action
-          }
+        h(plAlert, {
+          title: this.title,
+          message: this.message,
+          component: this.component,
+          componentProps: this.componentProps,
+          html: this.html,
+          buttonText: this.buttonText,
+          action: this.action
         })
       ]) || null
     },
@@ -60,26 +55,24 @@ export default function (App) {
     }
   })
 
+  const alertDom = document.createElement('div')
+  document.body.appendChild(alertDom)
+  const vm = Alert.mount(alertDom)
 
-  async function showAlert({ title, message, component, componentProps, html, buttonText, action }) {
-    Alert.title = title || ''
-    Alert.component = component
-    Alert.componentProps = componentProps || {}
-    Alert.html = !!html && !component
-    Alert.message = !component && message || ''
-    Alert.buttonText = buttonText || '好'
-    Alert.action = action || null
-    Alert.show()
+  App.config.globalProperties.$alert = async function ({ title, message, component, componentProps, html, buttonText, action }) {
+    vm.title = title || ''
+    vm.component = component
+    vm.componentProps = componentProps || {}
+    vm.html = !!html && !component
+    vm.message = !component && message || ''
+    vm.buttonText = buttonText || '好'
+    vm.action = action || null
+    vm.show()
     await new Promise((resolve, reject) => {
-      Alert.action = async () => {
-        await Alert.hide()
+      vm.action = async () => {
+        await vm.hide()
         resolve(typeof action === 'function' ? action() : null)
       }
     })
   }
-
-  App.config.globalProperties.$alert = showAlert
-  let alertDom = document.createElement('div')
-  Alert.mount(alertDom)
-  document.body.appendChild(alertDom)
 }

@@ -235,7 +235,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 @import "../../src/assets/less/mixin.less";
 
 .pl-canvas {

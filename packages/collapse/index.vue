@@ -4,7 +4,7 @@
       <div class="pl-collapse-title">
         <slot name="title">{{title}}</slot>
       </div>
-      <icon v-if="!disabled" name="icon-enter" fill="#ccc" :class="['icon-arrow', visible ? 'show' : 'hide']"></icon>
+      <iconEnter v-if="!disabled" :class="['icon-arrow', visible ? 'show' : 'hide']"></iconEnter>
     </div>
     <div class="pl-collapse-content" v-show="currentValue">
       <div :class="['pl-collapse-inner', visible ? 'show' : 'hide']">
@@ -15,14 +15,14 @@
 </template>
 
 <script>
-import icon from '../icon/index.vue'
+import iconEnter from '../../src/assets/images/icon-enter.svg'
 
 // 效果优化，样式调整
 export default {
   name: 'plCollapse',
   componentName: 'plCollapse',
   components: {
-    icon
+    iconEnter
   },
   model: {
     event: '-pl-change'
@@ -73,7 +73,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 @keyframes show {
   from {
     transform: translateY(-100%);
@@ -103,6 +103,8 @@ export default {
     align-items: center;
     outline: 0 none;
     .icon-arrow {
+      display: inline-block;
+      color: #ccc;
       transition: all 150ms ease;
       &.show {
         transform: rotate(90deg);

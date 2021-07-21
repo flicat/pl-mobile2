@@ -27,10 +27,14 @@
 
     <h3>前置图标</h3>
     <pl-radio v-model="value" :options="data" label="请选择：" :rules="rules" ref="radio2" wrap required>
-      <pl-icon name="icon-dingwei" fill="#999" slot="prepend"></pl-icon>
+      <template v-slot:prepend>
+        <pl-icon name="icon-dingwei" fill="#999"></pl-icon>
+      </template>
     </pl-radio>
     <pl-radio v-model="value" :options="data" label="请选择：" :rules="rules" ref="radio3" required>
-      <pl-icon name="icon-dingwei" fill="#999" slot="prepend"></pl-icon>
+      <template v-slot:prepend>
+        <pl-icon name="icon-dingwei" fill="#999"></pl-icon>
+      </template>
     </pl-radio>
 
     <h3>自定义子节点</h3>

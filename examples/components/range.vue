@@ -21,17 +21,21 @@
 
     <h3>图标填充</h3>
     <pl-range v-model="value" :min="0" :max="100" :step="1" label="请选择：" @change="onChange" :rules="rules" ref="range3" required>
-      <pl-icon name="icon-dingwei" fill="#999" slot="prepend"></pl-icon>
-      <span slot="append">{{value}}%</span>
+      <template v-slot:prepend>
+        <pl-icon name="icon-dingwei" fill="#999"></pl-icon>
+      </template>
+      <template v-slot:append>{{value}}%</template>
     </pl-range>
     <pl-range v-model="value" :min="0" :max="100" :step="1" label="请选择：" @change="onChange" :rules="rules" ref="range4" required wrap>
-      <pl-icon name="icon-dingwei" fill="#999" slot="prepend"></pl-icon>
-      <span slot="append">{{value}}%</span>
+      <template v-slot:prepend>
+        <pl-icon name="icon-dingwei" fill="#999"></pl-icon>
+      </template>
+      <template v-slot:append>{{value}}%</template>
     </pl-range>
 
     <h3>自定义滑块</h3>
     <pl-range v-model="value" :min="0" :max="100" :step="1" label="请选择：" @change="onChange" :rules="rules" ref="range5" required>
-      <span slot="thumb" class="thumb">{{value}}%</span>
+      <template v-slot:thumb><span class="thumb">{{value}}%</span></template>
     </pl-range>
 
     <pl-cell :span="[1]">

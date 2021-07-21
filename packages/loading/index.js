@@ -5,9 +5,6 @@ import { createApp, h } from 'vue'
 plLoading.install = function (App) {
   // loading
   let loading = createApp({
-    components: {
-      plLoading
-    },
     data() {
       return {
         vertical: true,
@@ -29,10 +26,8 @@ plLoading.install = function (App) {
           backgroundColor: 'rgba(0, 0, 0, 0.5)'
         }
       }, [
-        h('plLoading', {
-          props: {
-            vertical: this.vertical
-          },
+        h(plLoading, {
+          vertical: this.vertical,
           style: {
             color: '#fff',
             margin: 'auto'
@@ -42,29 +37,29 @@ plLoading.install = function (App) {
     }
   })
 
+
+  const loadingDom = document.createElement('div')
+  document.body.appendChild(loadingDom)
+  const vm = loading.mount(loadingDom)
+
+
+  App.component(plLoading.name, plLoading);
+
   let loadingCount = 0
 
-  function showLoading(text, vertical) {
+  App.config.globalProperties.$loadingShow = function (text, vertical) {
     loadingCount++
-    loading.isShow = true
-    loading.text = text
+    vm.isShow = true
+    vm.text = text
     if (typeof vertical === 'boolean') {
-      loading.vertical = vertical
+      vm.vertical = vertical
     }
   }
 
-  function hideLoading() {
+  App.config.globalProperties.$loadingHide = function () {
     loadingCount--
-    loading.isShow = loadingCount > 0
+    vm.isShow = loadingCount > 0
   }
-
-  App.component(plLoading.name, plLoading);
-  App.config.globalProperties.$loadingShow = showLoading
-  App.config.globalProperties.$loadingHide = hideLoading
-
-  let loadingDom = document.createElement('div')
-  loading.mount(loadingDom)
-  document.body.appendChild(loadingDom)
 };
 
 export default plLoading;

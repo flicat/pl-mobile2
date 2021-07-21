@@ -4,9 +4,7 @@
  * @description Description
  */
 
-import 'whatwg-fetch'
-import './polyfill-patch-fetch'
-import {is} from '../../src/assets/utils'
+import { is } from '../../src/assets/utils'
 
 /*
 * @params {String} url                    请求URL地址
@@ -21,7 +19,7 @@ import {is} from '../../src/assets/utils'
 * @params {AbortController} signal        AbortSignal 接口表示一个信号对象（ signal object ），它允许您通过 AbortController 对象与DOM请求（如Fetch）进行通信并在需要时将其中止。
 * @params {Function} onDownload           onDownload 回调方法
 * */
-export default function ({url, baseUrl, method = 'POST', data, headers = {}, type = 'json', mode, credentials, cache = 'no-cache', signal, onDownload, redirect}) {
+export default function ({ url, baseUrl, method = 'POST', data, headers = {}, type = 'json', mode, credentials, cache = 'no-cache', signal, onDownload, redirect }) {
   // 请求地址
   let requestUrl = /^https?:\/\//.test(url) ? url : [baseUrl.replace(/\/$/, ''), url.replace(/^\//, '')].join('/')
 
@@ -95,7 +93,7 @@ export default function ({url, baseUrl, method = 'POST', data, headers = {}, typ
         const total = Number(resCopy.headers.get('content-length')) || 0
         const reader = resCopy.body.getReader()
         const read = () => {
-          reader.read().then(({value, done}) => {
+          reader.read().then(({ value, done }) => {
             if (done) {
               return
             }

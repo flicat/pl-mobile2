@@ -3,8 +3,10 @@
  * @date 2018/7/28 028
  * @description api 接口
  */
+import factory from './polyfill-patch-fetch'
 import request from './fetch'
 
+// TODO tree shake
 const API = {}
 const defaultConfig = {}
 const middleware = []
@@ -47,6 +49,8 @@ function getHandler(options) {
 }
 
 export default function (App) {
+  factory()
+
   App.config.globalProperties.$fetch = API
 
   // 设置默认配置信息

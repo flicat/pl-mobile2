@@ -10,11 +10,6 @@ Datetime.install = function (App) {
   App.component(Datetime.name, Datetime);
 
   let Calendar = createApp({
-    components: {
-      plMonth,
-      plTime,
-      plDate
-    },
     render() {
       return this.display && h('div', {
         style: {
@@ -22,13 +17,13 @@ Datetime.install = function (App) {
           opacity: this.visible ? 1 : 0
         }
       }, [
-        h('plMonth', {
+        h(plMonth, {
           ref: 'month'
         }),
-        h('plTime', {
+        h(plTime, {
           ref: 'time'
         }),
-        h('plDate', {
+        h(plDate, {
           ref: 'date'
         })
       ]) || null
@@ -65,9 +60,13 @@ Datetime.install = function (App) {
     }
   })
 
-  function showCalendar(options) {
+  const calendarDom = document.createElement('div')
+  document.body.appendChild(calendarDom)
+  const vm = Calendar.mount(calendarDom)
+
+  App.config.globalProperties.$calendar = function (options) {
     return new Promise((resolve, reject) => {
-      Calendar.options = Object.assign({}, options, {
+      vm.options = Object.assign({}, options, {
         callback: result => {
           let time = result
           if (options.format) {
@@ -80,15 +79,9 @@ Datetime.install = function (App) {
           resolve(time)
         }
       })
-      Calendar.show()
+      vm.show()
     })
   }
-
-  App.config.globalProperties.$calendar = showCalendar
-
-  let calendarDom = document.createElement('div')
-  Calendar.mount(calendarDom)
-  document.body.appendChild(calendarDom)
 };
 
 export default Datetime;

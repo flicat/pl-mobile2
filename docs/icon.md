@@ -7,6 +7,14 @@
 <template>
   <pl-icon name="icon-icon_rukou"/>
 </template>
+<script>
+  import { icon } from 'pl-mobile2'
+  export default {
+    components: {
+      'pl-icon': icon
+    }
+  }
+</script>
 ```
 
 ### Attributes

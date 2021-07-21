@@ -27,8 +27,12 @@
 
     <h3>前后图标</h3>
     <pl-select label="请选择：" placeholder="请选择" v-model="value1" :options="data" @change="change" :rules="rules1" ref="select3" clearable required>
-      <pl-icon name="icon-dingwei" fill="#999" slot="prepend"></pl-icon>
-      <pl-icon name="icon-people_fill" fill="#999" slot="append"></pl-icon>
+      <template v-slot:prepend>
+        <pl-icon name="icon-dingwei" fill="#999"></pl-icon>
+      </template>
+      <template v-slot:append>
+        <pl-icon name="icon-people_fill" fill="#999"></pl-icon>
+      </template>
     </pl-select>
 
     <br /><br /><br />

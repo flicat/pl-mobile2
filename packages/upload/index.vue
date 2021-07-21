@@ -5,7 +5,7 @@
         <div class="pl-file-preview">
           <div class="pl-upload-img" :class="[file.type]" :style="file.preview ? {'background-image': `url(${file.preview})`} : null" @click="preview(file)"></div>
           <div class="pl-upload-del" v-if="!disabled" @click="delFile(i)">
-            <icon name="icon-roundclosefill"></icon>
+            <iconClose></iconClose>
           </div>
           <slot :file="file"></slot>
         </div>
@@ -15,7 +15,7 @@
           <input type="file" class="file-input" :multiple="multiple" :accept="accept" :capture="capture" @change="setFiles">
           <slot name="button">
             <div class="pl-add-button">
-              <icon name="icon-jia" class="pl-upload-add"></icon>
+              <iconPlus class="pl-upload-add"></iconPlus>
             </div>
           </slot>
         </div>
@@ -33,14 +33,16 @@
 </template>
 
 <script>
-import icon from '../icon/index.vue'
+import iconClose from '../../src/assets/images/icon-close.svg'
+import iconPlus from '../../src/assets/images/icon-plus.svg'
 import { is } from '../../src/assets/utils'
 
 export default {
   name: 'plUpload',
   componentName: 'plUpload',
   components: {
-    icon
+    iconClose,
+    iconPlus
   },
   model: {
     event: '-pl-change'
@@ -238,7 +240,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .pl-upload {
   * {
     box-sizing: border-box;

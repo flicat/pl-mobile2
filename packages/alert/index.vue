@@ -44,7 +44,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .pl-alert {
   display: flex;
   position: fixed;

@@ -25,10 +25,10 @@
           <span class="placeholder" v-else>{{placeholder}}</span>
         </div>
         <div class="pl-select-clear" @touchstart.stop.prevent="clear" @mousedown.stop.prevent="clear" v-show="showClear">
-          <icon name="icon-roundclosefill" fill="#ccc"></icon>
+          <iconClose class="pl-select-icon"></iconClose>
         </div>
         <div class="pl-select-icon">
-          <icon name="icon-unfold1" class="icon-arrow" fill="#ccc"></icon>
+          <iconUnfold class="pl-select-icon"></iconUnfold>
         </div>
         <div class="pl-select-append" v-if="$slots.append">
           <slot name="append"></slot>
@@ -51,7 +51,7 @@
               <span>
                 <slot :item="item">{{item[prop.label]}}</slot>
               </span>
-              <icon name="icon-duigou" class="checked-icon"></icon>
+              <iconHook class="pl-select-icon checked-icon"></iconHook>
             </li>
           </ul>
         </div>
@@ -61,7 +61,9 @@
 </template>
 
 <script>
-import icon from '../icon/index.vue'
+import iconClose from '../../src/assets/images/icon-close.svg'
+import iconHook from '../../src/assets/images/icon-hook.svg'
+import iconUnfold from '../../src/assets/images/icon-unfold.svg'
 import popup from '../popup/index.vue'
 import { is } from '../../src/assets/utils'
 import validate from '../../src/assets/utils/validate'
@@ -70,7 +72,9 @@ export default {
   name: 'plSelect',
   componentName: 'plSelect',
   components: {
-    icon,
+    iconClose,
+    iconHook,
+    iconUnfold,
     popup
   },
   model: {
@@ -242,7 +246,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 @import "../../src/assets/less/mixin.less";
 
 .pl-select {
@@ -354,13 +358,8 @@ export default {
     padding-right: 0.4em;
   }
   &-clear {
+    line-height: 0;
     margin-left: 0.4em;
-
-    .icon-clear {
-      width: 1.2em;
-      height: 1.2em;
-      vertical-align: bottom;
-    }
   }
   &-error {
     padding: 0 0.5em;
@@ -368,16 +367,7 @@ export default {
     line-height: 2em;
   }
   &-icon {
-    .icon-arrow {
-      /*display: block;*/
-      /*width: 0;*/
-      /*height: 0;*/
-      /*border: 3px solid;*/
-      /*border-color: transparent transparent currentColor currentColor;*/
-      /*transform: rotate(-45deg);*/
-      /*transform-origin: 0 0;*/
-      /*opacity: 0.6;*/
-    }
+    color: #ccc;
   }
 
   &.is-disabled {
@@ -448,10 +438,7 @@ export default {
         .checked-icon {
           margin-left: auto;
           display: none;
-
-          :deep(svg) {
-            fill: var(--primary);
-          }
+          color: var(--primary);
         }
         .inner-input {
           position: absolute;

@@ -1,13 +1,29 @@
 <template>
   <i class="pl-icon" v-bind="$attrs" :style="style">
-    <svg v-if="name && !src" class="icon-svg" aria-hidden="true">
-      <use :fill="fill" :stroke="stroke" :xlink:href="'#' + name"></use>
+    <svg v-if="href && !src" class="icon-svg" aria-hidden="true">
+      <use :fill="fill" :stroke="stroke" :xlink:href="href"></use>
     </svg>
   </i>
 </template>
 
 <script>
-import './iconfont.js'
+import { computed } from 'vue'
+
+let hasLoadScgIcon = false
+async function loadSvgIcon() {
+  if (hasLoadScgIcon) {
+    return
+  }
+  hasLoadScgIcon = true
+
+  const iconfontUrl = new URL('../../src/assets/utils/iconfont.js', import.meta.url)
+  let script = document.createElement('script')
+  script.setAttribute('src', iconfontUrl)
+  document.head.appendChild(script)
+  script.onload = script.onreadystatechange = function () {
+    script = null
+  }
+}
 
 export default {
   name: 'plIcon',
@@ -25,15 +41,23 @@ export default {
     fill: String,       // svg 填充颜色
     stroke: String        // svg 描边颜色
   },
-  computed: {
-    style() {
-      if (this.src) {
+  setup(props) {
+    loadSvgIcon()
+    const style = computed(() => {
+      if (props.src) {
         return {
-          backgroundImage: 'url(' + this.src + ')'
+          backgroundImage: 'url(' + props.src + ')'
         }
       } else {
         return null
       }
+    })
+    const href = computed(() => {
+      return props.name ? '#' + props.name : ''
+    })
+    return {
+      style,
+      href
     }
   }
 }

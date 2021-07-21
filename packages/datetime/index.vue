@@ -30,7 +30,7 @@
           </div>
         </div>
         <div class="pl-datetime-clear" @touchstart.stop.prevent="clear" @mousedown.stop.prevent="clear">
-          <icon name="icon-roundclosefill" fill="#ccc" v-if="showClear"></icon>
+          <iconClose class="pl-datetime-clear-icon" v-if="showClear"></iconClose>
         </div>
         <div class="pl-datetime-append" v-if="$slots.append">
           <slot name="append"></slot>
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import icon from '../icon/index.vue'
+import iconClose from '../../src/assets/images/icon-close.svg'
 import plMonth from './month.vue'
 import plTime from './time.vue'
 import plDate from './datetime.vue'
@@ -57,7 +57,7 @@ export default {
   name: 'plDatetime',
   componentName: 'plDatetime',
   components: {
-    icon,
+    iconClose,
     plMonth,
     plTime,
     plDate
@@ -287,7 +287,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 @import "../../src/assets/less/mixin.less";
 
 .pl-datetime {
@@ -404,12 +404,11 @@ export default {
     padding-right: 0.4em;
   }
   &-clear {
+    line-height: 0;
     margin-left: 0.4em;
 
-    .icon-clear {
-      width: 1.2em;
-      height: 1.2em;
-      vertical-align: bottom;
+    &-icon {
+      color: #ccc;
     }
   }
   &-error {
