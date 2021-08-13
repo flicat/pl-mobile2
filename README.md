@@ -27,9 +27,7 @@ import 'pl-mobile2/lib/style.css'
 #### 按需引入
 ```
 <template>
-  <div>
-    <pl-button type="default">按钮</pl-button>
-  </div>
+  <pl-button type="default">按钮</pl-button>
 </template>
 
 <script>

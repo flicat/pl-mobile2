@@ -186,6 +186,7 @@ export function getMonthDiff(date1, date2) {
   return diff
 }
 
+// 获取对象类型
 export function getType(target) {
   return Object.prototype.toString.call(target).match(/\[object (\w+)\]/)[1].toLowerCase()
 }
