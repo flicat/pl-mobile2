@@ -35,31 +35,34 @@
   </div>
 </template>
 <script>
-  export default {
-    methods: {
-      open (position) {
-        this.$refs['popup-' + position].open()
-      }
+export default {
+  methods: {
+    open(position) {
+      this.$refs['popup-' + position].open()
     }
   }
+}
 </script>
 
 <style lang="less" scoped>
-  .popup-inner {
-    background-color: #fff;
-    &.center {
-      width: 10em;
-      height: 10em;
-    }
-    &.left,
-    &.right {
-      width: 70vw;
-      height: 100%;
-    }
-    &.top,
-    &.bottom {
-      width: 100%;
-      height: 50vh;
-    }
+.popup-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  &.center {
+    width: 10em;
+    height: 10em;
   }
+  &.left,
+  &.right {
+    width: 70vw;
+    height: 100%;
+  }
+  &.top,
+  &.bottom {
+    width: 100%;
+    height: 50vh;
+  }
+}
 </style>

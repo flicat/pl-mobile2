@@ -1,20 +1,22 @@
 import plConfirm from './index.vue'
-import { createApp, h, nextTick } from 'vue'
+import { render, h, nextTick, markRaw } from 'vue'
 // confirm
 export default function (App) {
-  let Confirm = createApp({
+  let vNode = h({
     render() {
       return this.display && h('div', {
         style: {
           transition: 'all 0.3s ease',
-          opacity: this.visible ? 1 : 0
+          opacity: this.visible ? 1 : 0,
+          position: 'relative',
+          zIndex: 998
         }
       }, [
         h(plConfirm, {
           title: this.title,
           message: this.message,
           html: this.html,
-          component: this.component,
+          comp: this.comp,
           componentProps: this.componentProps,
           submitText: this.submitText,
           cancelText: this.cancelText,
@@ -23,7 +25,7 @@ export default function (App) {
         })
       ]) || null
     },
-    data: function () {
+    data() {
       return {
         display: false,
         visible: false,
@@ -31,7 +33,7 @@ export default function (App) {
         title: '',                 // 弹框标题
         message: '',               // 弹框主体信息
         html: false,               // 是否显示为HTML
-        component: null,          // 子组件
+        comp: null,          // 子组件
         componentProps: {},       // 子组件props
         submitText: '',            // 提交按钮文字
         cancelText: '',            // 取消按钮文字
@@ -58,28 +60,29 @@ export default function (App) {
     }
   })
 
-  const confirmDom = document.createElement('div')
-  document.body.appendChild(confirmDom)
-  const vm = Confirm.mount(confirmDom)
+  const vNodeDom = document.createElement('div')
+  document.body.appendChild(vNodeDom)
+  vNode.appContext = App._context
+  render(vNode, vNodeDom)
 
   App.config.globalProperties.$confirm = async function ({ title, message, component, componentProps, html, submitText, cancelText, submit, cancel }) {
-    vm.component = component
-    vm.componentProps = componentProps || {}
-    vm.html = !!html && !component
-    vm.message = !component && message || ''
-    vm.title = title || ''
-    vm.submitText = submitText || '确认'
-    vm.cancelText = cancelText || '取消'
-    vm.show()
+    vNode.component.proxy.comp = component ? markRaw(component) : null
+    vNode.component.proxy.componentProps = componentProps || {}
+    vNode.component.proxy.html = !!html && !component
+    vNode.component.proxy.message = !component && message || ''
+    vNode.component.proxy.title = title || ''
+    vNode.component.proxy.submitText = submitText || '确认'
+    vNode.component.proxy.cancelText = cancelText || '取消'
+    vNode.component.proxy.show()
 
-    await new Promise((resolve, reject) => {
-      vm.submit = async () => {
-        await vm.hide()
-        resolve(typeof submit === 'function' ? submit() : null)
+    return new Promise((resolve, reject) => {
+      vNode.component.proxy.submit = async () => {
+        await vNode.component.proxy.hide()
+        typeof submit === 'function' ? submit() : resolve()
       }
-      vm.cancel = async () => {
-        await vm.hide()
-        reject(typeof cancel === 'function' ? cancel() : null)
+      vNode.component.proxy.cancel = async () => {
+        await vNode.component.proxy.hide()
+        typeof cancel === 'function' ? cancel() : reject()
       }
     })
   }

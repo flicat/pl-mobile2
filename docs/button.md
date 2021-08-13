@@ -8,21 +8,19 @@
 使用`type`、`round`和`circle`属性来定义 Button 的样式。
 
 ```html
-<pl-cell>
+<template>
   <pl-button type="default">默认按钮</pl-button>
   <pl-button type="primary">主要按钮</pl-button>
   <pl-button type="success">成功按钮</pl-button>
   <pl-button type="warning">警告按钮</pl-button>
   <pl-button type="danger">危险按钮</pl-button>
-</pl-cell>
 
-<pl-cell>
   <pl-button round>圆角按钮</pl-button>
   <pl-button type="primary" round>主要按钮</pl-button>
   <pl-button type="success" round>成功按钮</pl-button>
   <pl-button type="warning" round>警告按钮</pl-button>
   <pl-button type="danger" round>危险按钮</pl-button>
-</pl-cell>
+</template>
 ```
 
 ### 禁用状态
@@ -32,13 +30,13 @@
 你可以使用`disabled`属性来定义按钮是否可用，它接受一个`Boolean`值。
 
 ```html
-<pl-cell>
+<template>
   <pl-button disabled>默认按钮</pl-button>
   <pl-button type="primary" disabled>主要按钮</pl-button>
   <pl-button type="success" disabled>成功按钮</pl-button>
   <pl-button type="warning" disabled>警告按钮</pl-button>
   <pl-button type="danger" disabled>危险按钮</pl-button>
-</pl-cell>
+</template>
 ```
 
 ### 文字按钮
@@ -46,8 +44,10 @@
 没有边框和背景色的按钮。
 
 ```html
-<pl-button type="text">文字按钮</pl-button>
-<pl-button type="text" disabled>文字按钮</pl-button>
+<template>
+  <pl-button type="text">文字按钮</pl-button>
+  <pl-button type="text" disabled>文字按钮</pl-button>
+</template>
 ```
 
 ### 不同尺寸
@@ -57,11 +57,11 @@ Button 组件提供除了默认值以外的三种尺寸，可以在不同场景�
 额外的尺寸：`normal`、`small`、`lager`，通过设置`size`属性来配置它们。
 
 ```html
-<pl-cell>
+<template>
   <pl-button>默认按钮</pl-button>
   <pl-button size="small">小型按钮</pl-button>
   <pl-button size="lager">大型按钮</pl-button>
-</pl-cell>
+</template>
 ```
 
 ### Attributes
@@ -75,6 +75,6 @@ Button 组件提供除了默认值以外的三种尺寸，可以在不同场景�
 | disabled  | 是否禁用状态    | boolean   | —   | false   |
 
 ### Slots
-| name      | 说明    | 
+| name      | 说明    |
 |---------- |-------- |
 | (default)     |   按钮inner   |

@@ -2,18 +2,19 @@
   <div class="pl-step" :class="['pl-step--' + direction]">
     <div class="pl-step-circle">
       <slot name="icon">
-        <iconCicleChoose v-if="active" class="pl-step-item-icon" :style="{color: activeColor}"></iconCicleChoose>
+        <iconCicleChoose v-if="isActive" class="pl-step-item-icon" :style="{color: currentColor}"></iconCicleChoose>
         <i class="icon-default" v-else></i>
       </slot>
       <div v-if="!isLast" class="pl-step-line"></div>
     </div>
-    <div class="pl-step-title" :style="{color: active ? activeColor : '#9898B6'}">
+    <div class="pl-step-title" :style="{color: isActive ? currentColor : '#9898B6'}">
       <slot></slot>
     </div>
   </div>
 </template>
 
 <script>
+import { inject, onMounted, onUnmounted, getCurrentInstance, computed } from 'vue'
 import iconCicleChoose from '../../src/assets/images/icon-cicle-choose.svg'
 
 // step-item
@@ -23,42 +24,38 @@ export default {
   components: {
     iconCicleChoose
   },
-  inject: {
-    steps: {
-      default: {}
-    }
-  },
-  data() {
-    return {};
-  },
-  computed: {
-    isFirst() {
-      return this.steps.items.indexOf(this) === 0
-    },
-    isLast() {
-      return this.steps.items.indexOf(this) === this.steps.items.length - 1
-    },
-    active() {
-      const index = this.steps.items.indexOf(this)
-      const active = this.steps.active
-      return index === active
-    },
-    activeColor() {
-      return this.steps.activeColor || 'currentColor'
-    },
-    direction() {
-      return this.steps.direction
-    }
-  },
+  setup() {
+    const app = getCurrentInstance()
+    const active = inject('active')
+    const items = inject('items')
+    const direction = inject('direction')
+    const activeColor = inject('activeColor')
+    const updateItems = inject('updateItems')
+    const removeItem = inject('removeItem')
 
-  mounted() {
-    this.steps.updateItems();
-  },
-  destroyed() {
-    if (this.$el && this.$el.parentNode) {
-      this.$el.parentNode.removeChild(this.$el);
+    const isLast = computed(() => {
+      return items.indexOf(app) === items.length - 1
+    })
+    const isActive = computed(() => {
+      return items.indexOf(app) === active.value
+    })
+    const currentColor = computed(() => {
+      return activeColor.value || 'currentColor'
+    })
+
+    onMounted(() => {
+      updateItems(app)
+    })
+    onUnmounted(() => {
+      removeItem(app);
+    })
+
+    return {
+      direction,
+      isActive,
+      currentColor,
+      isLast
     }
-    this.steps.removeItem(this);
   }
 }
 </script>

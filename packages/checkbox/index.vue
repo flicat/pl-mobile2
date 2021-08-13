@@ -20,7 +20,7 @@
         <div class="pl-checkbox-inner">
           <template v-if="options && options.length">
             <div v-for="(item, i) in options" :key="i" class="pl-checkbox-item" :class="{'is-button': button, 'is-vertical': vertical}">
-              <input type="checkbox" :disabled="calcDisabled || item[prop.disabled]" v-model="currentValue" :value="item[prop.value]" @change="emit">
+              <input type="checkbox" :disabled="calcDisabled || item[prop.disabled]" v-model="currentValue" :value="item[prop.value]">
               <iconCheck v-if="!button" class="pl-checkbox-icon icon-checked"></iconCheck>
               <iconUnCheck v-if="!button" class="pl-checkbox-icon icon-unchecked"></iconUnCheck>
               <span class="pl-checkbox-text">
@@ -30,7 +30,7 @@
           </template>
           <template v-else>
             <div class="pl-checkbox-item pl-toggle-box" :class="{'is-toggle': button, 'is-vertical': !button && vertical}">
-              <input type="checkbox" :disabled="calcDisabled" v-model="currentValue" :true-value="trueValue" :false-value="falseValue" @change="emit">
+              <input type="checkbox" :disabled="calcDisabled" v-model="currentValue" :true-value="trueValue" :false-value="falseValue">
               <iconCheck v-if="!button" class="pl-checkbox-icon icon-checked"></iconCheck>
               <iconUnCheck v-if="!button" class="pl-checkbox-icon icon-unchecked"></iconUnCheck>
               <span class="pl-checkbox-text">
@@ -46,6 +46,7 @@
 </template>
 
 <script>
+import { ref, computed, onMounted, getCurrentInstance, inject, onUnmounted, watch } from 'vue'
 import validate from '../../src/assets/utils/validate'
 import iconCheck from '../../src/assets/images/icon-check.svg'
 import iconUnCheck from '../../src/assets/images/icon-uncheck.svg'
@@ -57,9 +58,6 @@ export default {
   components: {
     iconCheck,
     iconUnCheck
-  },
-  model: {
-    event: '-pl-change'
   },
   props: {
     rules: {          // 验证规则
@@ -98,81 +96,73 @@ export default {
     label: String,                // 左侧 label
     labelWidth: String            // label 宽度
   },
-  inject: {
-    form: {
-      default: null
-    }
-  },
-  data() {
-    return {
-      currentValue: this.value === undefined ? '' : this.value,
-      ruleMessage: ''     // 验证错误提示信息
-    }
-  },
-  computed: {
-    calcSize() {
-      return this.size || this.form && this.form.size || 'normal'
-    },
-    calcLabelWidth() {
-      return this.labelWidth || this.form && this.form.labelWidth || null
-    },
-    calcDisabled() {
-      return this.disabled !== undefined ? this.disabled : this.form && this.form.disabled !== undefined ? this.form.disabled : false
-    },
-    // 定义验证规则的type
-    calcRules() {
-      if (Array.isArray(this.rules)) {
-        return this.rules.map(item => {
-          item.type = 'array'
-          return item
-        })
-      } else {
-        return []
+  setup(props, context) {
+    const app = getCurrentInstance()
+    const ruleMessage = ref('')     // 验证错误提示信息
+    const currentValue = computed({
+      get: () => {
+        return props.value === undefined ? '' : props.value
+      },
+      set: val => {
+        context.emit('update:value', val)
       }
-    }
-  },
-  mounted() {
-    if (this.form) {
-      this.form.updateItems(this);
-    }
-  },
-  methods: {
+    })
+
+    const formSize = inject('size', props.size)
+    const formLabelWidth = inject('labelWidth', props.labelWidth)
+    const formDisabled = inject('disabled', props.disabled)
+    const formUpdateItems = inject('updateItems', () => { })
+    const formRemoveItem = inject('removeItem', () => { })
+
+    const calcSize = computed(() => {
+      return props.size || formSize && formSize.value || 'normal'
+    })
+    const calcLabelWidth = computed(() => {
+      return props.labelWidth || formLabelWidth && formLabelWidth.value || null
+    })
+    const calcDisabled = computed(() => {
+      return props.disabled !== undefined ? props.disabled : formDisabled && formDisabled.value !== undefined ? formDisabled.value : false
+    })
+
     // 手动验证方法
-    validate() {
-      return validate(this.calcRules, this.currentValue).then(() => {
-        this.ruleMessage = ''
-      }).catch(result => {
-        this.ruleMessage = result.errors[0].message
-        return Promise.reject(this.ruleMessage)
-      })
-    },
-    clearValidate() {
-      this.ruleMessage = ''
-    },
-    setCurrentValue(value) {
-      if (value === this.currentValue) {
+    const validateField = async () => {
+      if (!Array.isArray(props.rules) || !props.rules.length) {
         return false
       }
-      this.currentValue = value
-      this.validate()
-    },
-    emit() {
-      this.validate()
-      this.$emit('-pl-change', this.currentValue)
-      this.$emit('change', this.currentValue)
+      try {
+        await validate(props.rules, currentValue.value, 'array')
+        ruleMessage.value = ''
+        return Promise.resolve()
+      } catch (e) {
+        ruleMessage.value = e.errors[0].message
+        return Promise.reject(ruleMessage.value)
+      }
     }
-  },
-  watch: {
-    'value'(val) {
-      this.setCurrentValue(val)
+
+    const clearValidate = () => {
+      ruleMessage.value = ''
     }
-  },
-  destroyed() {
-    if (this.$el && this.$el.parentNode) {
-      this.$el.parentNode.removeChild(this.$el);
-    }
-    if (this.form) {
-      this.form.removeItem(this);
+
+    watch(currentValue, () => {
+      validateField()
+    })
+
+    onMounted(() => {
+      formUpdateItems(app);
+    })
+
+    onUnmounted(() => {
+      formRemoveItem(app);
+    })
+
+    return {
+      currentValue,
+      ruleMessage,
+      calcSize,
+      calcLabelWidth,
+      calcDisabled,
+      validate: validateField,
+      clearValidate
     }
   }
 }
@@ -248,8 +238,6 @@ export default {
   }
   &--small {
     font-size: 0.8em;
-  }
-  &--normal {
   }
   &--error {
     position: relative;

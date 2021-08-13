@@ -47,7 +47,7 @@
         <div class="pl-select-popup-inner">
           <ul class="pl-select-popup-inner-row">
             <li class="pl-select-popup-inner-item" v-for="(item, i) in options" :key="i">
-              <input :type="multiple ? 'checkbox' : 'radio'" class="inner-input" v-model="popupValue" :value="getValue(item)" :disabled="item.disabled">
+              <input :type="multiple ? 'checkbox' : 'radio'" class="inner-input" v-model="popupValue" :value="getValue(item)" :disabled="item.disabled" @change.stop @click.stop>
               <span>
                 <slot :item="item">{{item[prop.label]}}</slot>
               </span>
@@ -61,12 +61,13 @@
 </template>
 
 <script>
+import { ref, computed, onMounted, getCurrentInstance, inject, onUnmounted, watch } from 'vue'
 import iconClose from '../../src/assets/images/icon-close.svg'
 import iconHook from '../../src/assets/images/icon-hook.svg'
 import iconUnfold from '../../src/assets/images/icon-unfold.svg'
 import popup from '../popup/index.vue'
-import { is } from '../../src/assets/utils'
 import validate from '../../src/assets/utils/validate'
+import { getType } from '../../src/assets/utils'
 
 export default {
   name: 'plSelect',
@@ -76,9 +77,6 @@ export default {
     iconHook,
     iconUnfold,
     popup
-  },
-  model: {
-    event: '-pl-change'
   },
   props: {
     rules: {          // 验证规则
@@ -116,131 +114,128 @@ export default {
       default: false
     }
   },
-  inject: {
-    form: {
-      default: null
-    }
-  },
-  data() {
-    return {
-      currentValue: this.value === undefined ? null : this.value,
-      popupValue: null,
+  setup(props, context) {
+    const app = getCurrentInstance()
 
-      ruleMessage: '',
-      handlers: []
-    }
-  },
-  computed: {
-    showClear() {
-      return this.clearable && !this.calcDisabled && (!this.multiple ? this.currentValue : this.currentValue.length)
-    },
-    calcOptions() {
-      return new Map(this.options.map(item => [this.getValue(item), this.getLabel(item)]))
-    },
-    calcSize() {
-      return this.size || this.form && this.form.size || 'normal'
-    },
-    calcLabelWidth() {
-      return this.labelWidth || this.form && this.form.labelWidth || null
-    },
-    calcDisabled() {
-      return this.disabled !== undefined ? this.disabled : this.form && this.form.disabled !== undefined ? this.form.disabled : false
-    },
-    // 定义验证规则的type
-    calcRules() {
-      if (Array.isArray(this.rules)) {
-        return this.rules.map(item => {
-          if (this.multiple) {
-            item.type = 'array'
-          }
-          return item
-        })
-      } else {
-        return []
-      }
-    }
-  },
-  mounted() {
-    if (this.form) {
-      this.form.updateItems(this);
-    }
-  },
-  methods: {
-    // 手动验证方法
-    validate() {
-      return validate(this.calcRules, this.currentValue).then(() => {
-        this.ruleMessage = ''
-      }).catch(result => {
-        this.ruleMessage = result.errors[0].message
-        return Promise.reject(this.ruleMessage)
-      })
-    },
-    clearValidate() {
-      this.ruleMessage = ''
-    },
-    open() {
-      if (this.calcDisabled || this.readonly || !this.options.length) {
-        return false
-      }
-      if (Array.isArray(this.currentValue)) {
-        this.popupValue = [...this.currentValue]
-      } else {
-        this.popupValue = this.currentValue
-      }
-      this.$refs.picker.open()
-    },
-    close() {
-      this.$refs.picker.close()
-    },
-    clear() {
-      this.$emit('-pl-change', null)
-      this.$emit('change', null)
-      this.$emit('clear')
-      this.setCurrentValue(null)
-    },
-    setCurrentValue(value) {
-      if (value === this.currentValue) {
-        return false
-      }
-      this.currentValue = value
-      this.validate()
-    },
-    submit() {
-      this.setCurrentValue(this.popupValue)
-      this.emit()
-    },
-    emit() {
-      this.$emit('-pl-change', this.currentValue)
-      this.$emit('change', this.currentValue)
-      this.close()
-    },
-    // 获取标签名，如果没有指定 prop 则返回对象本身
-    getLabel(target) {
-      return this.prop.label ? target[this.prop.label] : String(target)
-    },
-    // 获取值，如果没有指定 prop 则返回对象本身
-    getValue(target) {
-      return this.prop.value ? target[this.prop.value] : target
-    }
-  },
-  watch: {
-    'value': {
-      handler(val) {
-        if (this.multiple && !is(val, 'array')) {
-          this.currentValue = []
-        } else {
-          this.setCurrentValue(val)
-        }
+    const picker = ref(null)
+    const formSize = inject('size', props.size)
+    const formLabelWidth = inject('labelWidth', props.labelWidth)
+    const formDisabled = inject('disabled', props.disabled)
+    const formUpdateItems = inject('updateItems', () => { })
+    const formRemoveItem = inject('removeItem', () => { })
+
+    const ruleMessage = ref('')     // 验证错误提示信息
+    const popupValue = ref('')
+    const currentValue = computed({
+      get: () => {
+        return props.value === undefined ? '' : props.value
       },
-      immediate: true
+      set: val => {
+        context.emit('update:value', val)
+        context.emit('change', val)
+      }
+    })
+
+    const showClear = computed(() => {
+      return props.clearable && !calcDisabled.value && (!props.multiple ? currentValue.value : currentValue.value && currentValue.value.length)
+    })
+    const calcOptions = computed(() => {
+      return new Map(props.options.map(item => [getValue(item), getLabel(item)]))
+    })
+    const calcSize = computed(() => {
+      return props.size || formSize && formSize.value || 'normal'
+    })
+    const calcLabelWidth = computed(() => {
+      return props.labelWidth || formLabelWidth && formLabelWidth.value || null
+    })
+    const calcDisabled = computed(() => {
+      return props.disabled !== undefined ? props.disabled : formDisabled && formDisabled.value !== undefined ? formDisabled.value : false
+    })
+
+    // 手动验证方法
+    const validateField = async () => {
+      if (!Array.isArray(props.rules) || !props.rules.length) {
+        return false
+      }
+      let type = 'string'
+      if (props.multiple) {
+        type = 'array'
+      } else if (calcOptions.value.get(currentValue.value)) {
+        type = getType(currentValue.value)
+      }
+      try {
+        await validate(props.rules, currentValue.value, type)
+        ruleMessage.value = ''
+        return Promise.resolve()
+      } catch (e) {
+        ruleMessage.value = e.errors[0].message
+        return Promise.reject(ruleMessage.value)
+      }
     }
-  },
-  destroyed() {
-    if (this.$el && this.$el.parentNode) {
-      this.$el.parentNode.removeChild(this.$el);
+    const clearValidate = () => {
+      ruleMessage.value = ''
     }
-    if (this.form) {
-      this.form.removeItem(this);
+    const open = () => {
+      if (calcDisabled.value || props.readonly || !props.options.length) {
+        return false
+      }
+      if (Array.isArray(props.value)) {
+        popupValue.value = [...props.value]
+      } else {
+        popupValue.value = props.value
+      }
+      picker.value.open()
+    }
+    const close = () => {
+      picker.value.close()
+    }
+    const clear = () => {
+      currentValue.value = null
+      context.emit('clear')
+    }
+    const submit = () => {
+      currentValue.value = popupValue.value
+      close()
+    }
+
+    // 获取标签名，如果没有指定 prop 则返回对象本身
+    const getLabel = (target) => {
+      return props.prop.label ? target[props.prop.label] : String(target)
+    }
+    // 获取值，如果没有指定 prop 则返回对象本身
+    const getValue = (target) => {
+      return props.prop.value ? target[props.prop.value] : target
+    }
+
+    watch(currentValue, () => {
+      validateField()
+    })
+
+    onMounted(() => {
+      formUpdateItems(app);
+    })
+
+    onUnmounted(() => {
+      formRemoveItem(app);
+    })
+
+    return {
+      picker,
+      calcSize,
+      calcDisabled,
+      ruleMessage,
+      calcLabelWidth,
+      open,
+      close,
+      currentValue,
+      calcOptions,
+      clear,
+      showClear,
+      submit,
+      popupValue,
+      getValue,
+      validate: validateField,
+      clearValidate
     }
   }
 }
@@ -310,8 +305,8 @@ export default {
   &--small {
     font-size: 0.8em;
   }
-  &--normal {
-  }
+  // &--normal {
+  // }
   &--error {
     position: relative;
   }
@@ -321,9 +316,10 @@ export default {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-
-    .placeholder {
+    span {
       display: inline-block;
+    }
+    .placeholder {
       color: var(--primary-text);
     }
   }
@@ -371,7 +367,7 @@ export default {
   }
 
   &.is-disabled {
-    background-color: var(--select-disabled-bg);
+    color: var(--disabled);
   }
 
   .pl-select-popup {

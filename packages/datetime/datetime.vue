@@ -30,11 +30,8 @@
 </template>
 
 <script>
-import {
-  getDateString,
-  getDateFromString,
-  getMonthDays
-} from '../../src/assets/utils'
+import { ref, reactive } from 'vue'
+import { getDateString, getDateFromString, getMonthDays } from '../../src/assets/utils'
 
 // 日历默认配置信息
 const defaultOption = {
@@ -44,11 +41,12 @@ const defaultOption = {
   min: 0,                 // 日历最小月份
   max: 11,                // 日历最大月份
   dateLabel: '',          // 日期下标（单选）
-  startLabel: '开始',     // 日期下标（范围）
-  endLabel: '结束',       // 日期下标（范围）
+  startLabel: '',         // 日期下标（范围）
+  endLabel: '',           // 日期下标（范围）
   type: 'date',           // 日历类型
   isRange: false,         // 是否是范围选择
   selectRange: null,      // 日期可选最大范围
+  format: 'Y-M-D',
   disabledDate() {        // 不可选日期
     return false
   }
@@ -56,64 +54,61 @@ const defaultOption = {
 
 const DAY_STAMP = 86400000
 
+// 提取日期
+const getDateValue = (dateStr) => {
+  if (dateStr) {
+    let date = getDateFromString(dateStr)
+    if (date) {
+      date.setHours(0, 0, 0, 0)
+      return +date
+    }
+  }
+  return null
+}
+
 export default {
   name: 'plDatePopup',
   componentName: 'plDatePopup',
-  data() {
-    return {
-      options: Object.assign({}, defaultOption),
-      monthList: [],
-      show: false
-    }
-  },
-  methods: {
-    // 提取日期
-    getDateValue(dateStr) {
-      if (dateStr) {
-        let date = getDateFromString(dateStr)
-        if (date) {
-          date.setHours(0, 0, 0, 0)
-          return +date
-        }
-      }
-      return null
-    },
+  setup(props, context) {
+    const options = Object.assign({}, defaultOption)
+    const monthList = reactive([])
+    const show = ref(false)
+    const dateStartValue = ref(null)
+    const dateEndValue = ref(null)
+    const dateValue = ref(null)
+
     // 初始化配置
-    open(options) {
-      Object.assign(this.options, defaultOption, options)
+    const open = (option) => {
+      Object.assign(options, defaultOption, option)
       // 分离时间和日期
-      if (this.options.isRange) {
-        this.options.startValue = this.getDateValue(this.options.startValue)
-        this.options.endValue = this.getDateValue(this.options.endValue)
+      if (options.isRange) {
+        dateStartValue.value = getDateValue(options.startValue)
+        dateEndValue.value = getDateValue(options.endValue)
       } else {
-        this.options.value = this.getDateValue(this.options.value)
+        dateValue.value = getDateValue(options.value)
       }
 
-      this.createCalendar()
-      this.show = true
-    },
+      createCalendar()
+      show.value = true
+    }
     // 关闭日历
-    close() {
-      this.show = false
-    },
+    const close = () => {
+      show.value = false
+    }
     // 生成日历
-    createCalendar() {
-      let { min, max } = this.options
-      let monthList = []
+    const createCalendar = () => {
+      let { min, max } = options
       let minMonth = Math.min(min, max)
       let maxMonth = Math.max(min, max)
 
+      monthList.length = 0
       for (let i = minMonth; i <= maxMonth; i++) {
-        let monthDate = this.createMonth(i)
+        let monthDate = createMonth(i)
         monthList.push(monthDate)
       }
-
-      this.monthList = monthList
-    },
+    }
     // 生成月份
-    createMonth(diff) {
-      let _options = this.options
-
+    const createMonth = (diff) => {
       let today = new Date()
       today.setDate(1)
       today.setHours(0, 0, 0, 0)
@@ -130,34 +125,33 @@ export default {
         month.dateArr.push({
           label: i + 1,
           timeStamp,
-          _options,
           // 日期状态，禁用、已选择、区间
           get status() {
-            let { isRange, startValue, endValue, value } = this._options
-            if (value === this.timeStamp ||
-              startValue === this.timeStamp ||
-              endValue === this.timeStamp) {
+            let { isRange } = options
+            if (dateValue.value === this.timeStamp ||
+              dateStartValue.value === this.timeStamp ||
+              dateEndValue.value === this.timeStamp) {
               return 'current'
             }
             if (isRange &&
-              startValue &&
-              endValue &&
-              startValue < this.timeStamp &&
-              endValue > this.timeStamp) {
+              dateStartValue.value &&
+              dateEndValue.value &&
+              dateStartValue.value < this.timeStamp &&
+              dateEndValue.value > this.timeStamp) {
               return 'active'
             }
             return 'normal'
           },
           // 是否禁用
           get disabled() {
-            let { disabledDate, selectRange, isRange, startValue, endValue } = this._options
+            let { disabledDate, selectRange, isRange } = options
 
-            let disabled = typeof disabledDate === 'function' ? disabledDate.call(this._options, this.timeStamp) : false
+            let disabled = typeof disabledDate === 'function' ? disabledDate.call(options, this.timeStamp) : false
             if (isRange && selectRange > 0) {
               // 超出指定范围的日期
               let daysDiff = (Number(selectRange) || 0) * DAY_STAMP
-              if (startValue && !endValue) {
-                return disabled || this.timeStamp > startValue + daysDiff || this.timeStamp < startValue - daysDiff
+              if (dateStartValue.value && !dateEndValue.value) {
+                return disabled || this.timeStamp > dateStartValue.value + daysDiff || this.timeStamp < dateStartValue.value - daysDiff
               }
             }
             return disabled
@@ -166,13 +160,10 @@ export default {
           supLabel: '', // transHoliday[this.timeStamp]
           // 日期下标
           get subLabel() {
-            let { isRange, startValue, endValue, value, startLabel, endLabel, dateLabel } = this._options
-            let labels = [
-              isRange && startValue === this.timeStamp && startLabel || false,
-              isRange && endValue === this.timeStamp && endLabel || false,
-              !isRange && value === this.timeStamp && dateLabel || false
-            ].filter(Boolean)
-            return labels[0] || ''
+            let { startLabel, endLabel, dateLabel } = options
+            return (dateStartValue.value === this.timeStamp && startLabel) ||
+              (dateEndValue.value === this.timeStamp && endLabel) ||
+              (dateValue.value === this.timeStamp && dateLabel) || ''
           }
         })
       }
@@ -192,52 +183,59 @@ export default {
       }
 
       return month
-    },
+    }
     // 日期点击事件
-    onTapDate({ timeStamp, status, disabled } = {}) {
+    const onTapDate = ({ timeStamp, disabled } = {}) => {
       if (!timeStamp || disabled) {
         return false
       }
-      let { isRange, startValue, endValue } = this.options
+      let { isRange } = options
 
       if (isRange) {
-        if (endValue || !startValue) {
-          this.options.startValue = timeStamp
-          this.options.endValue = null
+        if (dateEndValue.value || !dateStartValue.value) {
+          dateStartValue.value = timeStamp
+          dateEndValue.value = null
         } else {
-          if (timeStamp < startValue) {
-            this.options.startValue = timeStamp
-            this.options.endValue = startValue
+          if (timeStamp < dateStartValue.value) {
+            dateEndValue.value = dateStartValue.value
+            dateStartValue.value = timeStamp
           } else {
-            this.options.endValue = timeStamp
+            dateEndValue.value = timeStamp
           }
         }
       } else {
-        this.options.value = timeStamp
+        dateValue.value = timeStamp
       }
-    },
-
+    }
     // 提交结果
-    submit() {
-      let { value, startValue, endValue, isRange } = this.options
+    const submit = () => {
+      let { isRange, format } = options
       // 如果选择了禁用日期则不能提交
-      if (this.monthList.some(month => month.dateArr.some(date => date.disabled && /current|active/.test(date.status)))) {
+      if (monthList.some(month => month.dateArr.some(date => date.disabled && /current|active/.test(date.status)))) {
         return false
       }
       // 日期范围没有选择不能提交
-      if (isRange && (!startValue || !endValue)) {
+      if (isRange && (!dateStartValue.value || !dateEndValue.value)) {
         return false
       }
 
-      let result = isRange ? [startValue, endValue] : value
+      let result = isRange ? [getDateString(dateStartValue.value, format), getDateString(dateEndValue.value, format)] : getDateString(dateValue.value, format)
 
       // 直接唤起的回调
-      if (typeof this.options.callback === 'function') {
-        this.options.callback(result)
+      if (typeof options.callback === 'function') {
+        options.callback(result)
       }
 
-      this.$emit('submit', result)
-      this.close()
+      context.emit('submit', result)
+      close()
+    }
+
+    return {
+      show,
+      open,
+      monthList,
+      onTapDate,
+      submit
     }
   }
 }

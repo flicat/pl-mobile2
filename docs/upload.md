@@ -4,7 +4,7 @@
 
 ```html
 <template>
-  <pl-upload v-model="files"></pl-upload>
+  <pl-upload v-model:value="files"></pl-upload>
 </template>
 <script>
   export default {
@@ -21,7 +21,7 @@
 
 ```html
 <template>
-  <pl-upload v-model="files" accept="image/*" :maxCount="3"></pl-upload>
+  <pl-upload v-model:value="files" accept="image/*" :maxCount="3"></pl-upload>
 </template>
 <script>
   export default {
@@ -39,7 +39,7 @@
 
 ```html
 <template>
-  <pl-upload v-model="files" accept="image/*" :beforeRead="beforeRead"></pl-upload>
+  <pl-upload v-model:value="files" accept="image/*" :beforeRead="beforeRead"></pl-upload>
 </template>
 <script>
   export default {
@@ -63,7 +63,7 @@
 
 ```html
 <template>
-  <pl-upload v-model="files" accept="image/*" :maxSize="100000" :maxCount="4" @oversize="oversize" @exceed="exceed" multiple></pl-upload>
+  <pl-upload v-model:value="files" accept="image/*" :maxSize="100000" :maxCount="4" @oversize="oversize" @exceed="exceed" multiple></pl-upload>
 </template>
 <script>
   export default {
@@ -91,7 +91,7 @@
 
 ```html
 <template>
-  <pl-upload v-model="files" accept="image/*" class="file-upload">
+  <pl-upload v-model:value="files" accept="image/*" class="file-upload">
     <span slot="tips">请选择图片，格式不限</span>
     <template v-slot="scope">
       <pl-button class="home" @click="setHomePage(scope.file)" size="small">设为首页</pl-button>
@@ -141,7 +141,7 @@
 | maxCount   |  文件上传数量限制 |  Number  | —  | —  |
 
 ### Slots
-| name      | 说明    | 
+| name      | 说明    |
 |---------- |-------- |
 | (default)  | 自定义内容 |
 | tips       | 提示文字 |
@@ -150,7 +150,7 @@
 ### Events
 | 事件名称      | 说明    | 回调参数      |
 |---------- |-------- |---------- |
-| change     |   value更改事件   | 更改后的value | 
+| change     |   value更改事件   | 更改后的value |
 | oversize   | 文件大小超出限制事件  |  超出大小的文件列表  |
 | exceed     | 文件数量超出限制事件  | 超出的数量 |
 

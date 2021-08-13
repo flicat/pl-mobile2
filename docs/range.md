@@ -3,8 +3,8 @@
 ### 基础用法
 ```html
 <template>
-  <pl-range v-model="value" :min="0" :max="100" :step="1"></pl-range>
-  <pl-range v-model="value" :min="0" :max="100" :step="1" label="请选择："></pl-range>
+  <pl-range v-model:value="value" :min="0" :max="100" :step="1"></pl-range>
+  <pl-range v-model:value="value" :min="0" :max="100" :step="1" label="请选择："></pl-range>
 </template>
 
 <script>
@@ -21,9 +21,9 @@
 ### 尺寸大小
 ```html
 <template>
-  <pl-range v-model="value" :min="0" :max="100" :step="1" label="请选择：" size="small"></pl-range>
-  <pl-range v-model="value" :min="0" :max="100" :step="1" label="请选择：" size="normal"></pl-range>
-  <pl-range v-model="value" :min="0" :max="100" :step="1" label="请选择：" size="large"></pl-range>
+  <pl-range v-model:value="value" :min="0" :max="100" :step="1" label="请选择：" size="small"></pl-range>
+  <pl-range v-model:value="value" :min="0" :max="100" :step="1" label="请选择：" size="normal"></pl-range>
+  <pl-range v-model:value="value" :min="0" :max="100" :step="1" label="请选择：" size="large"></pl-range>
 </template>
 
 <script>
@@ -40,7 +40,7 @@
 ### 标题换行
 ```html
 <template>
-  <pl-range v-model="value" :min="0" :max="100" :step="1" label="请选择：" wrap></pl-range>
+  <pl-range v-model:value="value" :min="0" :max="100" :step="1" label="请选择：" wrap></pl-range>
 </template>
 
 <script>
@@ -57,7 +57,7 @@
 ### 禁用
 ```html
 <template>
-  <pl-range v-model="value" :min="0" :max="100" :step="1" label="请选择：" disabled></pl-range>
+  <pl-range v-model:value="value" :min="0" :max="100" :step="1" label="请选择：" disabled></pl-range>
 </template>
 
 <script>
@@ -75,14 +75,14 @@
 
 ```html
 <template>
-  <pl-range v-model="value" :min="0" :max="100" :step="1" label="请选择：" :rules="rules" ref="range" required></pl-range>
+  <pl-range v-model:value="value" :min="0" :max="100" :step="1" label="请选择：" :rules="rules" ref="range" required></pl-range>
 </template>
 <script>
   export default {
     data () {
       return {
         value: null,
-        rules: [{required: true, message: '请选择', trigger: 'change'}]
+        rules: [{required: true, message: '请选择', trigger: 'change', type: 'number'}]
       }
     },
     methods: {
@@ -101,11 +101,11 @@
 ### 图标填充
 ```html
 <template>
-  <pl-range v-model="value" :min="0" :max="100" :step="1" label="请选择：" required>
+  <pl-range v-model:value="value" :min="0" :max="100" :step="1" label="请选择：" required>
     <pl-icon name="icon-dingwei" fill="#999" slot="prepend"></pl-icon>
     <span slot="append">{{value}}%</span>
   </pl-range>
-  <pl-range v-model="value" :min="0" :max="100" :step="1" label="请选择：" required wrap>
+  <pl-range v-model:value="value" :min="0" :max="100" :step="1" label="请选择：" required wrap>
     <pl-icon name="icon-dingwei" fill="#999" slot="prepend"></pl-icon>
     <span slot="append">{{value}}%</span>
   </pl-range>
@@ -125,7 +125,7 @@
 ### 自定义滑块
 ```html
 <template>
-  <pl-range v-model="value" :min="0" :max="100" :step="1" label="请选择：" required>
+  <pl-range v-model:value="value" :min="0" :max="100" :step="1" label="请选择：" required>
     <span slot="thumb" class="thumb">{{value}}%</span>
   </pl-range>
 </template>

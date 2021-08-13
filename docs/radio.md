@@ -4,7 +4,7 @@
 
 ```html
 <template>
-  <pl-radio v-model="value" :options="data" />
+  <pl-radio v-model:value="value" :options="data" />
 </template>
 <script>
   export default {
@@ -25,7 +25,7 @@
 
 ```html
 <template>
-  <pl-radio v-model="value" :options="data" button />
+  <pl-radio v-model:value="value" :options="data" button />
 </template>
 <script>
   export default {
@@ -46,7 +46,7 @@
 
 ```html
 <template>
-  <pl-radio v-model="value" :options="data" vertical />
+  <pl-radio v-model:value="value" :options="data" vertical />
 </template>
 <script>
   export default {
@@ -68,7 +68,7 @@
 
 ```html
 <template>
-  <pl-radio v-model="value" :options="data" label="请选择：" labelWidth="5em" />
+  <pl-radio v-model:value="value" :options="data" label="请选择：" labelWidth="5em" />
 </template>
 <script>
   export default {
@@ -90,7 +90,7 @@
 
 ```html
 <template>
-  <pl-radio v-model="value" :options="data" :rules="rules" required ref="radio" />
+  <pl-radio v-model:value="value" :options="data" :rules="rules" required ref="radio" />
 </template>
 <script>
   export default {
@@ -122,7 +122,7 @@
 
 ```html
 <template>
-  <pl-radio v-model="value" :options="data">
+  <pl-radio v-model:value="value" :options="data">
     <template v-slot="scope">{{scope.item.label}} - {{scope.item.value}}</template>
   </pl-radio>
 </template>

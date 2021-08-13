@@ -1,38 +1,58 @@
 <template>
   <div class="content">
     <h3>基础用法</h3>
-    <pl-tabs v-model="active" type="card" @change="onChange">
-      <pl-tab-item v-for="item in data" :name="item.name" :disabled="item.disabled" :label="item.label" :key="item.name">这里是{{item.label}}</pl-tab-item>
+    <pl-tabs v-model:value="active" type="card" @change="onChange">
+      <pl-tab-item v-for="item in getTabs()" :name="item.name" :disabled="item.disabled" :label="item.label" :key="item.name"><strong>{{active}}</strong>
+        <div>这里是{{item.label}}</div>
+      </pl-tab-item>
     </pl-tabs>
-    <pl-tabs v-model="active" type="border-card" @change="onChange">
-      <pl-tab-item v-for="item in data" :name="item.name" :disabled="item.disabled" :label="item.label" :key="item.name">这里是{{item.label}}</pl-tab-item>
+    <pl-tabs v-model:value="active" type="border-card" @change="onChange">
+      <pl-tab-item v-for="item in getTabs()" :name="item.name" :disabled="item.disabled" :label="item.label" :key="item.name"><strong>{{active}}</strong>
+        <div>这里是{{item.label}}</div>
+      </pl-tab-item>
     </pl-tabs>
-    <pl-tabs v-model="active" type="button" @change="onChange">
-      <pl-tab-item v-for="item in data" :name="item.name" :disabled="item.disabled" :label="item.label" :key="item.name">这里是{{item.label}}</pl-tab-item>
+    <pl-tabs v-model:value="active" type="button" @change="onChange">
+      <pl-tab-item v-for="item in getTabs()" :name="item.name" :disabled="item.disabled" :label="item.label" :key="item.name"><strong>{{active}}</strong>
+        <div>这里是{{item.label}}</div>
+      </pl-tab-item>
+    </pl-tabs>
+    <pl-tabs v-model:value="active" type="card" @change="onChange">
+      <pl-tab-item v-for="item in getTabs(10)" :name="item.name" :disabled="item.disabled" :label="item.label" :key="item.name"><strong>{{active}}</strong>
+        <div>这里是{{item.label}}</div>
+      </pl-tab-item>
     </pl-tabs>
 
     <h3>选项卡所在位置</h3>
-    <pl-tabs v-model="active" type="card" position="top" @change="onChange">
-      <pl-tab-item v-for="item in data" :name="item.name" :disabled="item.disabled" :label="item.label" :key="item.name">这里是{{item.label}}</pl-tab-item>
+    <pl-tabs v-model:value="active" type="card" position="top" @change="onChange">
+      <pl-tab-item v-for="item in getTabs()" :name="item.name" :disabled="item.disabled" :label="item.label" :key="item.name"><strong>{{active}}</strong>
+        <div>这里是{{item.label}}</div>
+      </pl-tab-item>
     </pl-tabs>
 
-    <pl-tabs v-model="active" type="button" position="right" @change="onChange">
-      <pl-tab-item v-for="item in data" :name="item.name" :disabled="item.disabled" :label="item.label" :key="item.name">这里是{{item.label}}</pl-tab-item>
+    <pl-tabs v-model:value="active" type="button" position="right" @change="onChange">
+      <pl-tab-item v-for="item in getTabs()" :name="item.name" :disabled="item.disabled" :label="item.label" :key="item.name"><strong>{{active}}</strong>
+        <div>这里是{{item.label}}</div>
+      </pl-tab-item>
     </pl-tabs>
 
-    <pl-tabs v-model="active" type="border-card" position="bottom" @change="onChange">
-      <pl-tab-item v-for="item in data" :name="item.name" :disabled="item.disabled" :label="item.label" :key="item.name">这里是{{item.label}}</pl-tab-item>
+    <pl-tabs v-model:value="active" type="border-card" position="bottom" @change="onChange">
+      <pl-tab-item v-for="item in getTabs()" :name="item.name" :disabled="item.disabled" :label="item.label" :key="item.name"><strong>{{active}}</strong>
+        <div>这里是{{item.label}}</div>
+      </pl-tab-item>
     </pl-tabs>
 
-    <pl-tabs v-model="active" type="card" position="left" @change="onChange">
-      <pl-tab-item v-for="item in data" :name="item.name" :disabled="item.disabled" :label="item.label" :key="item.name">这里是{{item.label}}</pl-tab-item>
+    <pl-tabs v-model:value="active" type="card" position="left" @change="onChange">
+      <pl-tab-item v-for="item in getTabs()" :name="item.name" :disabled="item.disabled" :label="item.label" :key="item.name"><strong>{{active}}</strong>
+        <div>这里是{{item.label}}</div>
+      </pl-tab-item>
     </pl-tabs>
 
     <h3>自定义标题</h3>
-    <pl-tabs v-model="active" type="card">
-      <pl-tab-item v-for="item in data" :name="item.name" :disabled="item.disabled" :key="item.name">
+    <pl-tabs v-model:value="active" type="card">
+      <pl-tab-item v-for="item in getTabs(10)" :name="item.name" :disabled="item.disabled" :key="item.name">
         <template v-slot:title>--{{item.label}}--</template>
-        <span>{{item.label}}</span>
+        <strong>{{active}}</strong>
+        <div>这里是{{item.label}}</div>
       </pl-tab-item>
     </pl-tabs>
   </div>
@@ -42,17 +62,17 @@
 export default {
   data() {
     return {
-      active: 'tab1',
-      data: [
-        { label: '选项1', name: 'tab1' },
-        { label: '选项2', name: 'tab2' },
-        { label: '选项3', name: 'tab3' },
-        { label: '选项4', name: 'tab4' },
-        { label: '选项5', name: 'tab5' }
-      ]
+      active: 'tab8'
     }
   },
   methods: {
+    getTabs(length = 3) {
+      let tabs = []
+      for (let i = 0; i < length; i++) {
+        tabs.push({ label: '选项' + (i + 1), name: 'tab' + (i + 1) })
+      }
+      return tabs
+    },
     onChange() {
       console.log('onChange::', this.active)
     }
@@ -63,5 +83,6 @@ export default {
 <style lang="less" scoped>
 .pl-tabs {
   margin-bottom: 50px;
+  outline: dashed 1px #ddecec;
 }
 </style>

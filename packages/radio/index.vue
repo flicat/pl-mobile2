@@ -33,9 +33,11 @@
 </template>
 
 <script>
+import { ref, computed, onMounted, getCurrentInstance, inject, onUnmounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import validate from '../../src/assets/utils/validate'
 import iconCicleChoose from '../../src/assets/images/icon-cicle-choose.svg'
 import iconCicleUnchoose from '../../src/assets/images/icon-cicle-unchoose.svg'
+import { getType } from '../../src/assets/utils'
 
 // radio
 export default {
@@ -44,9 +46,6 @@ export default {
   components: {
     iconCicleChoose,
     iconCicleUnchoose
-  },
-  model: {
-    event: '-pl-change'
   },
   props: {
     rules: {          // 验证规则
@@ -79,74 +78,89 @@ export default {
     label: String,                // 左侧 label
     labelWidth: String            // label 宽度
   },
-  inject: {
-    form: {
-      default: null
-    }
-  },
-  data() {
-    return {
-      currentValue: this.value === undefined ? '' : this.value,
-      ruleMessage: ''     // 验证错误提示信息
-    }
-  },
-  computed: {
-    calcSize() {
-      return this.size || this.form && this.form.size || 'normal'
-    },
-    calcLabelWidth() {
-      return this.labelWidth || this.form && this.form.labelWidth || null
-    },
-    calcDisabled() {
-      return this.disabled !== undefined ? this.disabled : this.form && this.form.disabled !== undefined ? this.form.disabled : false
-    }
-  },
-  mounted() {
-    if (this.form) {
-      this.form.updateItems(this);
-    }
-  },
-  methods: {
+  setup(props, context) {
+    const app = getCurrentInstance()
+
+    const formSize = inject('size', props.size)
+    const formLabelWidth = inject('labelWidth', props.labelWidth)
+    const formDisabled = inject('disabled', props.disabled)
+    const formUpdateItems = inject('updateItems', () => { })
+    const formRemoveItem = inject('removeItem', () => { })
+
+    const ruleMessage = ref('')     // 验证错误提示信息
+    const currentValue = computed({
+      get: () => {
+        return props.value === undefined ? '' : props.value
+      },
+      set: val => {
+        context.emit('update:value', val)
+        context.emit('change', val)
+      }
+    })
+
+    const calcSize = computed(() => {
+      return props.size || formSize && formSize.value || 'normal'
+    })
+    const calcLabelWidth = computed(() => {
+      return props.labelWidth || formLabelWidth && formLabelWidth.value || null
+    })
+    const calcDisabled = computed(() => {
+      return props.disabled !== undefined ? props.disabled : formDisabled && formDisabled.value !== undefined ? formDisabled.value : false
+    })
+
     // 手动验证方法
-    validate() {
-      return validate(this.rules, this.currentValue).then(() => {
-        this.ruleMessage = ''
-      }).catch(result => {
-        this.ruleMessage = result.errors[0].message
-        return Promise.reject(this.ruleMessage)
-      })
-    },
-    clearValidate() {
-      this.ruleMessage = ''
-    },
-    setCurrentValue(value) {
-      if (value === this.currentValue) {
+    const validateField = async () => {
+      if (!Array.isArray(props.rules) || !props.rules.length) {
         return false
       }
-      this.currentValue = value
-      this.validate()
-    },
-    emit(value) {
-      if (value === this.currentValue) {
+      let type = 'string'
+      if (props.options.find(item => item[props.prop.value] === currentValue.value)) {
+        type = getType(currentValue.value)
+      }
+      try {
+        await validate(props.rules, currentValue.value, type)
+        ruleMessage.value = ''
+        return Promise.resolve()
+      } catch (e) {
+        ruleMessage.value = e.errors[0].message
+        return Promise.reject(ruleMessage.value)
+      }
+    }
+
+    const clearValidate = () => {
+      ruleMessage.value = ''
+    }
+
+    const emit = (value) => {
+      if (value === currentValue.value) {
         return false
       }
-      this.currentValue = value
-      this.validate()
-      this.$emit('-pl-change', value)
-      this.$emit('change', value)
+      currentValue.value = value
     }
-  },
-  watch: {
-    'value'(val) {
-      this.setCurrentValue(val)
-    }
-  },
-  destroyed() {
-    if (this.$el && this.$el.parentNode) {
-      this.$el.parentNode.removeChild(this.$el);
-    }
-    if (this.form) {
-      this.form.removeItem(this);
+
+    watch(currentValue, () => {
+      validateField()
+    })
+
+    onMounted(() => {
+      formUpdateItems(app)
+    })
+
+    onUnmounted(() => {
+      formRemoveItem(app)
+    })
+
+    return {
+      calcSize,
+      calcDisabled,
+      ruleMessage,
+      calcLabelWidth,
+      currentValue,
+      calcDisabled,
+      ruleMessage,
+      emit,
+      validate: validateField,
+      clearValidate
     }
   }
 }
@@ -223,8 +237,8 @@ export default {
   &--small {
     font-size: 0.8em;
   }
-  &--normal {
-  }
+  // &--normal {
+  // }
   &--error {
     position: relative;
   }

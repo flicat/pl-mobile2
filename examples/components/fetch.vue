@@ -5,60 +5,33 @@
   </div>
 </template>
 <script>
-  export default {
-    data () {
-      return {
-        src: ''
-      }
-    },
-    created () {
-      this.$fetchConfig({
-        headers: {
-          'Accept': 'application/json, text/plain, */*'
-        },
-        baseUrl: location.origin,
-      });
-      this.$fetchDefine({
-        getImg: {
-          baseUrl: window.location.href.split('#')[0],
-          url: '/logo.png',
-          method: 'get',
-          type: 'blob'
+export default {
+  data() {
+    return {
+      src: ''
+    }
+  },
+  created() {
+
+  },
+  methods: {
+    getImg() {
+      this.$fetch.before((options) => {
+        options.type = 'blob'
+      })
+      this.$fetch.get('/favicon.ico').then(data => {
+        if (data && data.size > 0) {
+          this.src = URL.createObjectURL(data)
         }
-      });
-      this.$fetchMiddleware(function (res) {
-        console.log('Middleware1::', res)
-        res.then(data => {
-          if (data && data.code === 401) {
-            console.log('Your parameters may be incorrect')
-          }
-        }).catch(e => {
-          console.log('network error')
-        })
       })
-      this.$fetchMiddleware(function (res) {
-        res.then(data => {
-          console.log('Middleware2::', data)
-        })
-      })
-    },
-    methods: {
-      getImg () {
-        this.$fetch.getImg({
-          _: Date.now()
-        }).then(data => {
-          if (data && data.size > 0) {
-            this.src = URL.createObjectURL(data)
-          }
-        })
-      }
     }
   }
+}
 </script>
 
 <style lang="less" scoped>
-  img {
-    display: block;
-    width: 50vw;
-  }
+img {
+  display: block;
+  width: 50vw;
+}
 </style>

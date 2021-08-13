@@ -76,7 +76,7 @@
 | componentProps  | 子组件props | Object | —  | — |
 | html       | 消息内容是否是HTML   | Boolean | —  | false |
 | buttonText | 确定按钮文字   | String    | — | 好   |
-| action     | 确定后回调函数  | Function | —   | —   |
+| action     | 确定后回调函数（如果不传则通过Promise返回结果）  | Function | —   | —   |
 
 
 
@@ -167,8 +167,8 @@
 | html       | 消息内容是否是HTML   | Boolean | —  | false |
 | submitText | 确定按钮文字  | String| —  | 确认 |
 | cancelText | 取消钮文字 | String| —  | 取消 |
-| submit     | 确定后回调函数 | Function | —  | — |
-| cancel     | 取消后回调函数 | Function | —  | — |
+| submit     | 确定后回调函数（如果不传则通过Promise返回结果） | Function | —  | — |
+| cancel     | 取消后回调函数（如果不传则通过Promise返回结果） | Function | —  | — |
 
 
 

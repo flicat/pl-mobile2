@@ -47,7 +47,6 @@ function install(App) {
     icon,
     input,
     list,
-    picker,
     popup,
     progress,
     radio,
@@ -70,6 +69,7 @@ function install(App) {
   App.use(toast);
   App.use(datetime);
   App.use(fetch);
+  App.use(picker);
 }
 
 export {

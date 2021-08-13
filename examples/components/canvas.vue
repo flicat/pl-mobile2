@@ -3,8 +3,8 @@
     <pl-canvas class="canvas" ref="canvas" :penId="0" orientation="right">
       <template v-slot:placeholder>请在此处签名</template>
     </pl-canvas>
-    <pl-cell :span="[1,1,1]" gap="10px">
-      <pl-button @click="clear" type="primary">清除画布</pl-button>
+    <pl-cell :span="[1,2,2]" gap="10px" class="btn-warp">
+      <pl-button @click="clear" type="primary">清除</pl-button>
       <pl-button @click="getImageDataUrl" type="primary">获取dataURL</pl-button>
       <pl-button @click="getImageBlob" type="primary">获取BLob</pl-button>
     </pl-cell>
@@ -54,6 +54,9 @@ export default {
   .canvas {
     width: 100%;
     height: 80vh;
+  }
+  .btn-warp {
+    padding: 1rem 0;
   }
   .preview {
     padding: 1em;

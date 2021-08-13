@@ -22,7 +22,7 @@
       <div class="pl-input-value">
         <template v-if="type !== 'textarea'">
           <div class="pl-input-inner">
-            <input v-bind="$attrs" v-on="{input: emit, focus: emit, blur: emit, change: 'emit'}" v-if="type !== 'textarea'" :type="type" :disabled="calcDisabled" :value="currentValue" ref="input">
+            <input v-bind="$attrs" v-on="{focus: emit, blur: emit}" v-if="type !== 'textarea'" :type="type" :disabled="calcDisabled" v-model="currentValue" ref="input">
           </div>
           <div class="pl-input-clear" @touchstart="clear" @mousedown="clear" v-show="showClear">
             <iconClose class="pl-input-clear-icon"></iconClose>
@@ -32,7 +32,7 @@
           </div>
         </template>
         <div class="pl-input-inner" v-else>
-          <textarea v-bind="$attrs" :rows="rows" :cols="cols" v-on="{input: emit, focus: emit, blur: emit, change: 'emit'}" :value="currentValue" ref="input" :disabled="calcDisabled"></textarea>
+          <textarea v-bind="$attrs" :rows="rows" :cols="cols" v-on="{focus: emit, blur: emit}" v-model="currentValue" ref="input" :disabled="calcDisabled"></textarea>
         </div>
       </div>
 
@@ -42,6 +42,7 @@
 </template>
 
 <script>
+import { ref, computed, onMounted, getCurrentInstance, inject, onUnmounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import iconClose from '../../src/assets/images/icon-close.svg'
 import validate from '../../src/assets/utils/validate'
 
@@ -76,134 +77,133 @@ export default {
       default: false
     }
   },
-  inject: {
-    form: {
-      default: null
-    }
-  },
-  data() {
-    return {
-      currentValue: this.value === undefined ? '' : this.value,
-      focused: false,
-      ruleMessage: '',     // 验证错误提示信息
-      handlers: []
-    }
-  },
-  computed: {
-    showClear() {
-      return this.clearable && !this.calcDisabled && this.currentValue !== '' && this.focused
-    },
-    calcSize() {
-      return this.size || this.form && this.form.size || 'normal'
-    },
-    calcLabelWidth() {
-      return this.labelWidth || this.form && this.form.labelWidth || null
-    },
-    calcDisabled() {
-      return this.disabled !== undefined ? this.disabled : this.form && this.form.disabled !== undefined ? this.form.disabled : false
-    }
-  },
-  mounted() {
-    this.bindEvent()
-    if (this.form) {
-      this.form.updateItems(this);
-    }
-  },
-  methods: {
+  setup(props, context) {
+    const app = getCurrentInstance()
+
+    const input = ref(null)
+    const formSize = inject('size', props.size)
+    const formLabelWidth = inject('labelWidth', props.labelWidth)
+    const formDisabled = inject('disabled', props.disabled)
+    const formUpdateItems = inject('updateItems', () => { })
+    const formRemoveItem = inject('removeItem', () => { })
+
+    const ruleMessage = ref('')     // 验证错误提示信息
+    const currentValue = computed({
+      get: () => {
+        return props.value === undefined ? '' : props.value
+      },
+      set: val => {
+        context.emit('update:value', val)
+      }
+    })
+    const focused = ref(false)
+    const handlers = []
+
+    const showClear = computed(() => {
+      return props.clearable && !calcDisabled.value && currentValue.value !== '' && focused.value
+    })
+    const calcSize = computed(() => {
+      return props.size || formSize && formSize.value || 'normal'
+    })
+    const calcLabelWidth = computed(() => {
+      return props.labelWidth || formLabelWidth && formLabelWidth.value || null
+    })
+    const calcDisabled = computed(() => {
+      return props.disabled !== undefined ? props.disabled : formDisabled && formDisabled.value !== undefined ? formDisabled.value : false
+    })
+
     // 手动验证方法
-    validate() {
-      return validate(this.rules, this.currentValue).then(() => {
-        this.ruleMessage = ''
-      }).catch(result => {
-        this.ruleMessage = result.errors[0].message
-        return Promise.reject(this.ruleMessage)
-      })
-    },
-    clearValidate() {
-      this.ruleMessage = ''
-    },
-    focus() {
-      this.$refs.input.focus();
-    },
-    blur() {
-      this.$refs.input.blur();
-    },
-    setCurrentValue(value) {
-      if (value === this.currentValue) {
+    const validateField = async () => {
+      if (!Array.isArray(props.rules) || !props.rules.length) {
         return false
       }
-      this.currentValue = value
-      this.validate()
-    },
-    clear() {
-      this.$emit('input', '')
-      this.$emit('change', '')
-      this.$emit('clear')
-      this.setCurrentValue('')
-      this.focus()
-    },
-    emit(e) {
-      const value = e.target.value
-      const type = e.type
-
-      if (type === 'input') {
-        this.setCurrentValue(value)
+      try {
+        await validate(props.rules, currentValue.value, 'string')
+        ruleMessage.value = ''
+        return Promise.resolve()
+      } catch (e) {
+        ruleMessage.value = e.errors[0].message
+        return Promise.reject(ruleMessage.value)
       }
-      if (type === 'focus') {
-        this.focused = true
+    }
+    const clearValidate = () => {
+      ruleMessage.value = ''
+    }
+    const focus = () => {
+      input.value.focus();
+    }
+    const clear = () => {
+      context.emit('clear')
+      currentValue.value = ''
+      focus()
+    }
+    const emit = (e) => {
+      focused.value = e.type === 'focus'
+    }
+    const bindEvent = () => {
+      if (!Array.isArray(props.rules) || !props.rules.length) {
+        return false
       }
-      if (type === 'blur') {
-        this.focused = false
-      }
-      this.$emit(type, value)
-    },
-    bindEvent() {
       // 绑定事件
-      this.rules.forEach(rule => {
+      props.rules.forEach(rule => {
         let event = rule.trigger
         if (!event) {
           event = 'change'
         }
 
-        let handler = () => {
-          validate(rule, this.value).then(() => {
-            this.ruleMessage = ''
-          }).catch(e => {
-            this.ruleMessage = e
-          })
+        let handler = async () => {
+          await nextTick()
+          try {
+            await validate([rule], currentValue.value, 'string')
+            ruleMessage.value = ''
+          } catch (e) {
+            ruleMessage.value = e.errors[0].message
+          }
         }
 
-        this.$refs.input.addEventListener(event, handler)
-        this.handlers.push({ event, handler })
+        input.value.addEventListener(event, handler)
+        handlers.push({ event, handler })
       })
-    },
-    unbindEvent() {
-      this.handlers.forEach(handler => {
-        this.$refs.input.removeEventListener(handler.event, handler.handler)
+    }
+    const unbindEvent = () => {
+      handlers.forEach(handler => {
+        input.value.removeEventListener(handler.event, handler.handler)
       })
-      this.handlers.length = 0
-    },
-  },
-  watch: {
-    'value'(val) {
-      this.setCurrentValue(val)
-    },
-    'rules'(val) {
+      handlers.length = 0
+    }
+
+    watch(() => props.rules, (val) => {
       if (Array.isArray(val)) {
-        this.unbindEvent()
-        this.bindEvent()
+        unbindEvent()
+        bindEvent()
       }
-    }
-  },
-  beforeDestroy() {
-    this.unbindEvent()
-  },
-  destroyed() {
-    if (this.$el && this.$el.parentNode) {
-      this.$el.parentNode.removeChild(this.$el);
-    }
-    if (this.form) {
-      this.form.removeItem(this);
+    })
+
+    onMounted(() => {
+      bindEvent()
+      formUpdateItems(app)
+    })
+
+    onBeforeUnmount(() => {
+      unbindEvent()
+    })
+
+    onUnmounted(() => {
+      formRemoveItem(app)
+    })
+
+    return {
+      input,
+      calcSize,
+      calcDisabled,
+      ruleMessage,
+      calcLabelWidth,
+      emit,
+      currentValue,
+      clear,
+      showClear,
+      validate: validateField,
+      clearValidate
     }
   }
 }
@@ -277,8 +277,8 @@ export default {
   &--small {
     font-size: 0.8em;
   }
-  &--normal {
-  }
+  // &--normal {
+  // }
   &--error {
     position: relative;
   }
@@ -338,7 +338,14 @@ export default {
   }
 
   &.is-disabled {
-    background-color: var(--disabled);
+    color: var(--disabled);
+    input,
+    textarea {
+      color: var(--disabled);
+      &::placeholder {
+        color: var(--disabled);
+      }
+    }
   }
 }
 </style>

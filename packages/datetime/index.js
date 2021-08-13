@@ -3,13 +3,13 @@ import plMonth from './month.vue'
 import plTime from './time.vue'
 import plDate from './datetime.vue'
 import { getDateString } from '../../src/assets/utils'
-import { createApp, h, nextTick } from 'vue'
+import { render, h, nextTick } from 'vue'
 
 /* istanbul ignore next */
 Datetime.install = function (App) {
   App.component(Datetime.name, Datetime);
 
-  let Calendar = createApp({
+  let vNode = h({
     render() {
       return this.display && h('div', {
         style: {
@@ -60,13 +60,14 @@ Datetime.install = function (App) {
     }
   })
 
-  const calendarDom = document.createElement('div')
-  document.body.appendChild(calendarDom)
-  const vm = Calendar.mount(calendarDom)
+  const vNodeDom = document.createElement('div')
+  document.body.appendChild(vNodeDom)
+  vNode.appContext = App._context
+  render(vNode, vNodeDom)
 
   App.config.globalProperties.$calendar = function (options) {
     return new Promise((resolve, reject) => {
-      vm.options = Object.assign({}, options, {
+      vNode.component.proxy.options = Object.assign({}, options, {
         callback: result => {
           let time = result
           if (options.format) {
@@ -79,7 +80,7 @@ Datetime.install = function (App) {
           resolve(time)
         }
       })
-      vm.show()
+      vNode.component.proxy.show()
     })
   }
 };

@@ -4,7 +4,7 @@
 
 ```html
 <template>
-  <pl-collapse v-model="active" title="面板">
+  <pl-collapse v-model:value="active" title="面板">
     <p>面板内容</p>
   </pl-collapse>
 </template>
@@ -23,7 +23,7 @@
 
 ```html
 <template>
-  <pl-collapse v-model="active">
+  <pl-collapse v-model:value="active">
     <div slot="title">自定义标题</div>
     <p>面板内容</p>
   </pl-collapse>

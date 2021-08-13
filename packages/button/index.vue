@@ -89,52 +89,52 @@ export default {
     .padding(10, 16);
   }
 
+  &.is-disabled {
+    cursor: not-allowed;
+    background-color: var(--disabled);
+    border-color: var(--disabled);
+
+    &.pl-button--text {
+      background: none;
+      color: var(--disabled);
+    }
+    &.is-plain {
+      color: var(--disabled);
+    }
+  }
+
+  &.is-round {
+    border-radius: 1em;
+  }
+
+  &.is-circle {
+    border-radius: 50%;
+  }
+
+  &.is-plain {
+    background: transparent;
+
+    &.pl-button {
+      &--default {
+        color: var(--default);
+      }
+      &--primary {
+        color: var(--primary);
+      }
+      &--success {
+        color: var(--success);
+      }
+      &--warning {
+        color: var(--warning);
+      }
+      &--danger {
+        color: var(--danger);
+      }
+    }
+  }
+
   > * {
     vertical-align: bottom;
-  }
-}
-
-.is-disabled {
-  cursor: not-allowed;
-  background-color: var(--disabled);
-  border-color: var(--disabled);
-
-  &.pl-button--text {
-    background: none;
-    color: var(--disabled);
-  }
-  &.is-plain {
-    color: var(--disabled);
-  }
-}
-
-.is-round {
-  border-radius: 1em;
-}
-
-.is-circle {
-  border-radius: 50%;
-}
-
-.is-plain {
-  background: transparent;
-
-  &.pl-button {
-    &--default {
-      color: var(--default);
-    }
-    &--primary {
-      color: var(--primary);
-    }
-    &--success {
-      color: var(--success);
-    }
-    &--warning {
-      color: var(--warning);
-    }
-    &--danger {
-      color: var(--danger);
-    }
   }
 }
 </style>

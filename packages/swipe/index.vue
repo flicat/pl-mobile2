@@ -14,15 +14,16 @@
 </template>
 
 <script>
+import { ref, reactive, computed, onMounted, onUnmounted, provide, watch } from 'vue'
 // swipe
 export default {
   name: 'plSwipe',
   componentName: 'plSwipe',
-  provide() {
-    return {
-      swipes: this
-    }
-  },
+  // provide() {
+  //   return {
+  //     swipes: this
+  //   }
+  // },
   props: {
     auto: Number,       // 自动轮播间隔，单位为 ms
     duration: {         // 动画时长，单位为 ms
@@ -56,186 +57,204 @@ export default {
       default: true
     }
   },
-  data() {
-    return {
-      scrollList: null,             // 滚动的dom节点
-      children: [],                 // 子节点列表
-      autoTimer: null,        // 自动播放
+  setup(props, context) {
+    let autoTimer = null        // 自动播放
+    let translate = 0
+    let transStart = 0
+    let transEnd = 0
+    let transDiff = 0
 
-      currentIndex: this.index === undefined ? '' : this.index,  // 当前滚动的index
-      translate: 0,
-      transStart: 0,
-      transEnd: 0
-    }
-  },
-  computed: {
-    listStyle() {
+    const scrollList = ref(null)             // 滚动的dom节点
+    const currentIndex = ref(props.index === undefined ? null : props.index)  // 当前滚动的index
+    const children = reactive([])                 // 子节点列表
+
+    const listStyle = computed(() => {
       return {
-        transition: `all ${this.duration}ms ease`,
-        webkitTransition: `all ${this.duration}ms ease`
+        transition: `all ${props.duration}ms ease`,
+        webkitTransition: `all ${props.duration}ms ease`
       }
-    },
+    })
     // 三个子节点才能开启无限轮播
-    canLoop() {
-      return this.loop && this.children.length > 2
-    }
-  },
-  mounted() {
-    this.scrollList = this.$refs['list']
-    this.translate = this.currentIndex * this.itemSize()
-    this.scrollTo()
-    this.startAutoScroll()
-  },
-  methods: {
+    const canLoop = computed(() => {
+      return props.loop && children.length > 2
+    })
+
     // 轮播图的实际尺寸 px
-    itemSize() {
-      if (this.scrollList) {
-        return this.vertical ? this.scrollList.clientHeight : this.scrollList.clientWidth
+    const itemSize = () => {
+      if (scrollList && scrollList.value) {
+        return props.vertical ? scrollList.value.clientHeight : scrollList.value.clientWidth
       } else {
         return 0
       }
-    },
+    }
     // 更新内容节点
-    updateItems() {
-      this.children = this.$children.filter(item => item.$options.name === 'plSwipeItem')
-    },
+    const updateItems = (child) => {
+      if (child && !children.includes(child)) {
+        children.push(child)
+      }
+    }
     // 滚动方法
-    scrollTo(animate) {
-      let list = this.scrollList
-      list.style.transitionDuration = list.style.webkitTransitionDuration = animate ? `${this.duration}ms` : `0ms`
-      list.style.transform = list.style.webkitTransform = `translate${this.vertical ? 'Y' : 'X'}(${-this.translate}px)`
-    },
+    const scrollTo = (animate) => {
+      let list = scrollList.value
+      list.style.transitionDuration = list.style.webkitTransitionDuration = animate ? `${props.duration}ms` : `0ms`
+      list.style.transform = list.style.webkitTransform = `translate${props.vertical ? 'Y' : 'X'}(${-translate}px)`
+    }
     // 自动滚动方法
-    autoScroll() {
-      let max = this.canLoop ? this.children.length : this.children.length - 1
-      this.currentIndex++
-      if (this.currentIndex > max) {
-        this.currentIndex = 0
+    const autoScroll = () => {
+      let max = canLoop.value ? children.length : children.length - 1
+      currentIndex.value++
+      if (currentIndex.value > max) {
+        currentIndex.value = 0
       }
-      if (this.canLoop && this.currentIndex === max) {
-        this.moveToHead()
+      if (canLoop.value && currentIndex.value === max) {
+        moveToHead()
       }
-      this.translate = this.currentIndex * this.itemSize()
-      this.scrollTo(true)
-    },
+      translate = currentIndex.value * itemSize()
+      scrollTo(true)
+    }
     // 开始定时滚动
-    startAutoScroll() {
-      if (this.autoTimer) {
-        clearInterval(this.autoTimer)
+    const startAutoScroll = () => {
+      if (autoTimer) {
+        clearInterval(autoTimer)
       }
-      if (this.auto && this.auto > 0 && this.children.length > 1) {
-        this.autoTimer = setInterval(() => {
-          this.autoScroll()
-        }, this.auto)
+      if (props.auto && props.auto > 0 && children.length > 1) {
+        autoTimer = setInterval(() => {
+          autoScroll()
+        }, props.auto)
       }
-    },
+    }
     // 停止定时滚动
-    stopAutoScroll() {
-      if (this.autoTimer) {
-        clearInterval(this.autoTimer)
+    const stopAutoScroll = () => {
+      if (autoTimer) {
+        clearInterval(autoTimer)
       }
-    },
+    }
     // 触摸事件
-    handlerTouchStart(e) {
-      if (!this.touchable) {
+    const handlerTouchStart = (e) => {
+      if (!props.touchable) {
         return false
       }
 
-      this.transDiff = this.translate
-      this.transStart = this.vertical ? e.touches[0].clientY : e.touches[0].clientX
-      this.scrollList.style.transitionDuration = this.scrollList.style.webkitTransitionDuration = `0ms`
-      this.stopAutoScroll()
-    },
+      transDiff = translate
+      transStart = props.vertical ? e.touches[0].clientY : e.touches[0].clientX
+      scrollList.value.style.transitionDuration = scrollList.value.style.webkitTransitionDuration = `0ms`
+      stopAutoScroll()
+    }
     // 触摸事件
-    handlerTouchMove(e) {
-      if (!this.touchable) {
-        return false
-      }
-      e.preventDefault()
-      e.stopPropagation()
-
-      this.transEnd = this.vertical ? e.touches[0].clientY : e.touches[0].clientX
-      this.translate = this.transDiff + this.transStart - this.transEnd
-      this.scrollList.style.transform = this.scrollList.style.webkitTransform = `translate${this.vertical ? 'Y' : 'X'}(${-this.translate}px)`
-    },
-    // 触摸事件
-    handlerTouchEnd(e) {
-      if (!this.touchable) {
+    const handlerTouchMove = (e) => {
+      if (!props.touchable) {
         return false
       }
       e.preventDefault()
       e.stopPropagation()
 
-      let min = this.canLoop ? -1 : 0
-      let max = this.canLoop ? this.children.length : this.children.length - 1
+      transEnd = props.vertical ? e.touches[0].clientY : e.touches[0].clientX
+      translate = transDiff + transStart - transEnd
+      scrollList.value.style.transform = scrollList.value.style.webkitTransform = `translate${props.vertical ? 'Y' : 'X'}(${-translate}px)`
+    }
+    // 触摸事件
+    const handlerTouchEnd = (e) => {
+      if (!props.touchable) {
+        return false
+      }
+      e.preventDefault()
+      e.stopPropagation()
+
+      let min = canLoop.value ? -1 : 0
+      let max = canLoop.value ? children.length : children.length - 1
 
       // 左划减1右划加1
-      this.currentIndex += this.transStart - this.transEnd > 0 ? 1 : -1
+      currentIndex.value += transStart - transEnd > 0 ? 1 : -1
 
-      if (this.currentIndex <= min) {
-        this.currentIndex = min
-        if (this.canLoop) {
-          this.moveToEnd()
+      if (currentIndex.value <= min) {
+        currentIndex.value = min
+        if (canLoop.value) {
+          moveToEnd()
         }
       }
-      if (this.currentIndex >= max) {
-        this.currentIndex = max
-        if (this.canLoop) {
-          this.moveToHead()
+      if (currentIndex.value >= max) {
+        currentIndex.value = max
+        if (canLoop.value) {
+          moveToHead()
         }
       }
-      this.translate = this.currentIndex * this.itemSize()
+      translate = currentIndex.value * itemSize()
 
-      this.scrollTo(true)
-      this.startAutoScroll()
-    },
-    // 将队头调至队尾
-    setFirstChild(act) {
-      if (act) {
-        this.children[0].setTranslate(this.children.length * this.itemSize())
-      } else {
-        this.children[0].setTranslate(0)
-      }
-    },
-    // 将队尾调至队头
-    setLastChild(act) {
-      if (act) {
-        this.children[this.children.length - 1].setTranslate(-this.children.length * this.itemSize())
-      } else {
-        this.children[this.children.length - 1].setTranslate(0)
-      }
-    },
-    // 队头无缝衔接至队尾
-    moveToEnd() {
-      setTimeout(() => {
-        this.currentIndex = this.children.length - 1
-        this.translate = this.currentIndex * this.itemSize()
-        this.scrollTo()
-      }, this.duration)
-    },
-    // 队尾无缝衔接至队头
-    moveToHead() {
-      setTimeout(() => {
-        this.currentIndex = 0
-        this.translate = this.currentIndex * this.itemSize()
-        this.scrollTo()
-      }, this.duration)
+      scrollTo(true)
+      startAutoScroll()
     }
-  },
-  watch: {
-    // 监听滚动事件
-    currentIndex(val) {
-      if (this.canLoop) {
-        this.setFirstChild(val >= this.children.length - 1)
-        this.setLastChild(val <= 0)
+    // 将队头调至队尾
+    const setFirstChild = (act) => {
+      if (act) {
+        children[0].setTranslate(children.length * itemSize())
+      } else {
+        children[0].setTranslate(0)
       }
-      if (val > this.children.length - 1) {
-        val = this.children.length - 1
+    }
+    // 将队尾调至队头
+    const setLastChild = (act) => {
+      if (act) {
+        children[children.length - 1].setTranslate(-children.length * itemSize())
+      } else {
+        children[children.length - 1].setTranslate(0)
+      }
+    }
+    // 队头无缝衔接至队尾
+    const moveToEnd = () => {
+      setTimeout(() => {
+        currentIndex.value = children.length - 1
+        translate = currentIndex.value * itemSize()
+        scrollTo()
+      }, props.duration)
+    }
+
+    watch(currentIndex, (val) => {
+      if (canLoop.value) {
+        setFirstChild(val >= children.length - 1)
+        setLastChild(val <= 0)
+      }
+      if (val > children.length - 1) {
+        val = children.length - 1
       }
       if (val < 0) {
         val = 0
       }
-      this.$emit('scroll', val)
+      context.emit('scroll', val)
+    })
+
+    // 队尾无缝衔接至队头
+    const moveToHead = () => {
+      setTimeout(() => {
+        currentIndex.value = 0
+        translate = currentIndex.value * itemSize()
+        scrollTo()
+      }, props.duration)
+    }
+
+    onMounted(() => {
+      translate = currentIndex.value * itemSize()
+      scrollTo()
+      startAutoScroll()
+    })
+
+    onUnmounted(() => {
+      if (autoTimer) {
+        clearInterval(autoTimer)
+      }
+    })
+
+    provide('vertical', props.vertical)
+    provide('updateItems', updateItems)
+    provide('children', children)
+
+    return {
+      list: scrollList,
+      listStyle,
+      handlerTouchStart,
+      handlerTouchMove,
+      handlerTouchEnd,
+      children,
+      currentIndex
     }
   }
 }

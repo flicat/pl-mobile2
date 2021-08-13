@@ -1,46 +1,30 @@
 ## 移动端UI框架
-基于Vue的移动端UI框架
+基于Vue3的移动端UI框架
+
+### 文档
+[中文文档](https://flicat.github.io/pl-mobile2/)
 
 ### 安装
 ```
-npm i pl-mobile --save
+npm i pl-mobile2 --save
 ```
 
 ### 使用
+
+#### 全局引入
 ```
-import PlMobile from 'pl-mobile'
-import 'pl-mobile/lib/style/index.css'
-Vue.use(PlMobile)
+import PlMobile2 from 'pl-mobile2'
+Vue.use(PlMobile2)
 ```
->- *注意：这里需要单独引入样式文件*
+#### 样式引入
+```
+import 'pl-mobile2/lib/style.css'
+```
+
+>- *样式文件需要单独引入*
 >- *组件字体及尺寸基于 rem 计算*
 
-### 按需引入
-通过使用饿了么团队开发的[`babel-plugin-component`](https://github.com/ElementUI/babel-plugin-component)
-插件来实现按需引入
-#### 安装插件
-```
-npm i babel-plugin-component@1.1.1 -D
-```
-#### 配置babel
-```
-{
-  presets: [
-    '@vue/app'
-  ],
-  plugins: [
-    [
-      "component",
-      {
-        "libraryName": "pl-mobile",
-        "styleLibraryName": "style",
-        "camel2Dash": false
-      }
-    ]
-  ]
-}
-```
-#### 在项目中引用
+#### 按需引入
 ```
 <template>
   <div>
@@ -49,8 +33,7 @@ npm i babel-plugin-component@1.1.1 -D
 </template>
 
 <script>
-import {fetch, button} from 'pl-mobile'
-Vue.use(fetch)
+import {button} from 'pl-mobile2'
 
 export default {
   components: {
@@ -62,7 +45,7 @@ export default {
 
 ### 组件列表
 >- [button](./docs/button.md)
-> - [canvas](./docs/canvas.md)
+>- [canvas](./docs/canvas.md)
 >- [cell](./docs/cell.md)
 >- [checkbox](./docs/checkbox.md)
 >- [collapse](./docs/collapse.md)
@@ -74,9 +57,7 @@ export default {
 >- [input](./docs/input.md)
 >- [list](./docs/list.md)
 >- [loading](./docs/loading.md)
->- [alert](./docs/message.md)
->- [confirm](./docs/message.md)
->- [toast](./docs/message.md)
+>- [message](./docs/message.md)
 >- [picker](./docs/picker.md)
 >- [popup](./docs/popup.md)
 >- [progress](./docs/progress.md)
@@ -84,24 +65,22 @@ export default {
 >- [range](./docs/range.md)
 >- [select](./docs/select.md)
 >- [steps](./docs/steps.md)
->- [stepItem](./docs/steps.md)
 >- [swipe](./docs/swipe.md)
->- [swipeItem](./docs/swipe.md)
 >- [tabs](./docs/tabs.md)
->- [tabItem](./docs/tabs.md)
 >- [upload](./docs/upload.md)
-
 
 ### 所有组件
 ```
 import {
+  loading,
   alert,
+  confirm,
+  toast,
   button,
   canvas,
   cell,
   checkbox,
   collapse,
-  confirm,
   datetime,
   fetch,
   form,
@@ -109,7 +88,6 @@ import {
   icon,
   input,
   list,
-  loading,
   picker,
   popup,
   progress,
@@ -118,13 +96,12 @@ import {
   select,
   stepItem,
   steps,
-  swipe,
   swipeItem,
+  swipe,
   tabItem,
   tabs,
-  toast,
   upload
-} from 'pl-mobile'
+} from 'pl-mobile2'
 ```
 
 ### css全局变量
@@ -189,7 +166,6 @@ import {
   --datetime-current-text: #fff;
   --datetime-current-bg: #6db9e6;
   --datetime-active-bg: #e7faff;
-  --datetime-disabled-bg: #ebebe4;
   --datetime-button-top-border: #ededed;
   --datetime-button-text-color: #fff;
   --datetime-button-bg: linear-gradient(90deg, #b0e0fc 0%, #6db9e6 100%);
@@ -238,11 +214,10 @@ import {
   --range-progress: #5074FF;
   --range-thumb: #fff;
   --range-text: #999;
-  --range-disabled-bg: #9D9FA8;
+  --range-disabled-bg: #c0c2cc;
 
   /* select */
   --select-color: #fff;
-  --select-disabled-bg: #ebebe4;
   --select-popup-color: #333;
   --select-popup-bg: #fff;
   --select-popup-border: #ebedf0;

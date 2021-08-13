@@ -3,79 +3,157 @@
  * @date 2018/7/28 028
  * @description api 接口
  */
-import factory from './polyfill-patch-fetch'
+import polyfill from './polyfill-patch-fetch'
 import request from './fetch'
-
-// TODO tree shake
-const API = {}
-const defaultConfig = {}
-const middleware = []
-
-function getHandler(options) {
-  let handler = function (data, params) {
-    let resOptions = Object.assign({}, defaultConfig, handler.options, params, { data })
-    let resultPromise = request(resOptions)
-    return Promise.all(middleware.map(handler => {
-      return Promise.resolve(handler(resultPromise, resOptions))
-    })).then(() => {
-      return resultPromise
-    })
-  };
-  // url 拼接
-  handler.url = function (...args) {
-    handler.options.url = [options.url, ...args].join('/')
-    return handler
-  };
-  // 修改默认头部
-  handler.headers = function (headers) {
-    handler.options.headers = headers
-    return handler
-  };
-  // 强制为get请求
-  handler.get = function (data) {
-    handler.options.method = 'get'
-    return handler(data)
-  };
-  // 强制为post请求
-  handler.post = function (data) {
-    handler.options.method = 'post'
-    return handler(data)
-  };
-
-  // 默认请求配置
-  handler.options = { ...options }
-
-  return handler
-}
+import { is } from '../../src/assets/utils'
 
 export default function (App) {
-  factory()
+  polyfill()
 
-  App.config.globalProperties.$fetch = API
+  const beforeHandlerArr = []
 
-  // 设置默认配置信息
-  App.config.globalProperties.$fetchConfig = function (config) {
-    Object.assign(defaultConfig, config)
-  }
+  const afterHandlerArr = []
 
-  // 定义接口列表
-  App.config.globalProperties.$fetchDefine = function (target, namespace) {
-    let api = API
-    if (namespace && typeof namespace === 'string') {
-      API[namespace] = {}
-      api = API[namespace]
+  const handler = async function (option) {
+    for (let i = beforeHandlerArr.length; i--;) {
+      beforeHandlerArr[i](option)
     }
 
-    Object.keys(target).forEach(name => {
-      api[name] = getHandler(target[name])
-    })
+    let response = request(option)
+
+    for (let i = afterHandlerArr.length; i--;) {
+      await afterHandlerArr[i](response)
+    }
+    return response
   }
 
-  // 添加全局拦截函数
-  App.config.globalProperties.$fetchMiddleware = function (handler) {
-    if (typeof handler !== 'function') {
-      return false
+  class Fetch {
+    constructor(option) {
+      if (is(option, 'object')) {
+        this.option = option
+      }
     }
-    middleware.push(handler)
+    options(option) {
+      if (is(option, 'object')) {
+        Object.assign(this.option, option)
+      }
+      return this
+    }
+    url(...args) {
+      this.option.url = [this.option.url, ...args].join('/')
+      return this
+    }
+    headers(headers) {
+      if (!is(this.option.headers, 'object')) {
+        this.option.headers = {}
+      }
+      if (is(headers, 'object')) {
+        Object.assign(this.option.headers, headers)
+      }
+      return this
+    }
+    request(option) {
+      return handler(Object.assign({}, this.option, option))
+    }
+    get(url, data, option) {
+      let getOption = {
+        method: 'get'
+      }
+      if (url) {
+        getOption.url = url
+      }
+      if (data) {
+        getOption.data = data
+      }
+      return handler(Object.assign({}, this.option, option, getOption))
+    }
+    post(url, data, option) {
+      let postOption = {
+        method: 'post'
+      }
+      if (url) {
+        postOption.url = url
+      }
+      if (data) {
+        postOption.data = data
+      }
+      return handler(Object.assign({}, this.option, option, postOption))
+    }
   }
+
+  App.config.globalProperties.$fetch = new Proxy(handler, {
+    get(target, propKey, receiver) {
+      switch (propKey) {
+        case 'options':
+          return function (option) {
+            return new Fetch(option)
+          }
+
+        case 'url':
+          return function (...args) {
+            const target = new Fetch({})
+            target.url(...args)
+            return target
+          }
+
+        case 'headers':
+          return function (headers) {
+            const target = new Fetch({})
+            target.headers(headers)
+            return target
+          }
+
+        case 'request':
+          return function (option) {
+            return handler(option)
+          }
+
+        case 'get':
+          return function (url, data, option) {
+            let getOption = {
+              method: 'get'
+            }
+            if (url) {
+              getOption.url = url
+            }
+            if (data) {
+              getOption.data = data
+            }
+            return handler(Object.assign({}, option, getOption))
+          }
+
+        case 'post':
+          return function (url, data, option) {
+            let postOption = {
+              method: 'post'
+            }
+            if (url) {
+              postOption.url = url
+            }
+            if (data) {
+              postOption.data = data
+            }
+            return handler(Object.assign({}, option, postOption))
+          }
+
+        case 'before':
+          return function (func) {
+            if (is(func, 'function')) {
+              beforeHandlerArr.push(func)
+            }
+            return receiver
+          }
+
+        case 'after':
+          return function (func) {
+            if (is(func, 'function')) {
+              afterHandlerArr.push(func)
+            }
+            return receiver
+          }
+      }
+
+      return Reflect.get(target, propKey, receiver);
+    }
+  })
 }

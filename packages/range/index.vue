@@ -37,14 +37,12 @@
 </template>
 
 <script>
+import { ref, computed, onMounted, getCurrentInstance, inject, onUnmounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import validate from '../../src/assets/utils/validate'
 
 export default {
   name: 'plRange',
   componentName: 'plRange',
-  model: {
-    event: '-pl-change'
-  },
   props: {
     rules: {          // 验证规则
       type: Array,
@@ -75,130 +73,126 @@ export default {
     label: String,                // 左侧 label
     labelWidth: String            // label 宽度
   },
-  inject: {
-    form: {
-      default: null
-    }
-  },
-  data() {
-    return {
-      currentValue: this.value === undefined ? '' : this.value,
-      ruleMessage: '',     // 验证错误提示信息,
+  setup(props, context) {
+    const app = getCurrentInstance()
 
-      rangeWidth: 0,
-      transDiff: 0,
-      transStart: 0,
-      transEnd: 0
-    }
-  },
-  computed: {
-    diff() {
-      return this.currentValue / (this.max - this.min) * this.rangeWidth
-    },
-    progressStyle() {
+    const track = ref(null)
+    const ruleMessage = ref('')     // 验证错误提示信息
+    const currentValue = computed({
+      get: () => {
+        return props.value === undefined ? '' : props.value
+      },
+      set: val => {
+        context.emit('update:value', val)
+        context.emit('change', val)
+      }
+    })
+
+    let rangeWidth = 0
+    let transDiff = 0
+    let transStart = 0
+    let transEnd = 0
+
+    const formSize = inject('size', props.size)
+    const formLabelWidth = inject('labelWidth', props.labelWidth)
+    const formDisabled = inject('disabled', props.disabled)
+    const formUpdateItems = inject('updateItems', () => { })
+    const formRemoveItem = inject('removeItem', () => { })
+
+    const diff = computed(() => {
+      return currentValue.value / (props.max - props.min) * rangeWidth
+    })
+    const progressStyle = computed(() => {
       return {
-        width: this.diff + 'px'
+        width: diff.value + 'px'
       }
-    },
-    thumbStyle() {
+    })
+    const thumbStyle = computed(() => {
       return {
-        'transform': `translateX(${this.diff}px)`,
-        '-webkit-transform': `translateX(${this.diff}px)`
+        'transform': `translateX(${diff.value}px)`,
+        '-webkit-transform': `translateX(${diff.value}px)`
       }
-    },
-    calcSize() {
-      return this.size || this.form && this.form.size || 'normal'
-    },
-    calcLabelWidth() {
-      return this.labelWidth || this.form && this.form.labelWidth || null
-    },
-    calcDisabled() {
-      return this.disabled !== undefined ? this.disabled : this.form && this.form.disabled !== undefined ? this.form.disabled : false
-    },
-    // 定义验证规则的type
-    calcRules() {
-      if (Array.isArray(this.rules)) {
-        return this.rules.map(item => {
-          item.type = 'number'
-          return item
-        })
-      } else {
-        return []
-      }
-    }
-  },
-  mounted() {
-    if (this.$refs['track']) {
-      this.rangeWidth = this.$refs['track'].clientWidth
-    }
-    if (this.form) {
-      this.form.updateItems(this);
-    }
-  },
-  methods: {
+    })
+    const calcSize = computed(() => {
+      return props.size || formSize && formSize.value || 'normal'
+    })
+    const calcLabelWidth = computed(() => {
+      return props.labelWidth || formLabelWidth && formLabelWidth.value || null
+    })
+    const calcDisabled = computed(() => {
+      return props.disabled !== undefined ? props.disabled : formDisabled && formDisabled.value !== undefined ? formDisabled.value : false
+    })
+
     // 手动验证方法
-    validate() {
-      return validate(this.calcRules, this.currentValue).then(() => {
-        this.ruleMessage = ''
-      }).catch(result => {
-        this.ruleMessage = result.errors[0].message
-        return Promise.reject(this.ruleMessage)
-      })
-    },
-    clearValidate() {
-      this.ruleMessage = ''
-    },
-    setCurrentValue(value) {
-      if (value === this.currentValue) {
+    const validateField = async () => {
+      if (!Array.isArray(props.rules) || !props.rules.length) {
         return false
       }
-      this.currentValue = value
-      this.validate()
-    },
-    touchEvent(e) {
-      if (this.calcDisabled) {
+      try {
+        await validate(props.rules, currentValue.value, 'number')
+        ruleMessage.value = ''
+        return Promise.resolve()
+      } catch (e) {
+        ruleMessage.value = e.errors[0].message
+        return Promise.reject(ruleMessage.value)
+      }
+    }
+    const clearValidate = () => {
+      ruleMessage.value = ''
+    }
+    const touchEvent = (e) => {
+      if (calcDisabled.value) {
         return false
       }
-      let currentValue = 0
+      let moveValue = 0
 
       switch (e.type) {
         case 'touchstart':
-          this.transStart = e.touches[0].clientX
-          this.transDiff = this.diff
+          transStart = e.touches[0].clientX
+          transDiff = diff.value
           break;
         case 'touchmove':
           e.preventDefault()
           e.stopPropagation()
-          this.transEnd = e.touches[0].clientX
-          currentValue = Math.round((this.transDiff + this.transEnd - this.transStart) / this.rangeWidth * (this.max - this.min) / this.step) * this.step
-          if (currentValue < this.min) {
-            currentValue = this.min
+          transEnd = e.touches[0].clientX
+          moveValue = Math.round((transDiff + transEnd - transStart) / rangeWidth * (props.max - props.min) / props.step) * props.step
+          if (moveValue < props.min) {
+            moveValue = props.min
           }
-          if (currentValue > this.max) {
-            currentValue = this.max
+          if (moveValue > props.max) {
+            moveValue = props.max
           }
-          this.currentValue = currentValue
-          this.$emit('-pl-change', this.currentValue)
-          this.$emit('change', this.currentValue)
-          break;
-        case 'touchend':
-        case 'touchcancel':
-          this.validate()
+          currentValue.value = moveValue
           break;
       }
     }
-  },
-  watch: {
-    'value'(val) {
-      this.setCurrentValue(val)
-    }
-  },
-  destroyed() {
-    if (this.$el && this.$el.parentNode) {
-      this.$el.parentNode.removeChild(this.$el);
-    }
-    if (this.form) {
-      this.form.removeItem(this);
+
+    watch(currentValue, () => {
+      validateField()
+    })
+
+    onMounted(() => {
+      formUpdateItems(app);
+      if (track) {
+        rangeWidth = track.value.clientWidth
+      }
+    })
+
+    onUnmounted(() => {
+      formRemoveItem(app);
+    })
+
+    return {
+      track,
+      calcSize,
+      calcDisabled,
+      ruleMessage,
+      calcLabelWidth,
+      progressStyle,
+      thumbStyle,
+      touchEvent,
+      validate: validateField,
+      clearValidate
     }
   }
 }
@@ -268,8 +262,8 @@ export default {
   &--small {
     font-size: 0.8em;
   }
-  &--normal {
-  }
+  // &--normal {
+  // }
   &--error {
     position: relative;
   }
@@ -333,6 +327,7 @@ export default {
     line-height: 2em;
   }
   &.is-disabled {
+    color: var(--disabled);
     .slider-runnable-track {
       .progress {
         background-color: var(--range-disabled-bg);

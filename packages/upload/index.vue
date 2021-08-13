@@ -1,7 +1,7 @@
 <template>
   <div class="pl-upload">
-    <div class="rows" :style="rowStyle">
-      <div class="cols" v-for="(file, i) in files" :key="i">
+    <div class="rows" :style="{'grid-template-columns': 'repeat(' +  rows + ', 1fr)'}">
+      <div class="cols" v-for="(file, i) in fileArray" :key="i">
         <div class="pl-file-preview">
           <div class="pl-upload-img" :class="[file.type]" :style="file.preview ? {'background-image': `url(${file.preview})`} : null" @click="preview(file)"></div>
           <div class="pl-upload-del" v-if="!disabled" @click="delFile(i)">
@@ -10,9 +10,9 @@
           <slot :file="file"></slot>
         </div>
       </div>
-      <div class="cols" v-if="!disabled && files.length < maxCount">
+      <div class="cols" v-if="!disabled && fileArray.length < maxCount">
         <div class="pl-upload-button">
-          <input type="file" class="file-input" :multiple="multiple" :accept="accept" :capture="capture" @change="setFiles">
+          <input type="file" class="file-input" :multiple="multiple" :accept="accept" :capture="capture" @change.stop="setFiles">
           <slot name="button">
             <div class="pl-add-button">
               <iconPlus class="pl-upload-add"></iconPlus>
@@ -24,7 +24,7 @@
     <slot name="tips"></slot>
 
     <div class="pl-preview-dialog" v-if="dialogPreview">
-      <ul class="preview-list" ref="preview-list" :style="{transform: `translateX(${-translateX}px)`}" @touchstart="touchEvent($event)" @touchmove="touchEvent($event)" @touchend="touchEvent($event)" @touchcancel="touchEvent($event)" @click="closePreview">
+      <ul class="preview-list" :style="previewListStyle" @touchstart="touchEvent($event)" @touchmove="touchEvent($event)" @touchend="touchEvent($event)" @touchcancel="touchEvent($event)" @click="closePreview">
         <li class="preview-item" v-for="(file, i) in previewList" :key="i" :style="{'background-image': `url(${file.preview})`, 'left': i * 100 + '%'}"></li>
       </ul>
       <div class="preview-index">{{previewIndex + 1}}/{{previewList.length}}</div>
@@ -33,9 +33,9 @@
 </template>
 
 <script>
+import { computed, reactive, ref, watch } from 'vue'
 import iconClose from '../../src/assets/images/icon-close.svg'
 import iconPlus from '../../src/assets/images/icon-plus.svg'
-import { is } from '../../src/assets/utils'
 
 export default {
   name: 'plUpload',
@@ -43,9 +43,6 @@ export default {
   components: {
     iconClose,
     iconPlus
-  },
-  model: {
-    event: '-pl-change'
   },
   props: {
     value: Array,
@@ -71,65 +68,66 @@ export default {
       default: Infinity
     }
   },
-  data() {
-    return {
-      files: [],            // 文件列表
-      previewList: [],   // 图片预览列表
+  setup(props, context) {
+    const dialogPreview = ref(false)  // 预览弹窗
+    const previewIndex = ref(0)        // 预览index
 
-      dialogPreview: false,  // 预览弹窗
-      previewIndex: 0,        // 预览index
-      transStart: 0,
-      transDiff: 0
-    }
-  },
-  computed: {
-    // 列的样式
-    rowStyle() {
-      return {
-        'grid-template-columns': `repeat(${this.rows}, 1fr)`
+    // 文件列表
+    const fileArray = computed({
+      get: () => {
+        if (Array.isArray(props.value)) {
+          return props.value.map(file => {
+            if (file instanceof Blob) {
+              return {
+                type: getFileType(file),
+                url: getFileUrl(file),
+                preview: getFilePreview(file),
+                file
+              }
+            }
+            if (!file.url) {
+              file.url = getFileUrl(file)
+            }
+            if (!file.type) {
+              file.type = getFileType(file)
+            }
+            if (file.type === 'image' && !file.preview) {
+              file.preview = getFilePreview(file)
+            }
+            return file
+          })
+        }
+        return []
+      },
+      set: val => {
+        context.emit('update:value', val)
+        context.emit('change', val)
       }
-    },
-    // 预览图便宜量
-    translateX() {
-      return this.previewIndex * window.innerWidth
-    }
-  },
-  methods: {
-    // 预览
-    preview(file) {
-      if (file.type === 'image') {
-        this.previewList = this.files.filter(item => item.type === 'image')
-        this.previewIndex = this.previewList.findIndex(item => item === file)
-        this.dialogPreview = true
-      } else {
-        window.open(file.url)
-      }
-    },
-    closePreview() {
-      this.dialogPreview = false
-    },
+    })
+
     // 删除文件
-    delFile(index) {
-      this.files.splice(index, 1)
-    },
+    const delFile = (index) => {
+      props.value.splice(index, 1)
+      context.emit('change', fileArray.value)
+    }
     // 获取文件类型
-    getFileType(file) {
+    const getFileType = (file) => {
       return /image/.test(file.type) || /\.(jpe?g|png|gif|bmp)$/i.test(file.name) ? 'image' :
         /\.doc(x|m)?$/i.test(file.name) ? 'doc' :
           /\.xls(x|b|m)?$/i.test(file.name) ? 'xls' :
             /\.ppt(x|m)?$/i.test(file.name) ? 'ppt' :
               /\.pdf$/i.test(file.name) ? 'pdf' : ''
-    },
+    }
     // 根据文件类型获取预览图
-    getFilePreview(file) {
-      if (this.getFileType(file) === 'image') {
-        return this.getFileUrl(file)
+    const getFilePreview = (file) => {
+      if (getFileType(file) === 'image') {
+        return getFileUrl(file)
       } else {
         return null
       }
-    },
+    }
     // 获取文件链接
-    getFileUrl(file) {
+    const getFileUrl = (file) => {
       if (file.url) {
         return file.url
       }
@@ -137,15 +135,15 @@ export default {
         return window.URL.createObjectURL(file)
       }
       return null
-    },
+    }
     // 获取文件
-    setFiles(e) {
+    const setFiles = (e) => {
       let files = Array.from(e.target.files)
       let normalFiles = []
       let oversizeFiles = []
 
       files.forEach(file => {
-        if (file.size > this.maxSize) {
+        if (file.size > props.maxSize) {
           oversizeFiles.push(file)
         } else {
           normalFiles.push(file)
@@ -153,88 +151,112 @@ export default {
       })
 
       if (oversizeFiles.length) {
-        this.$emit('oversize', oversizeFiles)       // 文件超大事件
+        context.emit('oversize', oversizeFiles)       // 文件超大事件
       }
 
       let beforeResult = true
-      if (is(this.beforeRead, 'function')) {
+      if (typeof props.beforeRead == 'function') {
         // 文件选择前置钩子，返回false则取消添加文件
-        beforeResult = this.beforeRead(normalFiles) !== false
+        beforeResult = props.beforeRead(normalFiles) !== false
       }
 
       if (normalFiles.length && beforeResult) {
-
-        let fileLength = normalFiles.length + this.files.length
-        if (fileLength > this.maxCount) {
-          this.$emit('exceed', fileLength - this.maxCount)       // 文件数量超出事件
-          normalFiles = normalFiles.slice(0, this.maxCount - fileLength)
+        let fileLength = normalFiles.length + fileArray.value.length
+        if (fileLength > props.maxCount) {
+          context.emit('exceed', fileLength - props.maxCount)       // 文件数量超出事件
+          normalFiles = normalFiles.slice(0, props.maxCount - fileLength)
         }
-        this.files = this.files.concat(normalFiles.map(file => {
+        fileArray.value = [...fileArray.value, ...normalFiles.map(file => {
           return {
-            type: this.getFileType(file),
-            url: this.getFileUrl(file),
-            preview: this.getFilePreview(file),
+            type: getFileType(file),
+            url: getFileUrl(file),
+            preview: getFilePreview(file),
             file
           }
-        }))
+        })]
         // 文件选择后置钩子
-        is(this.afterRead, 'function') && this.afterRead(normalFiles)
-
-        this.$emit('-pl-change', this.files)
-        this.$emit('change', this.files)
+        if (typeof props.afterRead == 'function') {
+          props.afterRead(normalFiles)
+        }
       }
-    },
-    // 预览触摸滚动事件
-    touchEvent(e) {
-      let list = this.$refs['preview-list']
+    }
 
+    const previewList = ref([])   // 图片预览列表
+
+    // 预览
+    const preview = (file) => {
+      if (file.type === 'image') {
+        previewList.value = props.value.filter(item => item.type === 'image')
+        previewIndex.value = previewList.value.findIndex(item => item === file)
+        dialogPreview.value = true
+      } else {
+        window.open(file.url)
+      }
+    }
+
+    const closePreview = () => {
+      dialogPreview.value = false
+    }
+
+    // 预览图便宜量
+    const translateX = computed(() => {
+      return previewIndex.value * window.innerWidth
+    })
+
+    const previewListStyle = reactive({
+      transition: 'none',
+      transform: `translateX(${-translateX.value}px)`
+    })
+
+    watch(translateX, val => {
+      previewListStyle.transform = `translateX(${-val}px)`
+    })
+
+    let transStart = 0
+    let transDiff = 0
+
+    // 预览触摸滚动事件
+    const touchEvent = (e) => {
       switch (e.type) {
         case 'touchstart':
-          this.transStart = e.touches[0].clientX
-          list.style.transition = list.style.webkitTransition = 'none'
+          transStart = e.touches[0].clientX
+          previewListStyle.transition = 'none'
           break;
         case 'touchmove':
-          this.transDiff = e.touches[0].clientX - this.transStart
-          list.style.transform = list.style.webkitTransform = `translateX(${this.transDiff - this.translateX}px)`
+          transDiff = e.touches[0].clientX - transStart
+          previewListStyle.transform = `translateX(${transDiff - translateX.value}px)`
           break;
         case 'touchend':
         case 'touchcancel':
-          list.style.transition = list.style.webkitTransition = ''
-          if (this.transDiff > 0) {
-            this.previewIndex--
+          previewListStyle.transition = ''
+          if (transDiff > 0) {
+            previewIndex.value--
           } else {
-            this.previewIndex++
+            previewIndex.value++
           }
-          if (this.previewIndex < 0) {
-            this.previewIndex = 0
+          if (previewIndex.value < 0) {
+            previewIndex.value = 0
           }
-          if (this.previewIndex >= this.previewList.length) {
-            this.previewIndex = this.previewList.length - 1
+          if (previewIndex.value >= previewList.value.length) {
+            previewIndex.value = previewList.value.length - 1
           }
-          list.style.transform = list.style.webkitTransform = `translateX(${-this.translateX}px)`
+          previewListStyle.transform = `translateX(${-translateX.value}px)`
           break;
       }
     }
-  },
-  watch: {
-    'value': {
-      handler(val) {
-        if (Array.isArray(val)) {
-          val.forEach(file => {
-            if (!file.url) {
-              file.url = this.getFileUrl(file)
-            }
-            if (!file.type) {
-              file.type = this.getFileType(file)
-            }
-            if (file.type === 'image' && !file.preview) {
-              file.preview = this.getFilePreview(file)
-            }
-          })
-          this.files = val
-        }
-      },
-      immediate: true
+
+    return {
+      fileArray,
+      preview,
+      delFile,
+      setFiles,
+      dialogPreview,
+      translateX,
+      touchEvent,
+      closePreview,
+      previewList,
+      previewIndex,
+      previewListStyle
     }
   }
 }

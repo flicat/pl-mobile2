@@ -1,42 +1,52 @@
 <template>
   <div class="content">
-    <pl-button @click="open">打开</pl-button>
-    <pl-picker title="选择" :options="data" :prop="props" ref="picker" @submit="submit" :defaultValue="value">
-      <template v-slot="scope">{{scope.item.label}} - {{scope.item.value}}</template>
-    </pl-picker>
+    <pl-button @click="picker" type="primary">{{result.length ? getDateString(result.join('-'), 'Y年M月D日') : '打开日期选择器'}}</pl-button>
   </div>
 </template>
 <script>
-  export default {
-    data () {
-      return {
-        value: [2, 6],
-        data: {
-          children: [
-            {label: '选项1', value: 1, children: [
-              {label: '子选项3', value: 3},
-              {label: '子选项4', value: 4}
-            ]},
-            {label: '选项2', value: 2, children: [
-              {label: '子选项5', value: 5},
-              {label: '子选项6', value: 6}
-            ]}
-          ]
-        },
-        props: {
-          label: 'label',
-          value: 'value',
-          children: 'children'
-        }
-      }
-    },
-    methods: {
-      open () {
-        this.$refs.picker.open()
-      },
-      submit (val) {
-        this.value = val
+import { getCurrentInstance, ref } from 'vue'
+import { getMonthDays, getDateString } from '../../src/assets/utils/index.js'
+export default {
+  setup() {
+    const result = ref([])
+    const app = getCurrentInstance()
+    const { $picker } = app.appContext.config.globalProperties
+
+    async function picker() {
+      try {
+        result.value = await $picker({
+          title: '请选择',          // 弹框标题
+          defaultValue: result.value,   // 默认值
+          // 弹框选项列表
+          options: [
+            function () {
+              return new Array(20).fill('').map((i, index) => ({ label: index + 1990 + '年', value: index + 1990 }))
+            },
+            function () {
+              return new Array(12).fill('').map((i, index) => ({ label: index + 1 + '月', value: index + 1 }))
+            },
+            function (year, month) {
+              return new Array(getMonthDays(year, month)).fill('').map((i, index) => ({ label: index + 1 + '日', value: index + 1 }))
+            }
+          ],
+          // 弹框取值key
+          prop: {
+            label: 'label',
+            value: 'value',
+            children: 'children'
+          }
+        })
+        console.log(result.value)
+      } catch (e) {
+        console.log(e)
       }
     }
+
+    return {
+      getDateString,
+      result,
+      picker
+    }
   }
+}
 </script>

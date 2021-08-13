@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import { ref, watch, onUnmounted } from 'vue'
 import iconUp from '../../src/assets/images/icon-up.svg'
 
 export default {
@@ -20,15 +21,12 @@ export default {
       default: 0
     }
   },
-  data() {
-    return {
-      scrollTop: 0
-    }
-  },
-  methods: {
-    scrollToTop() {
-      let target = this.target
-      let top = this.scrollTop
+  setup(props) {
+    const scrollTop = ref(0)
+
+    const scrollToTop = () => {
+      let target = props.target
+      let top = scrollTop.value
       let step = top / 1000 * 60
       let animate = () => {
         top -= step
@@ -40,25 +38,25 @@ export default {
         target.scrollTop = top
       }
       animate()
-      this.scrollTop = 0
-    },
-    scrollHandler(e) {
-      this.scrollTop = e.target.scrollTop
+      scrollTop.value = 0
     }
-  },
-  beforeDestroy() {
-    if (this.target) {
-      this.target.removeEventListener('scroll', this.scrollHandler)
+    const scrollHandler = (e) => {
+      scrollTop.value = e.target.scrollTop
     }
-  },
-  watch: {
-    target: {
-      handler(val) {
-        if (val) {
-          val.addEventListener('scroll', this.scrollHandler)
-        }
-      },
-      immediate: true
+
+    watch(() => props.target, target => {
+      if (target) {
+        target.addEventListener('scroll', scrollHandler)
+      }
+    })
+
+    onUnmounted(() => {
+      props.target.removeEventListener('scroll', scrollHandler)
+    })
+
+    return {
+      scrollToTop,
+      scrollTop
     }
   }
 }

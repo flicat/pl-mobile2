@@ -4,7 +4,7 @@
 
 ```html
 <template>
-  <pl-select v-model="value" :options="data"></pl-select>
+  <pl-select v-model:value="value" :options="data"></pl-select>
 </template>
 <script>
   export default {
@@ -25,7 +25,7 @@
 ### 多选
 ```html
 <template>
-  <pl-select v-model="value" :options="data" multiple></pl-select>
+  <pl-select v-model:value="value" :options="data" multiple></pl-select>
 </template>
 <script>
   export default {
@@ -46,7 +46,7 @@
 ### 表单验证
 ```html
 <template>
-  <pl-select ref="select" :rules="rules" label="请选择：" labelWidth="5em" v-model="value" :options="data" @change="change" clearable></pl-select>
+  <pl-select ref="select" :rules="rules" label="请选择：" labelWidth="5em" v-model:value="value" :options="data" @change="change" clearable></pl-select>
 </template>
 <script>
   export default {
@@ -82,7 +82,7 @@
 ```html
 <template>
   <div class="content">
-    <pl-select v-model="value" :options="data">
+    <pl-select v-model:value="value" :options="data">
       <template v-slot="scope">
         <span>{{scope.item.label}}-{{scope.item.value}}</span>
       </template>

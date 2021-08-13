@@ -1,10 +1,12 @@
 import plLoading from './index.vue'
-import { createApp, h } from 'vue'
+import { render, h } from 'vue'
 
 /* istanbul ignore next */
 plLoading.install = function (App) {
+  App.component(plLoading.name, plLoading);
+
   // loading
-  let loading = createApp({
+  let vNode = h({
     data() {
       return {
         vertical: true,
@@ -32,33 +34,32 @@ plLoading.install = function (App) {
             color: '#fff',
             margin: 'auto'
           }
-        }, this.text)
+        }, {
+          default: () => this.text
+        })
       ])
     }
   })
 
-
-  const loadingDom = document.createElement('div')
-  document.body.appendChild(loadingDom)
-  const vm = loading.mount(loadingDom)
-
-
-  App.component(plLoading.name, plLoading);
+  const vNodeDom = document.createElement('div')
+  document.body.appendChild(vNodeDom)
+  vNode.appContext = App._context
+  render(vNode, vNodeDom)
 
   let loadingCount = 0
 
   App.config.globalProperties.$loadingShow = function (text, vertical) {
     loadingCount++
-    vm.isShow = true
-    vm.text = text
+    vNode.component.proxy.isShow = true
+    vNode.component.proxy.text = text
     if (typeof vertical === 'boolean') {
-      vm.vertical = vertical
+      vNode.component.proxy.vertical = vertical
     }
   }
 
   App.config.globalProperties.$loadingHide = function () {
     loadingCount--
-    vm.isShow = loadingCount > 0
+    vNode.component.proxy.isShow = loadingCount > 0
   }
 };
 

@@ -15,6 +15,7 @@
 </template>
 
 <script>
+import { provide, ref, reactive, onMounted, watch } from 'vue'
 import iconMoreDown from '../../src/assets/images/icon-more-down.svg'
 import iconMoreUp from '../../src/assets/images/icon-more-up.svg'
 
@@ -25,11 +26,6 @@ export default {
   components: {
     iconMoreDown,
     iconMoreUp
-  },
-  provide() {
-    return {
-      steps: this
-    }
   },
   props: {
     active: {              //  当前步骤 0
@@ -49,49 +45,64 @@ export default {
       default: false
     }
   },
-  data() {
-    return {
-      currentItem: this.active === undefined ? 0 : this.active,        // 当前激活标签
-      isFold: this.fold === undefined ? true : this.fold,              // 是否折叠
-      items: []                                                        // 内容节点列表
-    }
-  },
-  computed: {
+  setup(props) {
+    const currentItem = ref(props.active === undefined ? 0 : props.active)        // 当前激活标签
+    provide('active', currentItem)
 
-  },
-  mounted() {
-    this.updateItems()
-  },
-  methods: {
-    setCurrentItem(value) {
-      if (this.currentItem === value) {
+    const isFold = ref(props.fold === undefined ? true : props.fold)              // 是否折叠
+    const items = reactive([])                                                        // 内容节点列表
+    provide('items', items)
+
+    const direction = ref(props.direction)
+    provide('direction', direction)
+
+    const activeColor = ref(props.activeColor)
+    provide('activeColor', activeColor)
+
+    const setCurrentItem = (value) => {
+      if (currentItem.value === value) {
         return false
       }
-      this.currentItem = value;
-    },
+      currentItem.value = value;
+    }
     // 更新内容节点
-    updateItems() {
-      this.items = this.$children.filter(item => item.$options.name === 'plStepItem')
-    },
+    const updateItems = (child) => {
+      if (child && !items.includes(child)) {
+        items.push(child)
+      }
+    }
+    provide('updateItems', updateItems)
+
     // 删除内容节点
-    removeItem(item) {
-      const items = this.items;
+    const removeItem = (item) => {
       const index = items.indexOf(item);
       if (index > -1) {
         items.splice(index, 1);
       }
-    },
-    // 展开/收起
-    toggle() {
-      this.isFold = !this.isFold
     }
-  },
-  watch: {
-    'active'(val) {
-      this.setCurrentItem(val)
-    },
-    'fold'(val) {
-      this.isFold = val
+    provide('removeItem', removeItem)
+
+    // 展开/收起
+    const toggle = () => {
+      isFold.value = !isFold.value
+    }
+
+    watch(() => props.active, (val) => {
+      setCurrentItem(val)
+    })
+    watch(() => props.fold, (val) => {
+      isFold.value = val
+    })
+
+    onMounted(() => {
+      updateItems()
+    })
+
+    return {
+      direction,
+      isFold,
+      items,
+      toggle
     }
   }
 }
@@ -136,7 +147,7 @@ export default {
       flex-direction: column;
     }
     .pl-steps-fold {
-      :deep(.pl-step + .pl-step) {
+      .pl-step + .pl-step {
         display: none;
       }
     }

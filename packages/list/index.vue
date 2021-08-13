@@ -1,7 +1,6 @@
 <template>
   <div class="pl-list">
-    <div class="pl-list-wrap" ref="list" @scroll.stop="handlerScroll($event)" @touchstart.stop="touchEvent($event)" @touchmove.stop="touchEvent($event)" @touchend.stop="touchEvent($event)" @touchcancel.stop="touchEvent($event)">
-
+    <div class="pl-list-wrap" ref="listRef" @scroll.stop="handlerScroll($event)" @touchstart.stop="touchEvent($event)" @touchmove.stop="touchEvent($event)" @touchend.stop="touchEvent($event)" @touchcancel.stop="touchEvent($event)">
       <div class="pl-list-loading-top" v-show="translate < 0 && loading">
         <slot name="top-loading">
           <loading>{{loadingText}}</loading>
@@ -10,8 +9,11 @@
       <div class="pl-list-refresh-tip" v-show="translate < 0 && !loading">
         <slot name="top-refresh">{{refreshText}}</slot>
       </div>
-      <div class="pl-list-inner" :style="innerStyle" ref="inner">
-        <slot></slot>
+      <div class="pl-list-inner" :style="innerStyle" ref="innerRef">
+        <list v-if="splitSize > 0" :splitSize="splitSize">
+          <slot></slot>
+        </list>
+        <slot v-else></slot>
         <div class="pl-list-loading-bottom" v-show="(translate > 0 || (translate === 0 && loading)) && !finished">
           <slot name="bottom-loading">
             <loading>{{loadingText}}</loading>
@@ -22,20 +24,20 @@
         </div>
       </div>
     </div>
-    <go-top-button v-if="topButton" :target="$refs.list"></go-top-button>
   </div>
 </template>
 
 <script>
+import { computed, ref, watch, nextTick } from 'vue'
 import loading from '../loading/index.vue'
-import goTopButton from '../goTopButton/index.vue'
+import list from './list.vue'
 
 export default {
   name: 'plList',
   componentName: 'plList',
   components: {
     loading,
-    goTopButton
+    list
   },
   props: {
     // 是否处于加载状态，加载过程中不触发load事件
@@ -68,63 +70,58 @@ export default {
       type: String,
       default: '加载完成'
     },
-    // 加载失败后的提示文案
-    errorText: {
-      type: String,
-      default: '加载失败'
-    },
-    topButton: Boolean    // 返回顶部按钮
-  },
-  data() {
-    return {
-      translate: 0,
-      transition: null,
-      transDiff: 0,
-      canDrag: true,
-      scrollTop: 0,
-      scrollBottom: 0
+    splitSize: {    // 长列表分段显示数量
+      type: Number,
+      default: 0
     }
   },
-  computed: {
-    innerStyle() {
+  setup(props, context) {
+    const listRef = ref(null)
+    const innerRef = ref(null)
+
+    const translate = ref(0)
+    let transition = ref(null)
+    let transDiff = 0
+    let canDrag = true
+    let scrollTop = 0
+    let scrollBottom = 0
+
+    const innerStyle = computed(() => {
       return {
-        'transform': `translateY(${-this.translate}px)`,
-        'webkitTransform': `translateY(${-this.translate}px)`,
-        ...(this.transition ? {
-          'transition': this.transition,
-          'webkitTransition': this.transition
+        'transform': `translateY(${-translate.value}px)`,
+        'webkitTransform': `translateY(${-translate.value}px)`,
+        ...(transition.value ? {
+          'transition': transition.value,
+          'webkitTransition': transition.value
         } : null)
       }
-    }
-  },
-  mounted() {
+    })
 
-  },
-  methods: {
     // 触摸事件
-    touchEvent(e) {
+    const touchEvent = (e) => {
       let diff = 0
 
       switch (e.type) {
         case 'touchstart':
-          this.scrollTop = this.$refs.list.scrollTop
-          this.scrollBottom = this.$refs.list.scrollHeight - this.scrollTop - this.$refs.list.clientHeight
-          this.canDrag = (this.scrollTop < 2 || this.scrollBottom < 2) && !this.loading
-
-          this.transDiff = e.touches[0].clientY
-          this.transition = 'none'
+          scrollTop = listRef.value.scrollTop
+          scrollBottom = listRef.value.scrollHeight - scrollTop - listRef.value.clientHeight
+          canDrag = (scrollTop < 2 || scrollBottom < 2) && !props.loading
+          if (canDrag) {
+            transDiff = e.touches[0].clientY
+            transition.value = 'none'
+          }
           break;
         case 'touchmove':
-          if (this.canDrag) {
-            diff = (this.transDiff - e.touches[0].clientY) / 2
-            if ((this.scrollTop < 2 && diff < 0) || (this.scrollBottom < 2 && diff > 0)) {
+          if (canDrag) {
+            diff = (transDiff - e.touches[0].clientY) / 2
+            if ((scrollTop < 2 && diff < 0) || (scrollBottom < 2 && diff > 0)) {
               if (diff > 80) {
                 diff = 80
               }
               if (diff < -80) {
                 diff = -80
               }
-              this.translate = diff
+              translate.value = diff
               e.preventDefault()
               e.stopPropagation()
             }
@@ -132,48 +129,58 @@ export default {
           break;
         case 'touchend':
         case 'touchcancel':
-          if (Math.abs(this.translate) >= 80 && !this.loading) {
-            if (this.translate < 0 && this.scrollTop < 2) {
-              this.$emit('refresh')
+          if (canDrag) {
+            if (Math.abs(translate.value) >= 80 && !props.loading) {
+              if (translate.value < 0 && scrollTop < 2) {
+                context.emit('refresh')
+              }
+              if (translate.value > 0 && scrollBottom < 2 && !props.finished) {
+                context.emit('load')
+              }
             }
-            if (this.translate > 0 && this.scrollBottom < 2 && !this.finished) {
-              this.$emit('load')
-            }
-          }
-          this.$nextTick(() => {
-            if (!this.loading || this.finished) {
-              this.translate = 0
-            }
-          })
+            nextTick(() => {
+              if (!props.loading || props.finished) {
+                translate.value = 0
+              }
+            })
 
-          this.transition = null
+            transition.value = null
+          }
           break;
       }
-    },
+    }
     // 滚动事件
-    handlerScroll({ target: { scrollTop, clientHeight, scrollHeight } }) {
-      if (this.autoLoad === false || this.finished || this.loading) {
+    const handlerScroll = ({ target: { scrollTop, clientHeight, scrollHeight } }) => {
+      if (props.autoLoad === false || props.finished || props.loading) {
         return false
       }
-      if (scrollHeight - scrollTop - clientHeight <= Number(this.autoLoad)) {
-        this.$emit('load')
+      if (scrollHeight - scrollTop - clientHeight <= Number(props.autoLoad)) {
+        context.emit('load')
       }
     }
-  },
-  watch: {
-    'loading'(val) {
-      if (!val) {
-        this.translate = 0
 
-        if (!this.finished && !this.loading) {
+    watch(() => props.loading, val => {
+      if (!val) {
+        translate.value = 0
+
+        if (!props.finished && !props.loading) {
           // 如果加载内容的高度不够则继续加载下一页
-          this.$nextTick(() => {
-            if (this.$refs.list && this.$refs.inner && this.$refs.inner.scrollHeight <= this.$refs.list.clientHeight) {
-              this.$emit('load')
+          nextTick(() => {
+            if (listRef.value && innerRef.value && innerRef.value.scrollHeight <= listRef.value.clientHeight) {
+              context.emit('load')
             }
           })
         }
       }
+    })
+
+    return {
+      listRef,
+      handlerScroll,
+      touchEvent,
+      translate,
+      innerStyle,
+      innerRef
     }
   }
 }

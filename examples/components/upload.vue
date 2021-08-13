@@ -1,9 +1,9 @@
 <template>
   <div class="content">
     <h3>基础用法</h3>
-    <pl-upload v-model="files" accept="image/*" class="file-upload"></pl-upload>
+    <pl-upload v-model:value="files" accept="image/*" class="file-upload" :beforeRead="beforeRead" :afterRead="afterRead" multiple @change="onChange"></pl-upload>
     <h3>自定义按钮</h3>
-    <pl-upload v-model="files" accept="image/*" class="file-upload">
+    <pl-upload v-model:value="files" accept="image/*" class="file-upload" @change="onChange">
       <template v-slot:tips><span>请选择图片，格式不限</span></template>
       <template v-slot="scope">
         <pl-button class="home" @click="setHomePage(scope.file)" size="small">设为首页</pl-button>
@@ -24,11 +24,20 @@ export default {
   methods: {
     setHomePage(file) {
       console.log(file)
+    },
+    onChange(files) {
+      console.log('onChange: ', files)
+    },
+    beforeRead(files) {
+      console.log('beforeRead: ', files, this)
+    },
+    afterRead(files) {
+      console.log('afterRead: ', files, this)
     }
   }
 }
 </script>
-<style scoped>
+<style lang="less" scoped>
 .file-upload {
   position: relative;
 }

@@ -5,7 +5,7 @@
 ```html
 <template>
   <pl-form ref="form">
-    <pl-input v-model="value" />
+    <pl-input v-model:value="value" />
   </pl-form>
 </template>
 <script>
@@ -25,7 +25,7 @@
 ```html
 <template>
   <pl-form labelWidth="5em" size="small" disabled>
-    <pl-input v-model="value" label="用户名：" />
+    <pl-input v-model:value="value" label="用户名：" />
   </pl-form>
 </template>
 <script>
@@ -46,14 +46,14 @@
 <template>
   <div class="content">
     <pl-form labelWidth="5em" ref="form">
-      <pl-input v-model="value" :rules="rules.input" required ref="input" label="名字：" />
-      <pl-select :options="options" :rules="rules.select" v-model="value" label="请选择：" required></pl-select>
-      <pl-range v-model="rangeValue" :rules="rules.range" :min="0" :max="100" :step="1" label="请选择：" labelWidth="5em" required>
+      <pl-input v-model:value="value" :rules="rules.input" required ref="input" label="名字：" />
+      <pl-select :options="options" :rules="rules.select" v-model:value="value" label="请选择：" required></pl-select>
+      <pl-range v-model:value="rangeValue" :rules="rules.range" :min="0" :max="100" :step="1" label="请选择：" labelWidth="5em" required>
         <span slot="prepend">0%</span>
         <span slot="append">{{rangeValue}}%</span>
       </pl-range>
-      <pl-radio v-model="value" :options="options" :rules="rules.radio" label="单选：" required></pl-radio>
-      <pl-checkbox v-model="checkboxValue" :options="options" :rules="rules.checkbox" required ref="checkbox" label="多选："></pl-checkbox>
+      <pl-radio v-model:value="value" :options="options" :rules="rules.radio" label="单选：" required></pl-radio>
+      <pl-checkbox v-model:value="checkboxValue" :options="options" :rules="rules.checkbox" required ref="checkbox" label="多选："></pl-checkbox>
       <p>
         <pl-button @click="submit" type="primary">提交</pl-button>
       </p>

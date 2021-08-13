@@ -4,6 +4,12 @@
 <script>
 import * as Vue from 'vue'
 console.log(Vue)
+export default {
+  setup() {
+    const app = Vue.getCurrentInstance()
+    console.log(app)
+  }
+}
 </script>
 <style lang="less">
 @import "./assets/base.less";

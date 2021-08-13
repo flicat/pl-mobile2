@@ -4,7 +4,7 @@
 
 ```html
 <template>
-  <pl-tabs v-model="active" type="button">
+  <pl-tabs v-model:value="active" type="button">
     <pl-tab-item v-for="item in data" :name="item.name" :disabled="item.disabled" :label="item.label" :key="item.name">
       这里是{{item.label}}
     </pl-tab-item>
@@ -30,7 +30,7 @@
 
 ```html
 <template>
-  <pl-tabs v-model="active" type="button" position="left">
+  <pl-tabs v-model:value="active" type="button" position="left">
     <pl-tab-item v-for="item in data" :name="item.name" :disabled="item.disabled">{{item.label}}</pl-tab-item>
   </pl-tabs>
 </template>
@@ -44,7 +44,7 @@
           {label: '选项2', name: 'tab2', disabled: false},
           {label: '选项3', name: 'tab3', disabled: true}
         ]
-      }           
+      }
     }
   }
 </script>
@@ -56,7 +56,7 @@
 
 ```html
 <template>
-  <pl-tabs v-model="active" type="card" position="right">
+  <pl-tabs v-model:value="active" type="card" position="right">
     <pl-tab-item v-for="item in data" :name="item.name" :disabled="item.disabled" :key="item.name">
       <span slot="title">--{{item.label}}--</span>
       <span>{{item.label}}</span>
@@ -73,7 +73,7 @@
           {label: '选项2', name: 'tab2'},
           {label: '选项3', name: 'tab3'}
         ]
-      }           
+      }
     }
   }
 </script>
@@ -89,7 +89,7 @@
 ### Tabs Events
 | 事件名称      | 说明    | 回调参数      |
 |---------- |-------- |---------- |
-| change     |   value更改事件   | 更改后的value | 
+| change     |   value更改事件   | 更改后的value |
 
 
 ### TabItem Attributes
@@ -101,7 +101,7 @@
 
 
 ### TabItem Slots
-| name      | 说明    | 
+| name      | 说明    |
 |---------- |-------- |
 | (default)     |   tab页内容   |
 | title     |   自定义标题   |

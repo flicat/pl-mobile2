@@ -1,7 +1,7 @@
 <template>
   <div :class="['pl-watch-popup', show ? '' : 'hidden']" @click.self="close">
     <svg class="watch-content" viewBox="0 0 250 370" @touchstart.stop.prevent="touchHandler" @touchmove.stop.prevent="touchHandler">
-      <def>
+      <defs>
         <circle id="watch-bg" cx="125" cy="125" r="110" class="watch-bg"></circle>
         <rect id="text-bg" x="0" y="0" height="60" width="250" class="text-bg" />
         <g id="hour-num">
@@ -20,7 +20,7 @@
           <circle class="needle-center" cx="125" cy="125" r="5"></circle>
           <rect class="needle" x="125" y="76" height="54" width="1" />
         </g>
-      </def>
+      </defs>
 
       <!-- 表盘 -->
       <g ref="watch">
@@ -76,7 +76,8 @@
 </template>
 
 <script>
-import { getDateFromString } from '../../src/assets/utils'
+import { ref, reactive, computed } from 'vue'
+import { getDateString, getDateFromString } from '../../src/assets/utils'
 
 // 日历默认配置信息
 const defaultOption = {
@@ -84,156 +85,159 @@ const defaultOption = {
   startValue: null,        // 默认开始时间（范围）
   endValue: null,          // 默认结束时间（范围）
   isRange: false,         // 是否是范围选择
-  selectRange: null      // 时间可选最大范围
+  selectRange: null,      // 时间可选最大范围
+  format: 'H:I'
 }
 
+// 拆解出时间
+const getTimeValue = (timeStr) => {
+  if (timeStr) {
+    let time = getDateFromString(timeStr)
+    if (time) {
+      return [time.getHours(), time.getMinutes()]
+    }
+  }
+  return [0, 0]
+}
+
+// 获取时间格式
+const getTimeFormat = (hour, minute, format) => {
+  let date = new Date()
+  date.setHours(hour, minute, 0, 0)
+  return getDateString(date, format)
+}
 
 export default {
   name: 'plTimePopup',
   componentName: 'plTimePopup',
-  data() {
-    return {
-      options: Object.assign({}, defaultOption),
-      currentHour: 0,           // 小时（单选）
-      currentMinute: 0,         // 分钟（单选）
-      startHour: 0,             // 开始小时（范围）
-      startMinute: 0,           // 开始分钟（范围）
-      endHour: 0,               // 结束小时（范围）
-      endMinute: 0,             // 结束分钟（范围）
+  setup(props, context) {
+    const watch = ref(null)
+    const options = reactive(Object.assign({}, defaultOption))
 
-      currentPointer: null,     // 当前拖放的指针
-      watchClientRect: null,    // 表盘的位置信息
-      show: false
-    }
-  },
-  computed: {
-    hours() {
-      return new Array(12).fill('').map((item, i) => String(i * 2).padStart(2, '0'))
-    },
-    minutes() {
-      return new Array(12).fill('').map((item, i) => String(i * 5).padStart(2, '0'))
-    },
-    currentTime() {
-      return [this.currentHour, this.currentMinute].map(item => String(item).padStart(2, '0')).join(':')
-    },
-    currentStartTime() {
-      return [this.startHour, this.startMinute].map(item => String(item).padStart(2, '0')).join(':')
-    },
-    currentEndTime() {
-      return [this.endHour, this.endMinute].map(item => String(item).padStart(2, '0')).join(':')
-    },
+    const currentHour = ref(0)           // 小时（单选）
+    const currentMinute = ref(0)         // 分钟（单选）
+    const startHour = ref(0)             // 开始小时（范围）
+    const startMinute = ref(0)           // 开始分钟（范围）
+    const endHour = ref(0)               // 结束小时（范围）
+    const endMinute = ref(0)             // 结束分钟（范围）
+
+    const currentPointer = ref(null)     // 当前拖放的指针
+    let watchClientRect = null    // 表盘的位置信息
+    const show = ref(false)
+
+    const hours = new Array(12).fill('').map((item, i) => String(i * 2).padStart(2, '0'))
+    const minutes = new Array(12).fill('').map((item, i) => String(i * 5).padStart(2, '0'))
+
+    const currentTime = computed(() => {
+      return [currentHour.value, currentMinute.value].map(item => String(item).padStart(2, '0')).join(':')
+    })
+    const currentStartTime = computed(() => {
+      return [startHour.value, startMinute.value].map(item => String(item).padStart(2, '0')).join(':')
+    })
+    const currentEndTime = computed(() => {
+      return [endHour.value, endMinute.value].map(item => String(item).padStart(2, '0')).join(':')
+    })
     // 小时指针角度（单选）
-    hourAngle() {
-      return this.currentHour * 15
-    },
+    const hourAngle = computed(() => {
+      return currentHour.value * 15
+    })
     // 分钟指针角度（单选）
-    menuteAngle() {
-      return this.currentMinute * 6
-    },
+    const menuteAngle = computed(() => {
+      return currentMinute.value * 6
+    })
     // 开始小时指针角度（范围）
-    startHourAngle() {
-      return this.startHour * 15
-    },
+    const startHourAngle = computed(() => {
+      return startHour.value * 15
+    })
     // 开始分钟指针角度（范围）
-    startMenuteAngle() {
-      return this.startMinute * 6
-    },
+    const startMenuteAngle = computed(() => {
+      return startMinute.value * 6
+    })
     // 结束小时指针角度（范围）
-    endHourAngle() {
-      return this.endHour * 15
-    },
+    const endHourAngle = computed(() => {
+      return endHour.value * 15
+    })
     // 结束分钟指针角度（范围）
-    endMenuteAngle() {
-      return this.endMinute * 6
-    },
+    const endMenuteAngle = computed(() => {
+      return endMinute.value * 6
+    })
     // 已选时间范围显示
-    selectedRange() {
-      let hourDiff = this.endHour - this.startHour
+    const selectedRange = computed(() => {
+      let hourDiff = endHour.value - startHour.value
       if (hourDiff < 0) {
         hourDiff += 24
       }
       return {
-        rotate: this.startHour * 15 - 90,
+        rotate: startHour.value * 15 - 90,
         offset: 377 - parseInt((hourDiff / 24) * 377)
       }
-    }
-  },
-  methods: {
-    // 拆解出时间
-    getTimeValue(timeStr) {
-      if (timeStr) {
-        let time = getDateFromString(timeStr)
-        if (time) {
-          return [time.getHours(), time.getMinutes()]
-        }
-      }
-      return [0, 0]
-    },
+    })
+
     // 初始化配置
-    open(options) {
-      Object.assign(this.options, defaultOption, options)
+    const open = (option) => {
+      Object.assign(options, defaultOption, option)
 
-      if (this.options.isRange) {
-        [this.startHour, this.startMinute] = this.getTimeValue(this.options.startValue);
-        [this.endHour, this.endMinute] = this.getTimeValue(this.options.endValue);
-        this.currentPointer = { name: 'startHour', angle: 15 }
+      if (options.isRange) {
+        [startHour.value, startMinute.value] = getTimeValue(options.startValue);
+        [endHour.value, endMinute.value] = getTimeValue(options.endValue);
+        currentPointer.value = { name: 'startHour', angle: 15 }
       } else {
-        [this.currentHour, this.currentMinute] = this.getTimeValue(this.options.value);
-        this.currentPointer = { name: 'currentHour', angle: 15 }
+        [currentHour.value, currentMinute.value] = getTimeValue(options.value);
+        currentPointer.value = { name: 'currentHour', angle: 15 }
       }
 
-      this.show = true
-    },
+      show.value = true
+    }
     // 关闭日历
-    close() {
-      this.show = false
-    },
+    const close = () => {
+      show.value = false
+    }
     // 计算时间/分钟角度位置
-    getTimePosition(angle, diameter) {
+    const getTimePosition = (angle, diameter) => {
       let radian = 2 * Math.PI / 360 * ((540 - angle) % 360)
       return {
         x: 125 + diameter * Math.sin(radian),
         y: 125 + diameter * Math.cos(radian)
       }
-    },
+    }
     // 设置小时
-    setHours(name) {
+    const setHours = (name) => {
       if (!name) {
-        if (/Hour$/.test(this.currentPointer.name)) {
-          name = this.currentPointer.name
+        if (/Hour$/.test(currentPointer.value.name)) {
+          name = currentPointer.value.name
         } else {
-          name = this.options.isRange ? 'startHour' : 'currentHour'
+          name = options.isRange ? 'startHour' : 'currentHour'
         }
       }
-      this.currentPointer = { name, angle: 15 }
-    },
+      currentPointer.value = { name, angle: 15 }
+    }
     // 设置分钟
-    setMinutes(name) {
+    const setMinutes = (name) => {
       if (!name) {
-        if (/Minute$/.test(this.currentPointer.name)) {
-          name = this.currentPointer.name
+        if (/Minute$/.test(currentPointer.value.name)) {
+          name = currentPointer.value.name
         } else {
-          name = this.options.isRange ? this.currentPointer.name === 'startHour' ? 'startMinute' : 'endMinute' : 'currentMinute'
+          name = options.isRange ? currentPointer.value.name === 'startHour' ? 'startMinute' : 'endMinute' : 'currentMinute'
         }
       }
-      this.currentPointer = { name, angle: 6 }
-    },
+      currentPointer.value = { name, angle: 6 }
+    }
     // 拖动选时间
-    touchHandler({ type, touches }) {
+    const touchHandler = ({ type, touches }) => {
       if (!touches.length) {
         return false
       }
-      if (type === 'touchstart' && !this.watchClientRect) {
-        this.watchClientRect = this.$refs.watch.getBoundingClientRect()
+      if (type === 'touchstart' && !watchClientRect) {
+        watchClientRect = watch.value.getBoundingClientRect()
       }
-      this.getTimeFromAngle(touches[0])
-    },
+      getTimeFromAngle(touches[0])
+    }
     // 根据角度计算时间值
-    getTimeFromAngle({ clientX, clientY }) {
-      if (!this.watchClientRect || !this.currentPointer) {
+    const getTimeFromAngle = ({ clientX, clientY }) => {
+      if (!watchClientRect || !currentPointer.value) {
         return false
       }
-      let { left, top, width, height } = this.watchClientRect
+      let { left, top, width, height } = watchClientRect
       let x = clientX - left - width / 2
       let y = clientY - top - height / 2
 
@@ -248,31 +252,74 @@ export default {
         angle += 90;
       }
 
-      let time = Math.round(angle / this.currentPointer.angle)
-      if (time * this.currentPointer.angle === 360) {
+      let time = Math.round(angle / currentPointer.value.angle)
+      if (time * currentPointer.value.angle === 360) {
         time = 0
       }
-
-      this[this.currentPointer.name] = time
-    },
-
+      switch (currentPointer.value.name) {
+        case 'startHour':
+          startHour.value = time
+          break;
+        case 'endHour':
+          endHour.value = time
+          break;
+        case 'currentHour':
+          currentHour.value = time
+          break;
+        case 'startMinute':
+          startMinute.value = time
+          break;
+        case 'endMinute':
+          endMinute.value = time
+          break;
+        case 'currentMinute':
+          currentMinute.value = time
+          break;
+      }
+    }
     // 提交结果
-    submit() {
-      let { currentHour, currentMinute, startHour, startMinute, endHour, endMinute, options: { isRange } } = this
+    const submit = () => {
+      let { isRange, format } = options
       let result
 
       if (isRange) {
-        result = [+(new Date()).setHours(startHour, startMinute, 0, 0), +(new Date()).setHours(endHour, endMinute, 0, 0)]
+        result = [getTimeFormat(startHour.value, startMinute.value, format), getTimeFormat(endHour.value, endMinute.value, format)]
       } else {
-        result = +(new Date()).setHours(currentHour, currentMinute, 0, 0)
+        result = getTimeFormat(currentHour.value, currentMinute.value, format)
       }
       // 直接唤起的回调
-      if (typeof this.options.callback === 'function') {
-        this.options.callback(result)
+      if (typeof options.callback === 'function') {
+        options.callback(result)
       }
 
-      this.$emit('submit', result)
-      this.close()
+      context.emit('submit', result)
+      close()
+    }
+
+    return {
+      watch,
+      hours,
+      minutes,
+      options,
+      currentPointer,
+      show,
+      open,
+      close,
+      touchHandler,
+      getTimePosition,
+      selectedRange,
+      setMinutes,
+      setHours,
+      hourAngle,
+      menuteAngle,
+      startMenuteAngle,
+      endMenuteAngle,
+      startHourAngle,
+      endHourAngle,
+      currentTime,
+      currentStartTime,
+      currentEndTime,
+      submit
     }
   }
 }

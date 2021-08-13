@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import { computed, onMounted, ref, watch } from 'vue'
 export default {
   name: 'plProgress',
   componentName: 'plProgress',
@@ -30,48 +31,43 @@ export default {
       default: 'bar'
     }
   },
-  data() {
-    return {
-      value: 0,
-      finalValue: 0
-    }
-  },
-  computed: {
-    trackStyle() {
-      return {
-        'width': this.progress + '%'
-      }
-    }
-  },
-  mounted() {
-    this.animate()
-  },
-  methods: {
-    async animate() {
-      let progress = Number(this.progress)
+  setup(props) {
+    const value = ref(0)
+    const finalValue = ref(0)
+
+    const animate = async () => {
+      let progress = Number(props.progress)
       if (!progress || progress < 0) {
         progress = 0
       }
       if (progress > 100) {
         progress = 100
       }
-      this.finalValue = progress
+      finalValue.value = progress
 
-      let step = Math.round((progress - this.value) / 20)
-      while (Math.abs(progress - this.value) > Math.abs(step)) {
+      let step = Math.round((progress - value.value) / 20)
+      while (Math.abs(progress - value.value) > Math.abs(step)) {
         await new Promise(resolve => {
-          this.value += step
+          value.value += step
           requestAnimationFrame(resolve)
         })
       }
-      if (this.value != this.finalValue) {
-        this.value = this.finalValue
+      if (value.value != finalValue.value) {
+        value.value = finalValue.value
       }
     }
-  },
-  watch: {
-    progress() {
-      this.animate()
+
+    watch(() => props.progress, () => {
+      animate()
+    })
+
+    onMounted(() => {
+      animate()
+    })
+
+    return {
+      value,
+      finalValue
     }
   }
 }

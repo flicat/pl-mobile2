@@ -1,14 +1,16 @@
 import plToast from './index.vue'
-import { createApp, h, nextTick } from 'vue'
+import { render, h, nextTick } from 'vue'
 
 // toast
 export default function (App) {
-  let Toast = createApp({
+  let vNode = h({
     render() {
       return this.display && h('div', {
         style: {
           transition: 'all 0.3s ease',
-          opacity: this.visible ? 1 : 0
+          opacity: this.visible ? 1 : 0,
+          position: 'relative',
+          zIndex: 998
         }
       }, [
         h(plToast, {
@@ -46,27 +48,27 @@ export default function (App) {
     }
   })
 
-  const toastDom = document.createElement('div')
-  document.body.appendChild(toastDom)
-  const vm = Toast.mount(toastDom)
+  const vNodeDom = document.createElement('div')
+  document.body.appendChild(vNodeDom)
+  vNode.appContext = App._context
+  render(vNode, vNodeDom)
 
   App.config.globalProperties.$toast = async function (text, duration, html = false) {
-    vm.text = text
-    vm.html = html
-    vm.show()
+    vNode.component.proxy.text = text
+    vNode.component.proxy.html = html
+    vNode.component.proxy.show()
     duration |= 0
 
     if (!duration || !/\d+/.test(duration)) {
       duration = 3000
     }
 
-    await new Promise((resolve, reject) => {
-      clearTimeout(vm.timer)
-      vm.timer = setTimeout(async () => {
-        await vm.hide()
+    return new Promise((resolve, reject) => {
+      clearTimeout(vNode.component.proxy.timer)
+      vNode.component.proxy.timer = setTimeout(async () => {
+        await vNode.component.proxy.hide()
         resolve()
       }, duration)
     })
   }
-
 }

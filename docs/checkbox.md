@@ -4,7 +4,7 @@
 
 ```html
 <template>
-  <pl-checkbox v-model="value" :options="data" />
+  <pl-checkbox v-model:value="value" :options="data" />
 </template>
 <script>
   export default {
@@ -26,7 +26,7 @@
 
 ```html
 <template>
-  <pl-checkbox v-model="value" :options="data" label="请选择：" labelWidth="5em" />
+  <pl-checkbox v-model:value="value" :options="data" label="请选择：" labelWidth="5em" />
 </template>
 <script>
   export default {
@@ -48,7 +48,7 @@
 
 ```html
 <template>
-  <pl-checkbox v-model="value" :options="data" :rules="rules" required ref="checkbox" />
+  <pl-checkbox v-model:value="value" :options="data" :rules="rules" required ref="checkbox" />
 </template>
 <script>
   export default {
@@ -59,7 +59,7 @@
           {label: '选项1', value: 1, disabled: false},
           {label: '选项2', value: 2, disabled: true}
         ],
-        rules: [{required: true, message: '请选择', trigger: 'change', type: 'number'}]
+        rules: [{required: true, message: '请选择', trigger: 'change', type: 'array'}]
       }
     },
     methods: {
@@ -80,7 +80,7 @@
 
 ```html
 <template>
-  <pl-checkbox v-model="value" :trueValue="true" vertical :falseValue="false">开关</pl-checkbox>
+  <pl-checkbox v-model:value="value" :trueValue="true" vertical :falseValue="false">开关</pl-checkbox>
 </template>
 <script>
   export default {
@@ -98,7 +98,7 @@
 
 ```html
 <template>
-  <pl-checkbox v-model="value" :trueValue="true" button :falseValue="false">开关</pl-checkbox>
+  <pl-checkbox v-model:value="value" :trueValue="true" button :falseValue="false">开关</pl-checkbox>
 </template>
 <script>
   export default {
@@ -116,7 +116,7 @@
 
 ```html
 <template>
-  <pl-checkbox v-model="value" :trueValue="true" :falseValue="false">开关</pl-checkbox>
+  <pl-checkbox v-model:value="value" :trueValue="true" :falseValue="false">开关</pl-checkbox>
 </template>
 <script>
   export default {
@@ -136,7 +136,7 @@
 
 ```html
 <template>
-  <pl-checkbox v-model="value" :options="data">
+  <pl-checkbox v-model:value="value" :options="data">
     <template v-slot="scope">{{scope.item.label}} - {{scope.item.value}}</template>
   </pl-checkbox>
 </template>

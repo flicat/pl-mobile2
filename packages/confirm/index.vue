@@ -3,8 +3,8 @@
     <div class="pl-confirm-inner">
       <div class="pl-confirm-title">{{title}}</div>
       <div class="pl-confirm-content">
-        <component v-if="component" :is="component" ref="child" v-bind="componentProps"></component>
-        <span v-else-if="html" v-html="message"></span>
+        <component v-if="comp" :is="comp" ref="child" v-bind="componentProps"></component>
+        <span v-if="html" v-html="message"></span>
         <span v-else>{{message}}</span>
       </div>
       <div class="pl-confirm-button-wrap">
@@ -17,6 +17,8 @@
 
 
 <script>
+import { ref } from 'vue'
+
 // confirm
 export default {
   name: 'plConfirm',
@@ -25,37 +27,44 @@ export default {
     title: String,                 // 弹框标题
     message: String,               // 弹框主体信息
     html: Boolean,                 // 是否显示为HTML
-    component: Object,             // 子组件,
+    comp: Object,             // 子组件,
     componentProps: Object,        // 子组件props,
     submitText: String,            // 提交按钮文字
     cancelText: String,            // 取消按钮文字
     submit: Function,              // 确认回调
     cancel: Function               // 取消回调
   },
-  methods: {
-    async onSubmit() {
+  setup(props) {
+    const child = ref(null)
+    const onSubmit = async () => {
       await new Promise((resolve, reject) => {
-        if (this.$refs.child && typeof this.$refs.child.submit === 'function') {
-          resolve(this.$refs.child.submit())
+        if (child.value && typeof child.value.submit === 'function') {
+          resolve(child.value.submit())
         } else {
           resolve()
         }
       })
-      if (typeof this.submit === 'function') {
-        await this.submit()
+      if (typeof props.submit === 'function') {
+        await props.submit()
       }
-    },
-    async onCancel() {
+    }
+    const onCancel = async () => {
       await new Promise((resolve, reject) => {
-        if (this.$refs.child && typeof this.$refs.child.cancel === 'function') {
-          resolve(this.$refs.child.cancel())
+        if (child.value && typeof child.value.cancel === 'function') {
+          resolve(child.value.cancel())
         } else {
           resolve()
         }
       })
-      if (typeof this.cancel === 'function') {
-        await this.cancel()
+      if (typeof props.cancel === 'function') {
+        await props.cancel()
       }
+    }
+
+    return {
+      child,
+      onSubmit,
+      onCancel
     }
   }
 }

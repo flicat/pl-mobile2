@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import { ref, getCurrentInstance } from 'vue'
 export default {
   props: {
     isMsg: {
@@ -33,39 +34,48 @@ export default {
       default: false
     }
   },
-  data() {
-    return {
-      scrollIndex1: 0,
-      scrollIndex2: 0
+  setup() {
+    const app = getCurrentInstance()
+    const { $loadingShow, $loadingHide, $toast } = app.appContext.config.globalProperties
+
+    const scrollIndex1 = ref(0)
+    const scrollIndex2 = ref(0)
+
+    const onScroll1 = index => {
+      scrollIndex1.value = index
     }
-  },
-  methods: {
-    onScroll1(index) {
-      this.scrollIndex1 = index
-    },
-    onScroll2(index) {
-      this.scrollIndex2 = index
-    },
-    submit() {
+    const onScroll2 = index => {
+      scrollIndex2.value = index
+    }
+    const submit = () => {
       return new Promise((resolve, reject) => {
-        this.$loadingShow('提交中。。。')
+        $loadingShow('提交中。。。')
         setTimeout(() => {
           resolve()
-          this.$loadingHide()
-          this.$toast('提交成功')
+          $loadingHide()
+          $toast('提交成功')
         }, 2000)
       })
-    },
-    cancel() {
+    }
+    const cancel = () => {
       return new Promise((resolve, reject) => {
-        this.$loadingShow('取消中。。。')
+        $loadingShow('取消中。。。')
         setTimeout(() => {
           reject('取消失败')
-          this.$loadingHide()
-          this.$toast('取消失败')
+          $loadingHide()
+          $toast('取消失败')
         }, 2000)
       })
-    },
+    }
+
+    return {
+      scrollIndex1,
+      scrollIndex2,
+      onScroll1,
+      onScroll2,
+      submit,
+      cancel
+    }
   }
 }
 </script>

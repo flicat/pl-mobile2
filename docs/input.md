@@ -4,7 +4,7 @@
 
 ```html
 <template>
-  <pl-input type="text" v-model="value" />
+  <pl-input type="text" v-model:value="value" />
 </template>
 <script>
   export default {
@@ -22,7 +22,7 @@
 
 ```html
 <template>
-  <pl-input type="textarea" rows="5" cols="10" v-model="value" />
+  <pl-input type="textarea" rows="5" cols="10" v-model:value="value" />
 </template>
 <script>
   export default {
@@ -41,7 +41,7 @@
 
 ```html
 <template>
-  <pl-input v-model="value" :rules="rules" required ref="input" />
+  <pl-input v-model:value="value" :rules="rules" required ref="input" />
 </template>
 <script>
   export default {

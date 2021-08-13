@@ -1,126 +1,137 @@
 ## fetch 接口请求
 
 ### 基础用法
-```
-  import { fetch } from 'pl-mobile2'
-  app.use(fetch)
-```
-
-#### 1、定义默认配置
-```
-Vue.prototype.$fetchConfig({
-  baseUrl: 'https://www.demo.com'
-});
-```
-
-#### 2、定义接口
-```
-Vue.prototype.$fetchDefine({
-  getLogo: {
-    url: 'logo.png',
-    method: 'get',
-    type: 'blob'
-  },
-  userLogin: {
-    url: 'user/login',
-    method: 'post'
-  }
-}, 'my_api') // namespace
-```
-
-#### 3、发起一个请求
-```
-Vue.prototype.$fetch.my_api.getLogo({
-  _: Date.now()
-}).then(data => {
-  console.log(data) // Blob data
-})
-// get https://www.demo.com/logo.png?_=1597907390637
-```
-#### 4、指定post请求
-```
-Vue.prototype.$fetch.my_api.getLogo.post().then(data => {
-  console.log(data)
-})
-```
-#### 5、自定义header
-```
-Vue.prototype.$fetch.my_api.getLogo.header({
-  token: 'my-token'
-}).get().then(data => {
-  console.log(data)
-})
-```
-#### 6、自定义配置
-```
-Vue.prototype.$fetch.my_api.getLogo({
-  _: Date.now()
-}, {
-  baseUrl: 'https://www.test.com',
-  url: 'my_pic.jpg',
-  method: 'post',
-  headers: {
-    'Cookie': 'my-cookie'
-  }
-}).then(data => {
-  console.log(data) // Blob data
-})
-// get https://www.test.com/my_pic.jpg?_=1597907390637
-```
-#### 7、url拼接
-```
-Vue.prototype.$fetch.my_api.userLogin.url('jerry', '13565498754')({
-  data: MyFormData
-}).then(data => {
-  console.log(data)
-})
-// post https://www.demo.com/user/login/jerry/13565498754
-```
-#### 8、添加一个全局结果处理函数
-```
-Vue.prototype.$fetchMiddleware(function (res, options) {
-  res.then(data => {
-    if (!data) {
-      console.log('Your parameters may be incorrect')
-    }
-  }).catch(e => {
-    console.error('network error')
-  })
-})
-```
-
-
-### 在组件中使用
-
 ```html
 <script>
+  import { fetch } from 'pl-mobile2'
+  app.use(fetch)
+
   export default {
-    methods: {
-      getLogo () {
-        this.$fetch.my_api.getLogo({
-          _: Date.now()
-        }).then(data => {
-          if (data && data.size > 0) {
-            this.src = URL.createObjectURL(data)
-          }
-        })
-      }
+    created() {
+      this.$fetch({
+        url: 'https://www.test.com/image.png',
+        method: 'get',
+        type: 'blob'
+      }).then(data => {
+        // blob
+      })
+      // https://www.test.com/image.png
     }
   }
 </script>
 ```
 
+#### 自定义配置
+```html
+<script>
+  export default {
+    created() {
+      const request = this.$fetch.options({
+        baseUrl: 'https://www.test.com',
+        method: 'get',
+        type: 'blob'
+      })
+
+      request.get('/image.png').then(data => {
+        // blob
+      })
+      // https://www.test.com/image.png
+    }
+  }
+</script>
+```
+
+#### 自定义header
+```html
+<script>
+  export default {
+    created() {
+      const request = this.$fetch.options({
+        baseUrl: 'https://www.test.com'
+      })
+
+      request.headers({
+        token: 'sjkdfgiuysdnjksndkjvnslkdv'
+      })
+
+      request.post('/login', {
+        username: 'test',
+        password: 'test'
+      }).then(data => {
+        // json
+      })
+      // https://www.test.com/login
+    }
+  }
+</script>
+```
+#### url拼接
+```html
+<script>
+  export default {
+    created() {
+      const request = this.$fetch.options({
+        baseUrl: 'https://www.test.com',
+        url: '/data'
+      })
+
+      request.url('id', 1)
+
+      request.post().then(data => {
+        // json
+      })
+      // https://www.test.com/data/id/1
+    }
+  }
+</script>
+```
+
+#### 添加全局处理函数
+```html
+<script>
+  export default {
+    created() {
+      this.$fetch.before(options => {
+        options.headers.token = 'xdgdgdxsedfswfsdf'
+      })
+      this.$fetch.after(res => {
+        res.then(data => {
+          if (data.code === 500) {
+            // error
+          }
+        })
+      })
+      this.$fetch({
+        baseUrl: 'https://www.test.com',
+        url: '/login',
+        data: {
+          username: 'test',
+          password: 'test'
+        }
+      }).then(data => {
+        // json
+      })
+      // https://www.test.com/login
+    }
+  }
+</script>
+```
 
 ### Methods
-| 方法名 | 说明 | 参数 | 参数描述 |返回值 |
-| ---- | ---- | ---- | ---- | ---- |
-| $fetch | 接口api对象，根据 $fetchDefine 定义 API 路径和名称 | \<data>[, options] | data：请求的数据 | fetchHandler |
-| $fetchConfig | 设置默认请求配置 | \<options> | — | — |
-| $fetchDefine | 定义API | \<APIMap>[, namespace] | APIMap：定义API名称和配置，格式为 {name: \<options>}，namespace：接口命名空间 | — |
-| $fetchMiddleware | 添加请求结果拦截函数 | \<function> | — | Promise |
+| 方法名 | 说明 | 参数  |返回值 |
+| ---- | ---- | ---- | ---- |
+| $fetch | 发起请求 | \<Options> | Promise\<response> |
+| $fetch.before     | 请求前拦截函数 |  \<Function> | $fetch  |
+| $fetch.after    | 请求返回拦截函数 | \<Function>  |  $fetch |
+| $fetch.options   | 设置options | \<Options> | $fetch |
+| $fetch.url     | 对 options.url 进行参数拼接 | \<string>[, string]... | $fetch |
+| $fetch.headers | 自定义请求头，跟 options.headers 合并 | \<object> |  $fetch |
+| $fetch.request | 发起请求 | [\<Options>] |  Promise\<response> |
+| $fetch.get | 发起 get 请求 | [url[, data[, \<Options>]]] |  Promise\<response> |
+| $fetch.post | 发起 post 请求 | [url[, data[, \<Options>]]] |  Promise\<response> |
 
 
-### options
+### Options
 | 参数      | 说明    | 类型      | 可选值       | 默认值   |
 |---------- |-------- |---------- |-------------  |-------- |
 | url        | 请求URL地址 | String | — | — |
@@ -135,13 +146,4 @@ Vue.prototype.$fetchMiddleware(function (res, options) {
 | signal     | AbortSignal 接口表示一个信号对象（ signal object ），它允许您通过 AbortController 对象与DOM请求（如Fetch）进行通信并在需要时将其中止。 | AbortController | — | — |
 | redirect   | 根据请求地址转成get请求，直接重定向URL  | Boolean | — | false |
 | onDownload | onDownload 回调方法 | Function | — | — |
-
-
-### fetchHandler
-| 方法 | 说明 | 参数 | 返回值 |
-|----- |------ |-------- |------ |
-| url     | url拼接 | \<string>[, string]... | fetchHandler |
-| headers | 自定义请求头，会跟默认头信息合并 | \<object> |  fetchHandler |
-| get     | 强制发起get请求（忽略接口定义和默认设置） |  \<data>[, options] | Promise对象  |
-| post    | 强制发起post请求（忽略接口定义和默认设置） | \<data>[, options]  |  Promise对象 |
 

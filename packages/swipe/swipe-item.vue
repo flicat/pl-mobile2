@@ -1,38 +1,43 @@
 <template>
   <div class="pl-swipe-item" :style="{
           position: index === 0 ? '' : 'absolute',
-          left: swipes.vertical ? 0 : index * 100 + '%',
-          top: swipes.vertical ? index * 100 + '%' : 0,
-          transform: `translate${swipes.vertical ? 'Y' : 'X'}(${translate}px)`,
-          webkitTransform: `translate${swipes.vertical ? 'Y' : 'X'}(${translate}px)`
+          left: vertical ? 0 : index * 100 + '%',
+          top: vertical ? index * 100 + '%' : 0,
+          transform: `translate${vertical ? 'Y' : 'X'}(${translate}px)`,
+          webkitTransform: `translate${vertical ? 'Y' : 'X'}(${translate}px)`
         }">
     <slot></slot>
   </div>
 </template>
 
 <script>
+import { inject, ref, onMounted } from 'vue'
 // swipe
 export default {
   name: 'plSwipeItem',
   componentName: 'plSwipeItem',
-  inject: {
-    swipes: {
-      default: {}
+  setup() {
+    const vertical = inject('vertical')
+    const updateItems = inject('updateItems')
+    const children = inject('children')
+    const index = ref(0)
+    const translate = ref(0)
+
+    const target = {
+      setTranslate: val => {
+        translate.value = val
+      }
     }
-  },
-  data() {
+
+    onMounted(() => {
+      updateItems(target);
+      index.value = children.indexOf(target)
+    })
+
     return {
-      index: 0,
-      translate: 0
-    }
-  },
-  mounted() {
-    this.swipes.updateItems();
-    this.index = this.swipes.$children.indexOf(this)
-  },
-  methods: {
-    setTranslate(val) {
-      this.translate = val
+      vertical,
+      index,
+      translate
     }
   }
 }

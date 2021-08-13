@@ -1,59 +1,38 @@
 <template>
-  <div class="pl-tab-item" :class="{'is-active': active}">
+  <div class="pl-tab-item" v-show="active">
     <slot></slot>
   </div>
 </template>
 <script>
+import { computed, getCurrentInstance, inject, onMounted, onUnmounted, watch } from 'vue';
 export default {
   name: 'plTabItem',
   componentName: 'plTabItem',
-
   props: {
     label: String,
     name: [String, Number],
     disabled: Boolean
   },
-  inject: {
-    tabs: {
-      default: {}
-    }
-  },
-  data() {
+  setup(props) {
+    const app = getCurrentInstance()
+    const currentName = inject('currentName', '')
+    const updateItems = inject('updateItems', () => { })
+    const removeItem = inject('removeItem', () => { })
+
+    const active = computed(() => {
+      return currentName.value === props.name;
+    })
+
+    onMounted(() => {
+      updateItems(app)
+    })
+    onUnmounted(() => {
+      removeItem(app)
+    })
+
     return {
-
-    };
-  },
-
-  computed: {
-    active() {
-      return this.tabs.currentName === this.name;
-    }
-  },
-
-  mounted() {
-    this.tabs.updateItems();
-  },
-
-  destroyed() {
-    if (this.$el && this.$el.parentNode) {
-      this.$el.parentNode.removeChild(this.$el);
-    }
-    this.tabs.removeItem(this);
-  },
-
-  watch: {
-    label() {
-      this.tabs.$forceUpdate();
+      active
     }
   }
 };
 </script>
-
-<style lang="less">
-.pl-tab-item {
-  display: none;
-  &.is-active {
-    display: block;
-  }
-}
-</style>

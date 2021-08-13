@@ -4,56 +4,66 @@
 
 ```html
 <template>
-  <div class="content">
-    <pl-canvas class="canvas" ref="canvas"></pl-canvas>
-    <pl-button @click="clear" type="primary">清除画布</pl-button>
-    <pl-button @click="getImageDataUrl" type="primary">获取dataURL</pl-button>
-  </div>
+  <pl-canvas class="canvas" ref="canvas"></pl-canvas>
+  <pl-button @click="clear" type="primary">清除画布</pl-button>
+  <pl-button @click="getImageDataUrl" type="primary">获取dataURL</pl-button>
 </template>
 
 <script>
-  export default {
-    data () {
-      return {
-        src: ''
-      }
-    },
-    methods: {
-      clear () {
-        this.$refs.canvas.clear()
-      },
-      getImageDataUrl () {
-        this.src = this.$refs.canvas.getImageDataUrl()
-      }
+import { ref } from 'vue'
+
+export default {
+  setup() {
+    let src = ref('')
+    let canvas = ref(null)
+    // 清除画布
+    function clear() {
+      canvas.value.clear()
+    }
+    // 获取画布内容 DataUrl
+    function getImageDataUrl() {
+      let result = canvas.value.getImageDataUrl()
+      src.value = result
+    }
+
+    return {
+      canvas,
+      clear,
+      getImageDataUrl
     }
   }
+}
 </script>
 ```
 
-### 获取 jpg 格式的 Blob 图片对象 
+### 获取 jpg 格式的 Blob 图片对象
 
 ```html
 <template>
-  <div class="content">
-    <pl-canvas class="canvas" ref="canvas"></pl-canvas>
-    <pl-button @click="getImageBlob" type="primary">获取BLob</pl-button>
-  </div>
+  <pl-canvas class="canvas" ref="canvas"></pl-canvas>
+  <pl-button @click="getImageBlob" type="primary">获取BLob</pl-button>
 </template>
 
 <script>
-  export default {
-    data () {
-      return {
-        src: ''
-      }
-    },
-    methods: {
-      getImageBlob () {
-        let result = this.$refs.canvas.getImageBlob('image/jpeg')
-        this.src = URL.createObjectURL(result)
-      }
+import { ref } from 'vue'
+
+export default {
+  setup() {
+    let src = ref('')
+    let canvas = ref(null)
+
+    // 获取blob
+    function getImageBlob() {
+      let result = canvas.value.getImageBlob('image/jpeg')
+      src.value = URL.createObjectURL(result)
+    }
+
+    return {
+      canvas,
+      getImageBlob
     }
   }
+}
 </script>
 ```
 
@@ -61,11 +71,9 @@
 
 ```html
 <template>
-  <div class="content">
-    <pl-canvas class="canvas" ref="canvas" orientation="right">
-      <span slot="placeholder">请在此处签名</span>
-    </pl-canvas>
-  </div>
+  <pl-canvas class="canvas" ref="canvas" orientation="right">
+    <span slot="placeholder">请在此处签名</span>
+  </pl-canvas>
 </template>
 ```
 
@@ -78,7 +86,7 @@
 | fillStyle    | canvas背景色，设置后会遮挡住placeholder，如果需要导出jpg图片，则必须设置，否则会产生黑底    | String   | —  |  —  |
 
 ### Slots
-| name      | 说明    | 
+| name      | 说明    |
 |---------- |-------- |
 | placeholder  |  画布空白遮罩  |
 
@@ -94,7 +102,7 @@
 ### Events
 | 事件名称      | 说明    | 回调参数      |
 |---------- |-------- |---------- |
-| drawStart    |   开始绘画   | — | 
-| drawing    |   绘画中   | — | 
-| drawEnd    |   绘画结束   | — | 
-| clear    |   清除画布   | — | 
+| drawStart    |   开始绘画   | — |
+| drawing    |   绘画中   | — |
+| drawEnd    |   绘画结束   | — |
+| clear    |   清除画布   | — |

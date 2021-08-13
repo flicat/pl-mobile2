@@ -70,5 +70,6 @@ export default {
 .pl-cell {
   display: grid;
   line-height: normal;
+  box-sizing: border-box;
 }
 </style>

@@ -17,15 +17,15 @@
       </div>
       <div class="pl-datetime-value">
         <div class="pl-datetime-inner">
-          <div class="pl-datetime-inner-flex" v-if="pickerOptions.isRange">
-            <span v-if="startValue" class="title" @click="open()">{{getLabelFormat(startValue)}}</span>
+          <div class="pl-datetime-inner-flex" v-if="calcIsRange">
+            <span v-if="emitValue && emitValue[0]" class="title" @click="open()">{{emitValue[0]}}</span>
             <span class="placeholder" v-else @click="open()">{{startPlaceholder}} </span>
             <span class="range-separator">{{rangeSeparator}}</span>
-            <span v-if="endValue" class="title" @click="open()">{{getLabelFormat(endValue)}}</span>
+            <span v-if="emitValue && emitValue[1]" class="title" @click="open()">{{emitValue[1]}}</span>
             <span class="placeholder" v-else @click="open()">{{endPlaceholder}} </span>
           </div>
           <div v-else @click="open()">
-            <span v-if="currentValue" class="title">{{getLabelFormat(currentValue)}}</span>
+            <span v-if="emitValue" class="title">{{emitValue}}</span>
             <span class="placeholder" v-else>{{placeholder}} </span>
           </div>
         </div>
@@ -46,12 +46,12 @@
 </template>
 
 <script>
-import iconClose from '../../src/assets/images/icon-close.svg'
+import { ref, computed, onMounted, onUnmounted, getCurrentInstance, inject, watch } from 'vue'
 import plMonth from './month.vue'
 import plTime from './time.vue'
 import plDate from './datetime.vue'
-import { getDateFromString, getDateString } from '../../src/assets/utils'
 import validate from '../../src/assets/utils/validate'
+import iconClose from '../../src/assets/images/icon-close.svg'
 
 export default {
   name: 'plDatetime',
@@ -61,9 +61,6 @@ export default {
     plMonth,
     plTime,
     plDate
-  },
-  model: {
-    event: '-pl-change'
   },
   props: {
     rules: {          // 验证规则
@@ -94,194 +91,148 @@ export default {
     labelWidth: String,          // label 宽度
     clearable: Boolean           // 清除按钮
   },
-  inject: {
-    form: {
-      default: null
-    }
-  },
-  data() {
-    return {
-      currentValue: null,    // 日期（单选）
-      startValue: null,// 开始日期（范围）
-      endValue: null,  // 结束日期（范围）
-      emitValue: null,  // 提交日期
-      ruleMessage: ''
-    }
-  },
-  computed: {
-    // 清除按钮
-    showClear() {
-      return this.clearable && !this.calcDisabled && (this.currentValue || this.startValue || this.endValue)
-    },
-    // 计算后的size
-    calcSize() {
-      return this.size || this.form && this.form.size || 'normal'
-    },
-    // 计算后的labelWidth
-    calcLabelWidth() {
-      return this.labelWidth || this.form && this.form.labelWidth || null
-    },
-    // 计算后的disabled
-    calcDisabled() {
-      return this.disabled !== undefined ? this.disabled : this.form && this.form.disabled !== undefined ? this.form.disabled : false
-    },
-    // 计算后的日历设置
-    pickerOptions() {
-      let props = {}
-      this.currentValue && (props.value = this.currentValue)
-      this.startValue && (props.startValue = this.startValue)
-      this.endValue && (props.endValue = this.endValue)
-      this.type && (props.type = this.type)
-      this.isRange && (props.isRange = this.isRange)
-      this.valueFormat && (props.format = this.valueFormat)
+  setup(props, context) {
+    const app = getCurrentInstance()
 
-      return Object.assign({
-        type: 'date',
-        isRange: false,
-        format: 'Y-M-D'
-      }, this.options, props)
-    },
-    // 定义验证规则的type
-    calcRules() {
-      if (Array.isArray(this.rules)) {
-        return this.rules.map(item => {
-          item.type = this.pickerOptions.isRange ? 'array' : 'string'
-          return item
-        })
-      } else {
-        return []
-      }
-    }
-  },
-  mounted() {
-    if (this.form) {
-      this.form.updateItems(this);
-    }
-  },
-  methods: {
-    validate() {
-      return validate(this.calcRules, this.emitValue).then(() => {
-        this.ruleMessage = ''
-      }).catch(result => {
-        this.ruleMessage = result.errors[0].message
-        return Promise.reject(this.ruleMessage)
-      })
-    },
-    clearValidate() {
-      this.ruleMessage = ''
-    },
-    // 打开选择框
-    open(options) {
-      if (this.calcDisabled || this.readonly) {
-        return false
-      }
-      if (!options) {
-        options = this.pickerOptions
-      }
+    const month = ref(null)
+    const time = ref(null)
+    const datetime = ref(null)
 
-      if (options.type === 'month') {
-        this.$refs.month.open(options)
-      } else if (options.type === 'time') {
-        this.$refs.time.open(options)
-      } else {
-        this.$refs.datetime.open(options)
-      }
-    },
-
-    // 标签展示格式
-    getLabelFormat(date) {
-      date = getDateFromString(date)
-      let format = this.format || this.pickerOptions.format
-      if (format) {
-        return getDateString(date, format)
-      } else {
-        return date
-      }
-    },
+    const ruleMessage = ref('')
     // 提交日期
-    submit(result) {
-      if (this.pickerOptions.isRange) {
-        this.emitValue = result.map(item => getDateString(item, this.pickerOptions.format)).filter(Boolean)
-      } else {
-        this.emitValue = getDateString(result, this.pickerOptions.format)
-      }
-
-      if (this.setCurrentValue(result)) {
-        this.$emit('-pl-change', this.emitValue)
-        this.$emit('change', this.emitValue)
-      }
-    },
-    // 设置当前值
-    setCurrentValue(value) {
-      if (!this.pickerOptions.isRange && value === this.currentValue) {
-        return false
-      }
-      if (this.pickerOptions.isRange && Array.isArray(value) && value[0] === this.startValue && value[1] === this.endValue) {
-        return false
-      }
-
-      if (this.pickerOptions.isRange) {
-        this.startValue = Array.isArray(value) ? value[0] : null
-        this.endValue = Array.isArray(value) ? value[1] : null
-      } else {
-        this.currentValue = value || null
-      }
-      this.validate()
-
-      return true
-    },
-    // 获取时间戳
-    getTimeStamp(value) {
-      let date = getDateFromString(value)
-
-      if (date) {
-        return +date
-      }
-      if (this.pickerOptions.type === 'time') {
-        let matchTime = /\d{1,2}(:\d{1,2}){1,2}/.exec(value)
-        if (matchTime && matchTime[0]) {
-          let time = new Date()
-          time.setHours.apply(time, matchTime[0].split(':'))
-          return +time
-        }
-      }
-      return null
-    },
-    // 清除方法
-    clear() {
-      this.$emit('-pl-change', null)
-      this.$emit('change', null)
-      this.$emit('clear')
-      this.emitValue = null
-      this.setCurrentValue(null)
-    }
-  },
-  watch: {
-    'value': {
-      handler(val) {
-        if (val === this.emitValue) {
-          return false
-        }
-        let value
-        if (this.pickerOptions.isRange && Array.isArray(val)) {
-          value = [this.getTimeStamp(val[0]), this.getTimeStamp(val[1])]
-          this.emitValue = value.map(item => getDateString(item, this.pickerOptions.format)).filter(Boolean)
-        } else {
-          value = this.getTimeStamp(val)
-          this.emitValue = getDateString(value, this.pickerOptions.format)
-        }
-        this.setCurrentValue(value)
+    const emitValue = computed({
+      get: () => {
+        return props.value === undefined ? '' : props.value
       },
-      deep: true,
-      immediate: true
+      set: val => {
+        context.emit('update:value', val)
+        context.emit('change', val)
+      }
+    })
+
+    const formSize = inject('size', props.size)
+    const formLabelWidth = inject('labelWidth', props.labelWidth)
+    const formDisabled = inject('disabled', props.disabled)
+    const formUpdateItems = inject('updateItems', () => { })
+    const formRemoveItem = inject('removeItem', () => { })
+
+    // 清除按钮
+    const showClear = computed(() => {
+      return props.clearable && !calcDisabled.value && emitValue.value
+    })
+    // 计算后的size
+    const calcSize = computed(() => {
+      return props.size || formSize && formSize.value || 'normal'
+    })
+    // 计算后的labelWidth
+    const calcLabelWidth = computed(() => {
+      return props.labelWidth || formLabelWidth && formLabelWidth.value || null
+    })
+    // 计算后的disabled
+    const calcDisabled = computed(() => {
+      return props.disabled !== undefined ? props.disabled : formDisabled && formDisabled.value !== undefined ? formDisabled.value : false
+    })
+    const calcType = computed(() => {
+      return props.type || props.options && props.options.type || 'date'
+    })
+    const calcIsRange = computed(() => {
+      return props.isRange !== undefined && props.isRange || props.options && props.options.isRange || false
+    })
+    const calcFormat = computed(() => {
+      return props.valueFormat || props.options && props.options.format
+    })
+
+    const validateField = async () => {
+      if (!Array.isArray(props.rules) || !props.rules.length) {
+        return false
+      }
+      try {
+        await validate(props.rules, emitValue.value, calcIsRange.value ? 'array' : 'string')
+        ruleMessage.value = ''
+        return Promise.resolve()
+      } catch (e) {
+        ruleMessage.value = e.errors[0].message
+        return Promise.reject(ruleMessage.value)
+      }
     }
-  },
-  destroyed() {
-    if (this.$el && this.$el.parentNode) {
-      this.$el.parentNode.removeChild(this.$el);
+
+    const clearValidate = () => {
+      ruleMessage.value = ''
     }
-    if (this.form) {
-      this.form.removeItem(this);
+    // 打开选择框
+    const open = () => {
+      if (calcDisabled.value || props.readonly) {
+        return false
+      }
+
+      const options = Object.assign({}, props.options || {}, {
+        type: calcType.value,
+        isRange: calcIsRange.value
+      })
+      if (calcFormat.value) {
+        options.format = calcFormat.value
+      }
+
+      if (options.isRange) {
+        options.startValue = Array.isArray(emitValue.value) && emitValue.value[0] || props.options && props.options.startValue
+        options.endValue = Array.isArray(emitValue.value) && emitValue.value[1] || props.options && props.options.endValue
+      } else {
+        options.value = emitValue.value || props.options && props.options.value
+      }
+
+      switch (options.type) {
+        case 'month':
+          month.value.open(options)
+          break;
+        case 'date':
+          datetime.value.open(options)
+          break;
+        case 'time':
+          time.value.open(options)
+          break;
+      }
+    }
+
+    // 提交日期
+    const submit = (result) => {
+      emitValue.value = result
+    }
+
+    // 清除方法
+    const clear = () => {
+      emitValue.value = null
+      context.emit('clear')
+    }
+
+    watch(emitValue, () => {
+      validateField()
+    })
+
+    onMounted(() => {
+      formUpdateItems(app);
+    })
+
+    onUnmounted(() => {
+      formRemoveItem(app);
+    })
+
+    return {
+      month,
+      time,
+      datetime,
+      emitValue,
+      calcSize,
+      calcDisabled,
+      ruleMessage,
+      calcLabelWidth,
+      calcIsRange,
+      open,
+      clear,
+      showClear,
+      ruleMessage,
+      submit,
+      validate: validateField,
+      clearValidate
     }
   }
 }
@@ -351,8 +302,8 @@ export default {
   &--small {
     font-size: 0.8em;
   }
-  &--normal {
-  }
+  // &--normal {
+  // }
   &--error {
     position: relative;
   }
@@ -417,7 +368,10 @@ export default {
     line-height: 2em;
   }
   &.is-disabled {
-    background-color: var(--datetime-disabled-bg);
+    color: var(--disabled);
+    .placeholder {
+      color: var(--disabled);
+    }
   }
 }
 </style>

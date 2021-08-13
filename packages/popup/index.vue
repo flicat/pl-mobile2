@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { ref } from 'vue'
 export default {
   name: 'plPopup',
   componentName: 'plPopup',
@@ -17,32 +18,36 @@ export default {
       default: 'center' // top bottom right left center
     }
   },
-  data() {
-    return {
-      isOpen: false,
-      visible: false
-    }
-  },
-  computed: {},
-  mounted() {
+  setup(props, { emit }) {
+    const isOpen = ref(false)
+    const visible = ref(false)
 
-  },
-  methods: {
     // 手动打开弹框
-    open() {
-      this.visible = true
-      this.isOpen = true
-      this.$emit('open')
-    },
-    close() {
-      this.isOpen = false
-      setTimeout(() => {
-        this.visible = false
-        this.$emit('close')
-      }, 300)
+    const open = () => {
+      visible.value = true
+      isOpen.value = true
+      emit('open')
     }
-  },
-  watch: {}
+    const close = async (e) => {
+      await new Promise((resolve) => {
+        isOpen.value = false
+        setTimeout(() => {
+          visible.value = false
+          resolve()
+          if (e && e.type === 'click') {
+            emit('close')
+          }
+        }, 300)
+      })
+    }
+
+    return {
+      isOpen,
+      visible,
+      open,
+      close
+    }
+  }
 }
 </script>
 
@@ -130,8 +135,8 @@ export default {
   }
 
   &--close {
-    .pl-popup-content {
-    }
+    // .pl-popup-content {
+    // }
     .pl-popup-layer {
       opacity: 0;
     }

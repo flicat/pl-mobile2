@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import { provide } from 'vue'
 // form
 export default {
   name: 'plForm',
@@ -14,40 +15,43 @@ export default {
     labelWidth: String,  // label 宽度
     disabled: Boolean    // 禁用
   },
-  provide() {
-    return {
-      form: this
-    }
-  },
-  data() {
-    return {
-      children: []
-    }
-  },
-  methods: {
+  setup(props) {
+    const children = []
+
     // 更新内容节点
-    updateItems(item) {
-      if (this.children.indexOf(item) < 0) {
-        this.children.push(item)
+    const updateItems = (item) => {
+      if (children.indexOf(item) < 0) {
+        children.push(item)
       }
-    },
+    }
     // 删除内容节点
-    removeItem(item) {
-      const index = this.children.indexOf(item);
+    const removeItem = (item) => {
+      const index = children.indexOf(item);
       if (index > -1) {
-        this.children.splice(index, 1);
+        children.splice(index, 1);
       }
-    },
+    }
     // 手动验证方法
-    validate() {
-      return Promise.all(this.children.map(item => item.validate())).then(() => {
+    const validate = () => {
+      return Promise.all(children.map(item => item.proxy.validate())).then(() => {
         return Promise.resolve()
       }).catch(e => {
         return Promise.reject(e)
       })
-    },
-    clearValidate() {
-      this.children.map(item => item.clearValidate())
+    }
+    const clearValidate = () => {
+      children.map(item => item.proxy.clearValidate())
+    }
+
+    provide('size', props.size)
+    provide('labelWidth', props.labelWidth)
+    provide('disabled', props.disabled)
+    provide('updateItems', updateItems)
+    provide('removeItem', removeItem)
+
+    return {
+      validate,
+      clearValidate
     }
   }
 }

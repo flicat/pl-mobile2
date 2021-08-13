@@ -1,8 +1,8 @@
 <template>
-  <div class="pl-tabs" :class="['is-' + type, 'is-' + position]" ref="tabs">
+  <div class="pl-tabs" :class="['is-' + type, 'is-' + position]" ref="tab">
     <div class="pl-tab-title" @touchstart="touchEvent($event)" @touchmove="touchEvent($event)" @touchend="touchEvent($event)" @touchcancel="touchEvent($event)">
       <div class="pl-tab-title-inner" ref="title" :style="titleStyle">
-        <div class="tab-title" v-for="title in titleArray" :key="title.name" @click="setCurrentName(title.name, title.disabled)" ref="title-item" :class="{'is-active': title.name === currentName, 'is-disabled': title.disabled}">
+        <div class="tab-title" v-for="title in titleArray" :key="title.name" @click="setCurrentName(title.name, title.disabled)" :class="{'is-active': title.name === currentName, 'is-disabled': title.disabled}">
           <div class="tab-title-text">
             <span v-if="title.label">{{title.label}}</span>
             <component v-else :is="title.titleSlot"></component>
@@ -17,12 +17,10 @@
 </template>
 
 <script>
+import { computed, h, nextTick, provide, reactive, ref, watch } from 'vue'
 export default {
   name: 'plTabs',
   componentName: 'plTabs',
-  model: {
-    event: '-pl-change'
-  },
   props: {
     // 风格类型：card/border-card/button
     type: {
@@ -40,164 +38,166 @@ export default {
       default: 'top'
     },
   },
-  provide() {
-    return {
-      tabs: this
-    }
-  },
-  data() {
-    return {
-      currentName: this.value === undefined ? '' : this.value,        // 当前激活标签
-      items: [],                                                      // 内容节点列表
-      titles: [],                                                     // 标题节点列表
+  setup(props, context) {
+    const tabNode = ref(null)
+    const titleNode = ref(null)
 
-      tabSize: 0,                                                    // tab宽/高
-      titleSize: 0,                                                  // 标题宽/高
+    const children = reactive([])               // 内容节点列表
+    const transition = ref(null)                // 标题滑动transition
+    const translate = ref(0)                    // 标题偏移量
 
-      swipeDir: null,                                                  // 标题滑动方向
-      transition: null,
-      translate: 0,
-      transDiff: 0,
-      transStart: 0,
-      transEnd: 0
-    }
-  },
-  computed: {
-    // 当前选中的标题节点
-    currentTitleNode() {
-      let index = this.titleArray.findIndex(item => item.name === this.currentName)
-      if (this.titles.length) {
-        return this.titles[index]
-      } else {
-        return null
+    // value
+    const currentName = computed({
+      get: () => {
+        return props.value === undefined ? '' : props.value
+      },
+      set: val => {
+        context.emit('update:value', val)
+        context.emit('change', val);
       }
-    },
+    })
+    provide('currentName', currentName)
+
+    // 标题滑动方向
+    const swipeDir = computed(() => {
+      return /^(top|bottom)$/.test(props.position) ? 'column' : 'row'
+    })
+
+    // tab宽
+    const tabSize = computed(() => {
+      if (tabNode.value && swipeDir.value === 'column') {
+        return tabNode.value.clientWidth
+      }
+      return 0
+    })
+    // 标题宽
+    const titleSize = computed(() => {
+      if (titleNode.value && swipeDir.value === 'column') {
+        return titleNode.value.scrollWidth
+      }
+      return 0
+    })
+
     // 标题对象数组
-    titleArray() {
-      return this.items.map(item => {
+    const titleArray = computed(() => {
+      return children.map(item => {
         return {
-          name: item.name,
-          label: item.label,
+          name: item.proxy.name,
+          label: item.proxy.label,
           titleSlot: {
-            render(h) {
-              return h('span', null, item.$slots.title)
+            render() {
+              return h(item.proxy.$slots.title)
             }
           },
-          disabled: item.disabled
+          disabled: item.proxy.disabled
         }
       })
-    },
-    // 标题
-    titleStyle() {
-      let transform = this.swipeDir === 'column' ? `translateX(${-this.translate}px)` : `none`
+    })
+
+    // 当前标题index
+    const currentIndex = computed(() => {
+      return titleArray.value.findIndex(item => item.name === currentName.value)
+    })
+
+    // 将当前标题滚动至可见
+    watch(currentIndex, index => {
+      nextTick(() => {
+        let currentTarget = titleNode.value.children[index]
+
+        // 如果标题在可是区域外则滚动至可见
+        if (swipeDir.value === 'column' && currentTarget && titleSize.value > tabSize.value) {
+          let width = currentTarget.offsetWidth
+          let offset = currentTarget.offsetLeft + (width / 2) - (tabSize.value / 2)
+          if (offset < 0) {
+            offset = 0
+          }
+          if (offset > titleSize.value - tabSize.value) {
+            offset = titleSize.value - tabSize.value
+          }
+
+          translate.value = offset
+        }
+      })
+    })
+
+    // 标题动态样式
+    const titleStyle = computed(() => {
+      let transform = swipeDir.value === 'column' ? `translateX(${-translate.value}px)` : `none`
 
       return {
         transform,
-        webkitTransform: transform,
-        transition: this.transition,
-        webkitTransition: this.transition
+        transition: transition.value
       }
-    }
-  },
-  mounted() {
-    this.updateItems()
-  },
-  methods: {
-    setCurrentName(value, disabled) {
+    })
+
+    // 更新value
+    const setCurrentName = (value, disabled) => {
       if (disabled) {
         return false
       }
-      if (this.currentName === value) {
+      if (currentName.value === value) {
         return false
       }
-      this.currentName = value;
-      this.$emit('-pl-change', value);
-      this.$emit('change', value);
-    },
-    // 更新内容节点
-    updateItems() {
-      this.items = this.$children.filter(item => item.$options.name === 'plTabItem')
-    },
-    // 删除内容节点
-    removeItem(item) {
-      const items = this.items;
-      const index = items.indexOf(item);
-      if (index > -1) {
-        items.splice(index, 1);
+      currentName.value = value;
+    }
+
+    // 更新标题节点
+    const updateItems = (item) => {
+      if (children.indexOf(item) < 0) {
+        children.push(item)
       }
-    },
+    }
+    provide('updateItems', updateItems)
+
+    // 删除标题节点
+    const removeItem = (item) => {
+      const index = children.indexOf(item);
+      if (index > -1) {
+        children.splice(index, 1);
+      }
+    }
+    provide('removeItem', removeItem)
+
+    let transDiff = 0
+    let transStart = 0
     // 标题触摸事件
-    touchEvent(e) {
-      if (this.swipeDir === 'row' || this.tabSize >= this.titleSize) {
+    const touchEvent = (e) => {
+      if (swipeDir.value === 'row' || tabSize.value >= titleSize.value) {
         return false
       }
 
       switch (e.type) {
         case 'touchstart':
-          this.transDiff = this.translate
+          transDiff = translate.value
 
-          this.transStart = e.touches[0].clientX
-          this.transition = 'none'
+          transStart = e.touches[0].clientX
+          transition.value = 'none'
           break;
         case 'touchmove':
           e.preventDefault()
           e.stopPropagation()
-
-          this.transEnd = e.touches[0].clientX
-          this.translate = this.transDiff + this.transStart - this.transEnd
+          translate.value = transDiff + transStart - e.touches[0].clientX
           break;
         case 'touchend':
         case 'touchcancel':
-          this.transition = null
-          if (this.translate < 0) {
-            this.translate = 0
-          } else if (this.translate + this.tabSize > this.titleSize) {
-            this.translate = this.titleSize - this.tabSize
+          transition.value = null
+          if (translate.value < 0) {
+            translate.value = 0
+          } else if (translate.value + tabSize.value > titleSize.value) {
+            translate.value = titleSize.value - tabSize.value
           }
           break;
       }
     }
-  },
-  watch: {
-    'value'(val) {
-      this.currentName = val;
-    },
-    'titleArray'() {
-      this.$nextTick(() => {
-        // 更新标题节点
-        if (this.$refs['title-item'] && this.$refs['title-item'].length) {
-          this.titles = this.$refs['title-item']
-        }
 
-        this.swipeDir = /^(top|bottom)$/.test(this.position) ? 'column' : 'row'
-
-        // 标题滑动方向，如果标题过长则返回
-        if (this.swipeDir === 'column') {
-          this.tabSize = this.$refs.tabs.clientWidth
-          this.titleSize = this.$refs.title.scrollWidth
-        }
-      })
-    },
-    'currentTitleNode'(val) {
-      let titleSize = this.titleSize
-      let tabSize = this.tabSize
-
-      // 如果标题在可是区域外则滚动至可见
-      if (this.swipeDir === 'column' && val && titleSize > tabSize) {
-        let width = val.offsetWidth
-        let offset = val.offsetLeft + width - this.translate
-        if (offset > tabSize - width) {
-          this.translate += tabSize / 2
-        } else if (offset < width * 2) {
-          this.translate -= tabSize / 2
-        }
-
-        if (this.translate < 0) {
-          this.translate = 0
-        } else if (this.translate + tabSize > titleSize) {
-          this.translate = titleSize - tabSize
-        }
-      }
+    return {
+      tab: tabNode,
+      title: titleNode,
+      touchEvent,
+      titleStyle,
+      titleArray,
+      setCurrentName,
+      currentName
     }
   }
 }
