@@ -4,6 +4,7 @@ import vitePluginMd2Vue from 'vite-plugin-md2vue';
 import svgLoader from 'vite-svg-loader'
 
 export default defineConfig({
+  base: './',
   plugins: [
     Vue(),
     svgLoader(),
