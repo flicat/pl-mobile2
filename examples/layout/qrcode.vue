@@ -8,6 +8,15 @@
 import { reactive, ref, onMounted, watch } from 'vue'
 import * as Qrious from 'qrious'
 
+let QriousFunc
+if (typeof Qrious === 'function') {
+  QriousFunc = Qrious
+} else if (typeof Qrious.default === 'function') {
+  QriousFunc = Qrious.default
+} else {
+  QriousFunc = function () { }
+}
+
 export default {
   props: {
     background: {
@@ -52,7 +61,7 @@ export default {
     let qrious = reactive({})
 
     onMounted(() => {
-      qrious = new Qrious({
+      qrious = new QriousFunc({
         element: canvas.value,
         background: props.background,
         backgroundAlpha: props.backgroundAlpha,
