@@ -37,17 +37,72 @@
   </div>
 </template>
 <script>
+import { getCurrentInstance, ref } from 'vue'
 export default {
-  data() {
-    return {
-      date: '',
-      month: '',
-      time: '',
-      dateRange: [],
-      monthRange: [],
-      timeRange: [],
-      popupResult: '',
+  setup() {
+    const app = getCurrentInstance()
+    const { $toast, $calendar } = app.appContext.config.globalProperties
 
+    const popupResult = ref('')
+    const datetime1 = ref(null)
+    const datetime2 = ref(null)
+    const datetime3 = ref(null)
+
+    const date = ref('')
+    const month = ref('')
+    const time = ref('')
+    const dateRange = ref([])
+    const monthRange = ref([])
+    const timeRange = ref([])
+
+
+    const onChange = (val) => {
+      console.log('onChange::', val)
+    }
+    const validate = async () => {
+      try {
+        await datetime1.value.validate()
+        await datetime2.value.validate()
+        await datetime3.value.validate()
+        $toast('校验成功')
+      } catch (e) {
+        $toast('校验失败: ' + e)
+      }
+    }
+    const open = async () => {
+      popupResult.value = await $calendar({
+        value: '2021-10-20 09:21',
+        startValue: '2020-12-1 18:45',
+        endValue: '2021-4-30 6:15',
+        min: -1,
+        max: 11,
+        dateLabel: '选中',
+        startLabel: '开始',
+        endLabel: '结束',
+        type: 'date',
+        isRange: false,
+        format: 'Y-M-D',
+        selectRange: 10,
+        disabledDate() {
+          return false
+        }
+      })
+    }
+
+    return {
+      popupResult,
+      datetime1,
+      datetime2,
+      datetime3,
+      onChange,
+      validate,
+      open,
+      date,
+      month,
+      time,
+      dateRange,
+      monthRange,
+      timeRange,
       dateOption: {
         min: -1,
         max: 6,
@@ -101,40 +156,6 @@ export default {
 
       rules1: [{ required: true, message: '请选择日期', trigger: 'change' }],
       rules2: [{ required: true, message: '请选择范围', trigger: 'change', type: 'array' }]
-    }
-  },
-  methods: {
-    onChange(val) {
-      console.log('onChange::', val)
-    },
-    async validate() {
-      try {
-        await this.$refs['datetime1'].validate()
-        await this.$refs['datetime2'].validate()
-        await this.$refs['datetime3'].validate()
-        this.$toast('校验成功')
-      } catch (e) {
-        this.$toast('校验失败: ' + e)
-      }
-    },
-    async open() {
-      this.popupResult = await this.$calendar({
-        value: '2021-10-20 09:21',
-        startValue: '2020-12-1 18:45',
-        endValue: '2021-4-30 6:15',
-        min: -1,
-        max: 11,
-        dateLabel: '选中',
-        startLabel: '开始',
-        endLabel: '结束',
-        type: 'date',
-        isRange: false,
-        format: 'Y-M-D',
-        selectRange: 10,
-        disabledDate() {
-          return false
-        }
-      })
     }
   }
 }

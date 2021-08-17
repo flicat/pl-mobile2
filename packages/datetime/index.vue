@@ -118,7 +118,7 @@ export default {
 
     // 清除按钮
     const showClear = computed(() => {
-      return props.clearable && !calcDisabled.value && emitValue.value
+      return props.clearable && !calcDisabled.value && (calcIsRange.value ? emitValue.value && emitValue.value.length : emitValue.value)
     })
     // 计算后的size
     const calcSize = computed(() => {

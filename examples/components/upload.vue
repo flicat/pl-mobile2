@@ -15,24 +15,30 @@
   </div>
 </template>
 <script>
+import { ref } from 'vue'
 export default {
-  data() {
-    return {
-      files: []
-    }
-  },
-  methods: {
-    setHomePage(file) {
+  setup() {
+    const files = ref([])
+
+    const setHomePage = (file) => {
       console.log(file)
-    },
-    onChange(files) {
+    }
+    const onChange = (files) => {
       console.log('onChange: ', files)
-    },
-    beforeRead(files) {
+    }
+    const beforeRead = (files) => {
       console.log('beforeRead: ', files, this)
-    },
-    afterRead(files) {
+    }
+    const afterRead = (files) => {
       console.log('afterRead: ', files, this)
+    }
+
+    return {
+      files,
+      setHomePage,
+      onChange,
+      beforeRead,
+      afterRead
     }
   }
 }

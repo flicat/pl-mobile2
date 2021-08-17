@@ -45,25 +45,35 @@
 </template>
 
 <script>
+import { getCurrentInstance, ref } from 'vue'
 export default {
-  data() {
-    return {
-      value: null,
-      rules: [{ required: true, message: '请选择', trigger: 'change', type: 'number' }],
-    }
-  },
-  methods: {
-    async validate() {
+  setup() {
+    const app = getCurrentInstance()
+    const value = ref(null)
+    const range1 = ref(null)
+    const range2 = ref(null)
+    const { $toast } = app.appContext.config.globalProperties
+
+    const validate = async () => {
       try {
-        await this.$refs.range1.validate()
-        await this.$refs.range2.validate()
-        this.$toast('校验成功！')
+        await range1.value.validate()
+        await range2.value.validate()
+        $toast('校验成功！')
       } catch (e) {
-        this.$toast('校验失败: ' + e)
+        $toast('校验失败: ' + e)
       }
-    },
-    onChange() {
-      console.log('onChange::', this.value)
+    }
+    const onChange = () => {
+      console.log('onChange::', value.value)
+    }
+
+    return {
+      value,
+      range1,
+      range2,
+      validate,
+      onChange,
+      rules: [{ required: true, message: '请选择', trigger: 'change', type: 'number' }],
     }
   }
 }

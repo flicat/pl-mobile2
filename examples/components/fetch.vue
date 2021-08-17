@@ -5,25 +5,26 @@
   </div>
 </template>
 <script>
+import { getCurrentInstance, ref } from 'vue'
 export default {
-  data() {
-    return {
-      src: ''
-    }
-  },
-  created() {
+  setup() {
+    const app = getCurrentInstance()
+    const { $fetch } = app.appContext.config.globalProperties
 
-  },
-  methods: {
-    getImg() {
-      this.$fetch.before((options) => {
+    const src = ref('')
+    const getImg = async () => {
+      $fetch.before((options) => {
         options.type = 'blob'
       })
-      this.$fetch.get('/favicon.ico').then(data => {
-        if (data && data.size > 0) {
-          this.src = URL.createObjectURL(data)
-        }
-      })
+      const data = await $fetch.get('/favicon.ico')
+      if (data && data.size > 0) {
+        src.value = URL.createObjectURL(data)
+      }
+    }
+
+    return {
+      src,
+      getImg
     }
   }
 }

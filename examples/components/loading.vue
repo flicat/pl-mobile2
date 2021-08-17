@@ -5,17 +5,19 @@
   </div>
 </template>
 <script>
+import { getCurrentInstance } from 'vue'
 export default {
-  mounted() {
-    this.showLoading()
-  },
-  methods: {
-    showLoading() {
-      this.$loadingShow('加载中...')
+  setup() {
+    const app = getCurrentInstance()
+    const { $loadingShow, $loadingHide } = app.appContext.config.globalProperties
+
+    const showLoading = () => {
+      $loadingShow('加载中...')
       setTimeout(() => {
-        this.$loadingHide()
+        $loadingHide()
       }, 2000)
     }
+    showLoading()
   }
 }
 </script>

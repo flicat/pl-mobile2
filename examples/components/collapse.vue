@@ -15,22 +15,27 @@
   </div>
 </template>
 <script>
+import { onMounted, ref } from 'vue'
 export default {
-  data() {
-    return {
-      active1: false,
-      active2: true
-    }
-  },
-  mounted() {
-    setTimeout(() => {
-      this.active1 = !this.active1
-      this.active2 = !this.active2
-    }, 3000)
-  },
-  methods: {
-    onChange(e) {
+  setup() {
+    const active1 = ref(false)
+    const active2 = ref(true)
+
+    const onChange = e => {
       console.log('onChange::', e)
+    }
+
+    onMounted(() => {
+      setTimeout(() => {
+        active1.value = !active1.value
+        active2.value = !active2.value
+      }, 1500)
+    })
+
+    return {
+      active1,
+      active2,
+      onChange
     }
   }
 }

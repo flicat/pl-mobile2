@@ -3,6 +3,7 @@
     <h3>基础用法</h3>
     <pl-checkbox v-model:value="value" :options="data" />
     <pl-checkbox v-model:value="value" :options="data" button />
+    <pl-checkbox v-model:value="value" :options="data" label="请选择：" button />
 
     <h3>尺寸大小</h3>
     <pl-checkbox v-model:value="value" :options="data" size="small" />
@@ -52,30 +53,41 @@
   </div>
 </template>
 <script>
+import { getCurrentInstance, ref } from 'vue'
+
 export default {
-  data() {
+  setup() {
+    const app = getCurrentInstance()
+    const box = ref(null)
+    const boolValue = ref(true)
+    const value = ref([])
+
+    const { $toast } = app.appContext.config.globalProperties
+
+    const onChange = () => {
+      console.log('onChange::', value.value)
+    }
+    const validate = async () => {
+      try {
+        await box.value.validate()
+        $toast('校验成功！')
+      } catch (e) {
+        $toast('校验失败: ' + e)
+      }
+    }
+
     return {
-      boolValue: true,
-      value: [],
+      box,
+      boolValue,
+      value,
+      onChange,
+      validate,
       data: [
         { label: '选项1', value: 1, disabled: false },
         { label: '选项2', value: 2, disabled: true },
         { label: '选项3', value: 3, disabled: false }
       ],
       rules: [{ required: true, message: '请选择', trigger: 'change', type: 'array' }]
-    }
-  },
-  methods: {
-    onChange() {
-      console.log('onChange::', this.value)
-    },
-    async validate() {
-      try {
-        await this.$refs['box'].validate()
-        this.$toast('校验成功！')
-      } catch (e) {
-        this.$toast('校验失败: ' + e)
-      }
     }
   }
 }

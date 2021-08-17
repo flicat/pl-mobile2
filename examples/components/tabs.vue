@@ -59,22 +59,26 @@
 </template>
 
 <script>
+import { ref } from 'vue'
 export default {
-  data() {
-    return {
-      active: 'tab8'
-    }
-  },
-  methods: {
-    getTabs(length = 3) {
+  setup() {
+    const active = ref('tab8')
+
+    const getTabs = (length = 3) => {
       let tabs = []
       for (let i = 0; i < length; i++) {
         tabs.push({ label: '选项' + (i + 1), name: 'tab' + (i + 1) })
       }
       return tabs
-    },
-    onChange() {
-      console.log('onChange::', this.active)
+    }
+    const onChange = () => {
+      console.log('onChange::', active.value)
+    }
+
+    return {
+      active,
+      getTabs,
+      onChange
     }
   }
 }

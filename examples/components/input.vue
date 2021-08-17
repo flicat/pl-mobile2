@@ -47,23 +47,34 @@
   </div>
 </template>
 <script>
+import { getCurrentInstance, ref } from 'vue'
 export default {
-  data() {
-    return {
-      value: '',
-      rules: [{ required: true, message: '请输入', trigger: 'blur' }]
-    }
-  },
-  methods: {
-    async validate() {
+  setup() {
+    const app = getCurrentInstance()
+    const value = ref('')
+    const input1 = ref(null)
+    const input2 = ref(null)
+    const input3 = ref(null)
+    const { $toast } = app.appContext.config.globalProperties
+
+    const validate = async () => {
       try {
-        await this.$refs.input1.validate()
-        await this.$refs.input2.validate()
-        await this.$refs.input3.validate()
-        this.$toast('校验成功！')
+        await input1.value.validate()
+        await input2.value.validate()
+        await input3.value.validate()
+        $toast('校验成功！')
       } catch (e) {
-        this.$toast('校验失败: ' + e)
+        $toast('校验失败: ' + e)
       }
+    }
+
+    return {
+      value,
+      input1,
+      input2,
+      input3,
+      validate,
+      rules: [{ required: true, message: '请输入', trigger: 'blur' }]
     }
   }
 }

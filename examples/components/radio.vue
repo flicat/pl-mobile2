@@ -48,29 +48,38 @@
   </div>
 </template>
 <script>
+import { getCurrentInstance, ref } from 'vue'
 export default {
-  data() {
+  setup() {
+    const app = getCurrentInstance()
+    const { $toast } = app.appContext.config.globalProperties
+
+    const value = ref(null)
+    const radio = ref(null)
+
+    const validate = async () => {
+      try {
+        await radio.value.validate()
+        $toast('校验成功！')
+      } catch (e) {
+        $toast('校验失败: ' + e)
+      }
+    }
+    const onChange = () => {
+      console.log('onChange::', value.value)
+    }
+
     return {
-      value: null,
+      value,
+      radio,
+      validate,
+      onChange,
       data: [
         { label: '选项1', value: 1, disabled: false },
         { label: '选项2', value: 2, disabled: true },
         { label: '选项3', value: 3, disabled: false }
       ],
       rules: [{ required: true, message: '请选择', trigger: 'change' }]
-    }
-  },
-  methods: {
-    async validate() {
-      try {
-        await this.$refs.radio.validate()
-        this.$toast('校验成功！')
-      } catch (e) {
-        this.$toast('校验失败: ' + e)
-      }
-    },
-    onChange() {
-      console.log('onChange::', this.value)
     }
   }
 }

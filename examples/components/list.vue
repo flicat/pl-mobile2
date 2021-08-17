@@ -5,7 +5,7 @@
     </div>
     <div class="list">
       <pl-list class="pl-list" :autoLoad="50" :splitSize="10" :loading="loading" :finished="finished" @refresh="reload" @load="load" refreshText="松开刷新" loadingText="加载中..." finishedText="加载完成" topButton>
-        <div v-for="item in data" :key="item.value" class="card-item">
+        <div v-for="item in dataList" :key="item.value" class="card-item">
           <p>这是标题{{item.label}}</p>
           <p>这是选项卡副标题</p>
           <p>这是选项卡内容，this is content.</p>
@@ -20,41 +20,36 @@
 </template>
 
 <script>
+import { ref } from 'vue'
 export default {
-  data() {
-    return {
-      loading: false,
-      finished: false,
-      page: 1,
-      size: 10,
-      data: [],
-      totalSize: 50
+  setup() {
+    const loading = ref(false)
+    const finished = ref(false)
+    const dataList = ref([])
+    let page = 1
+    let size = 10
+    let totalSize = 50
+
+    const reload = () => {
+      page = 1
+      finished.value = false
+      getData()
     }
-  },
-  created() {
-    this.reload()
-  },
-  methods: {
-    reload() {
-      this.page = 1
-      this.finished = false
-      this.getData()
-    },
-    load() {
-      if (this.finished) {
+    const load = () => {
+      if (finished.value) {
         return false
       }
 
-      this.page++
-      this.getData()
-    },
-    async getData() {
-      this.loading = true
+      page++
+      getData()
+    }
+    const getData = async () => {
+      loading.value = true
 
       let data = await new Promise((resolve, reject) => {
         let result = []
-        for (let i = 1; i <= this.size; i++) {
-          let index = i + this.size * (this.page - 1)
+        for (let i = 1; i <= size; i++) {
+          let index = i + size * (page - 1)
           result.push({ label: index, value: index })
         }
         setTimeout(() => {
@@ -62,14 +57,24 @@ export default {
         }, 1000)
       })
 
-      if (this.page === 1) {
-        this.data = data
+      if (page === 1) {
+        dataList.value = data
       } else {
-        this.data = this.data.concat(data)
+        dataList.value = dataList.value.concat(data)
       }
-      this.finished = this.data.length >= this.totalSize
+      finished.value = dataList.value.length >= totalSize
 
-      this.loading = false
+      loading.value = false
+    }
+
+    reload()
+
+    return {
+      loading,
+      finished,
+      reload,
+      load,
+      dataList
     }
   }
 }

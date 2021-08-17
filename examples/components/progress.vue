@@ -13,16 +13,19 @@
 </template>
 
 <script>
+import { onMounted, ref } from 'vue'
 export default {
-  data() {
+  setup() {
+    const progress = ref(99.99)
+    onMounted(() => {
+      setTimeout(() => {
+        progress.value = 60
+      }, 1500)
+    })
+
     return {
-      progress: 99.99
+      progress
     }
-  },
-  mounted() {
-    setTimeout(() => {
-      this.progress = 60
-    }, 1000)
   }
 }
 </script>

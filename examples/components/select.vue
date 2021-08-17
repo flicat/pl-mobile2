@@ -43,11 +43,40 @@
   </div>
 </template>
 <script>
+import { getCurrentInstance, ref } from 'vue'
 export default {
-  data() {
+  setup() {
+    const app = getCurrentInstance()
+    const value1 = ref(null)
+    const value2 = ref([])
+    const select1 = ref(null)
+    const select2 = ref(null)
+    const { $toast } = app.appContext.config.globalProperties
+
+    const validate = async () => {
+      try {
+        await select1.value.validate()
+        await select2.value.validate()
+        $toast('校验成功！')
+      } catch (e) {
+        $toast('校验失败: ' + e)
+      }
+    }
+    const change = () => {
+      console.log('change::', value1.value)
+    }
+    const change2 = () => {
+      console.log('change::', value2.value)
+    }
+
     return {
-      value1: null,
-      value2: [],
+      value1,
+      value2,
+      select1,
+      select2,
+      validate,
+      change,
+      change2,
       rules1: [{ required: true, message: '请选择', trigger: 'change' }],
       rules2: [{ required: true, message: '请选择', trigger: 'change' }],
       data: [
@@ -58,23 +87,6 @@ export default {
         { label: '选项5', value: 5, disabled: false },
         { label: '选项6', value: 6, disabled: false }
       ]
-    }
-  },
-  methods: {
-    async validate() {
-      try {
-        await this.$refs.select1.validate()
-        await this.$refs.select2.validate()
-        this.$toast('校验成功！')
-      } catch (e) {
-        this.$toast('校验失败: ' + e)
-      }
-    },
-    change() {
-      console.log('change::', this.value1)
-    },
-    change2() {
-      console.log('change::', this.value2)
     }
   }
 }
