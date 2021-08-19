@@ -189,6 +189,7 @@ export default {
     .font-size(16);
     color: var(--picker-text);
     background-color: var(--picker-bg);
+    width: 100%;
   }
   &-top {
     .height(44);
