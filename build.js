@@ -7,6 +7,7 @@ build({
     svgLoader()
   ],
   build: {
+    minify: false,
     lib: {
       entry: path.resolve(__dirname, 'src/index.js'),
       name: 'PlMobile',

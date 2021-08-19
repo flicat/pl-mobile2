@@ -63,7 +63,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .pl-icon {
   width: 1.2em;
   height: 1.2em;
