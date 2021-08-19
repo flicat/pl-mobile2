@@ -39,7 +39,7 @@
       <template v-slot="scope">{{scope.item.label}} - {{scope.item.value}}</template>
     </pl-radio>
 
-    <h3>必填</h3>
+    <h3>表单校验</h3>
     <pl-radio v-model:value="value" :options="data" label="请选择：" :rules="rules" ref="radio" @change="onChange" required></pl-radio>
 
     <pl-cell :span="[1]">

@@ -34,7 +34,7 @@
       <template v-slot:thumb><span class="thumb">{{value}}%</span></template>
     </pl-range>
 
-    <h3>必填</h3>
+    <h3>表单校验</h3>
     <pl-range v-model:value="value" :min="0" :max="100" :step="1" label="请选择：" @change="onChange" :rules="rules" ref="range1" required></pl-range>
     <pl-range v-model:value="value" :min="0" :max="100" :step="1" label="请选择：" @change="onChange" :rules="rules" ref="range2" required wrap></pl-range>
 

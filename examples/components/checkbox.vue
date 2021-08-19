@@ -44,7 +44,7 @@
       <template v-slot="scope">{{scope.item.label}} - {{scope.item.value}}</template>
     </pl-checkbox>
 
-    <h3>必填</h3>
+    <h3>表单校验</h3>
     <pl-checkbox @change="onChange" v-model:value="value" :options="data" :rules="rules" label="请选择：" ref="box" required />
 
     <pl-cell :span="[1]">

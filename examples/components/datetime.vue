@@ -25,7 +25,7 @@
     <pl-datetime startPlaceholder="开始日期" endPlaceholder="结束日期" :options="dateRangeOption" v-model:value="dateRange" type="date" @change="onChange" valueFormat="Y-M-D" format="Y-M-D" isRange clearable></pl-datetime>
     <pl-datetime startPlaceholder="开始月份" endPlaceholder="结束月份" :options="monthRangeOption" v-model:value="monthRange" type="month" @change="onChange" valueFormat="Y-M" format="Y-M" isRange clearable></pl-datetime>
 
-    <h3>表单验证</h3>
+    <h3>表单校验</h3>
     <pl-datetime label="请选择时间：" placeholder="请选择时间" ref="datetime1" v-model:value="time" type="time" @change="onChange" valueFormat="H:I" :rules="rules1" required clearable></pl-datetime>
     <pl-datetime label="请选择日期：" placeholder="请选择日期" :options="dateOption" v-model:value="date" type="date" @change="onChange" ref="datetime2" :rules="rules1" required clearable></pl-datetime>
     <pl-datetime label="请选择日期范围：" startPlaceholder="开始日期" endPlaceholder="结束日期" :options="dateRangeOption" v-model:value="dateRange" type="date" @change="onChange" ref="datetime3" :rules="rules2" required isRange clearable></pl-datetime>
