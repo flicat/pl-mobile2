@@ -4,7 +4,7 @@
       <h4>滚动列表<small>上拉加载</small><small>下拉刷新</small></h4>
     </div>
     <div class="list">
-      <pl-list class="pl-list" :autoLoad="50" :splitSize="10" :loading="loading" :finished="finished" @refresh="reload" @load="load" refreshText="松开刷新" loadingText="加载中..." finishedText="加载完成" topButton>
+      <pl-list class="pl-list" :autoLoad="50" :splitSize="10" :loading="loading" :finished="finished" @refresh="reload" @load="load" refreshText="松开刷新" loadingText="加载中..." finishedText="加载完成">
         <div v-for="item in dataList" :key="item.value" class="card-item">
           <p>这是标题{{item.label}}</p>
           <p>这是选项卡副标题</p>

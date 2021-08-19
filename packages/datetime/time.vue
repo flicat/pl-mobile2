@@ -1,78 +1,80 @@
 <template>
-  <div :class="['pl-watch-popup', show ? '' : 'hidden']" @click.self="close">
-    <svg class="watch-content" viewBox="0 0 250 370" @touchstart.stop.prevent="touchHandler" @touchmove.stop.prevent="touchHandler">
-      <defs>
-        <circle id="watch-bg" cx="125" cy="125" r="110" class="watch-bg"></circle>
-        <rect id="text-bg" x="0" y="0" height="60" width="250" class="text-bg" />
-        <g id="hour-num">
-          <text class="hour-item" v-for="(item, i) in hours" :key="'hour-' + item" v-bind="getTimePosition(i * 30, 60)" dy="5px">{{item}}</text>
+  <teleport to='body'>
+    <div :class="['pl-watch-popup', show ? '' : 'hidden']" @click.self="close">
+      <svg class="watch-content" viewBox="0 0 250 370" @touchstart.stop.prevent="touchHandler" @touchmove.stop.prevent="touchHandler">
+        <defs>
+          <circle id="watch-bg" cx="125" cy="125" r="110" class="watch-bg"></circle>
+          <rect id="text-bg" x="0" y="0" height="60" width="250" class="text-bg" />
+          <g id="hour-num">
+            <text class="hour-item" v-for="(item, i) in hours" :key="'hour-' + item" v-bind="getTimePosition(i * 30, 60)" dy="5px">{{item}}</text>
+          </g>
+          <g id="minute-num">
+            <text class="minute-item" v-for="(item, i) in minutes" :key="'minute-' + item" v-bind="getTimePosition(i * 30, 90)" dy="6px">{{item}}</text>
+          </g>
+          <g id="minute-pointer">
+            <circle class="pointer-circle" cx="125" cy="35" r="15"></circle>
+            <circle class="needle-center" cx="125" cy="125" r="5"></circle>
+            <rect class="needle" x="125" y="50" height="75" width="1" />
+          </g>
+          <g id="hour-pointer">
+            <circle class="pointer-circle" cx="125" cy="64" r="12"></circle>
+            <circle class="needle-center" cx="125" cy="125" r="5"></circle>
+            <rect class="needle" x="125" y="76" height="54" width="1" />
+          </g>
+        </defs>
+
+        <!-- 表盘 -->
+        <g ref="watch">
+          <use xlink:href="#watch-bg" x="0" y="60"></use>
+          <!-- 多选时间范围轨迹 -->
+          <circle id="time-range" cx="125" cy="185" r="61" class="time-range" :transform="'rotate('+selectedRange.rotate+' 125 185)'" :stroke-dashoffset="selectedRange.offset" v-if="options.isRange"></circle>
+          <use xlink:href="#minute-num" fill="#222" x="0" y="60" @touchstart="setMinutes()"></use>
+          <use xlink:href="#hour-num" fill="#444" x="0" y="60" @touchstart="setHours()"></use>
         </g>
-        <g id="minute-num">
-          <text class="minute-item" v-for="(item, i) in minutes" :key="'minute-' + item" v-bind="getTimePosition(i * 30, 90)" dy="6px">{{item}}</text>
+
+        <!-- 单选时针 -->
+        <g :transform="'rotate('+hourAngle+' 125 185)'" @touchstart="setHours('currentHour')" v-if="!options.isRange">
+          <use xlink:href="#hour-pointer" x="0" y="60" style="fill: var(--watch-hour-pointer)"></use>
         </g>
-        <g id="minute-pointer">
-          <circle class="pointer-circle" cx="125" cy="35" r="15"></circle>
-          <circle class="needle-center" cx="125" cy="125" r="5"></circle>
-          <rect class="needle" x="125" y="50" height="75" width="1" />
+        <!-- 单选分针 -->
+        <g :transform="'rotate('+menuteAngle+' 125 185)'" @touchstart="setMinutes('currentMinute')" v-if="!options.isRange">
+          <use xlink:href="#minute-pointer" x="0" y="60" style="fill: var(--watch-minute-pointer)"></use>
         </g>
-        <g id="hour-pointer">
-          <circle class="pointer-circle" cx="125" cy="64" r="12"></circle>
-          <circle class="needle-center" cx="125" cy="125" r="5"></circle>
-          <rect class="needle" x="125" y="76" height="54" width="1" />
+
+        <!-- 多选开始分针 -->
+        <g :transform="'rotate('+startMenuteAngle+' 125 185)'" @touchstart="setMinutes('startMinute')" v-if="options.isRange" v-show="/startMinute|startHour/.test(currentPointer.name)">
+          <use xlink:href="#minute-pointer" x="0" y="60" style="fill: var(--watch-minute-pointer)"></use>
         </g>
-      </defs>
+        <!-- 多选结束分针 -->
+        <g :transform="'rotate('+endMenuteAngle+' 125 185)'" @touchstart="setMinutes('endMinute')" v-if="options.isRange" v-show="/endMinute|endHour/.test(currentPointer.name)">
+          <use xlink:href="#minute-pointer" x="0" y="60" style="fill: var(--watch-end-minute-pointer)"></use>
+        </g>
+        <!-- 多选开始时针 -->
+        <g :transform="'rotate('+startHourAngle+' 125 185)'" @touchstart="setHours('startHour')" v-if="options.isRange">
+          <use xlink:href="#hour-pointer" x="0" y="60" style="fill: var(--watch-hour-pointer)"></use>
+        </g>
+        <!-- 多选结束时针 -->
+        <g :transform="'rotate('+endHourAngle+' 125 185)'" @touchstart="setHours('endHour')" v-if="options.isRange">
+          <use xlink:href="#hour-pointer" x="0" y="60" style="fill: var(--watch-end-hour-pointer)"></use>
+        </g>
 
-      <!-- 表盘 -->
-      <g ref="watch">
-        <use xlink:href="#watch-bg" x="0" y="60"></use>
-        <!-- 多选时间范围轨迹 -->
-        <circle id="time-range" cx="125" cy="185" r="61" class="time-range" :transform="'rotate('+selectedRange.rotate+' 125 185)'" :stroke-dashoffset="selectedRange.offset" v-if="options.isRange"></circle>
-        <use xlink:href="#minute-num" fill="#222" x="0" y="60" @touchstart="setMinutes()"></use>
-        <use xlink:href="#hour-num" fill="#444" x="0" y="60" @touchstart="setHours()"></use>
-      </g>
+        <!-- 时间结果显示 -->
+        <g @touchstart.stop.prevent @touchmove.stop.prevent>
+          <use xlink:href="#text-bg" x="0" y="0"></use>
+          <text class="current-time" x="125" y="42" v-if="!options.isRange">{{currentTime}}</text>
+          <text class="current-time" x="125" y="42" v-else>{{currentStartTime}}~{{currentEndTime}}</text>
+        </g>
 
-      <!-- 单选时针 -->
-      <g :transform="'rotate('+hourAngle+' 125 185)'" @touchstart="setHours('currentHour')" v-if="!options.isRange">
-        <use xlink:href="#hour-pointer" x="0" y="60" style="fill: var(--watch-hour-pointer)"></use>
-      </g>
-      <!-- 单选分针 -->
-      <g :transform="'rotate('+menuteAngle+' 125 185)'" @touchstart="setMinutes('currentMinute')" v-if="!options.isRange">
-        <use xlink:href="#minute-pointer" x="0" y="60" style="fill: var(--watch-minute-pointer)"></use>
-      </g>
-
-      <!-- 多选开始分针 -->
-      <g :transform="'rotate('+startMenuteAngle+' 125 185)'" @touchstart="setMinutes('startMinute')" v-if="options.isRange" v-show="/startMinute|startHour/.test(currentPointer.name)">
-        <use xlink:href="#minute-pointer" x="0" y="60" style="fill: var(--watch-minute-pointer)"></use>
-      </g>
-      <!-- 多选结束分针 -->
-      <g :transform="'rotate('+endMenuteAngle+' 125 185)'" @touchstart="setMinutes('endMinute')" v-if="options.isRange" v-show="/endMinute|endHour/.test(currentPointer.name)">
-        <use xlink:href="#minute-pointer" x="0" y="60" style="fill: var(--watch-end-minute-pointer)"></use>
-      </g>
-      <!-- 多选开始时针 -->
-      <g :transform="'rotate('+startHourAngle+' 125 185)'" @touchstart="setHours('startHour')" v-if="options.isRange">
-        <use xlink:href="#hour-pointer" x="0" y="60" style="fill: var(--watch-hour-pointer)"></use>
-      </g>
-      <!-- 多选结束时针 -->
-      <g :transform="'rotate('+endHourAngle+' 125 185)'" @touchstart="setHours('endHour')" v-if="options.isRange">
-        <use xlink:href="#hour-pointer" x="0" y="60" style="fill: var(--watch-end-hour-pointer)"></use>
-      </g>
-
-      <!-- 时间结果显示 -->
-      <g @touchstart.stop.prevent @touchmove.stop.prevent>
-        <use xlink:href="#text-bg" x="0" y="0"></use>
-        <text class="current-time" x="125" y="42" v-if="!options.isRange">{{currentTime}}</text>
-        <text class="current-time" x="125" y="42" v-else>{{currentStartTime}}~{{currentEndTime}}</text>
-      </g>
-
-      <!-- 提交按钮 -->
-      <g @touchstart.stop.prevent @touchmove.stop.prevent>
-        <use xlink:href="#text-bg" x="0" y="310"></use>
-        <text class="btn-text" x="63" y="347" @touchstart="close">取消</text>
-        <text class="btn-text" x="125" y="347">|</text>
-        <text class="btn-text" x="187" y="347" @touchstart="submit">确定</text>
-      </g>
-    </svg>
-  </div>
+        <!-- 提交按钮 -->
+        <g @touchstart.stop.prevent @touchmove.stop.prevent>
+          <use xlink:href="#text-bg" x="0" y="310"></use>
+          <text class="btn-text" x="63" y="347" @touchstart="close">取消</text>
+          <text class="btn-text" x="125" y="347">|</text>
+          <text class="btn-text" x="187" y="347" @touchstart="submit">确定</text>
+        </g>
+      </svg>
+    </div>
+  </teleport>
 </template>
 
 <script>

@@ -1,7 +1,9 @@
 <template>
-  <div class="pl-to-top" v-if="scrollTop > offset" @click="scrollToTop">
-    <iconUp class="icon-up"></iconUp>
-  </div>
+  <teleport to='body'>
+    <div class="pl-to-top" v-if="scrollTop > offset" @click="scrollToTop">
+      <iconUp class="icon-up"></iconUp>
+    </div>
+  </teleport>
 </template>
 
 <script>

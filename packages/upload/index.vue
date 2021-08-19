@@ -23,12 +23,14 @@
     </div>
     <slot name="tips"></slot>
 
-    <div class="pl-preview-dialog" v-if="dialogPreview">
-      <ul class="preview-list" :style="previewListStyle" @touchstart="touchEvent($event)" @touchmove="touchEvent($event)" @touchend="touchEvent($event)" @touchcancel="touchEvent($event)" @click="closePreview">
-        <li class="preview-item" v-for="(file, i) in previewList" :key="i" :style="{'background-image': `url(${file.preview})`, 'left': i * 100 + '%'}"></li>
-      </ul>
-      <div class="preview-index">{{previewIndex + 1}}/{{previewList.length}}</div>
-    </div>
+    <teleport to='body'>
+      <div class="pl-preview-dialog" v-if="dialogPreview">
+        <ul class="preview-list" :style="previewListStyle" @touchstart="touchEvent($event)" @touchmove="touchEvent($event)" @touchend="touchEvent($event)" @touchcancel="touchEvent($event)" @click="closePreview">
+          <li class="preview-item" v-for="(file, i) in previewList" :key="i" :style="{'background-image': `url(${file.preview})`, 'left': i * 100 + '%'}"></li>
+        </ul>
+        <div class="preview-index">{{previewIndex + 1}}/{{previewList.length}}</div>
+      </div>
+    </teleport>
   </div>
 </template>
 
@@ -331,48 +333,47 @@ export default {
       }
     }
   }
+}
+.pl-preview-dialog {
+  position: fixed;
+  z-index: 99;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background: rgba(0, 0, 0, 0.5);
 
-  .pl-preview-dialog {
-    position: fixed;
-    z-index: 99;
+  .preview-list {
+    position: relative;
     width: 100%;
     height: 100%;
-    left: 0;
-    top: 0;
-    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    transition: all 0.3s ease;
+    will-change: transform, -webkit-transform;
 
-    .preview-list {
-      position: relative;
+    .preview-item {
+      position: absolute;
       width: 100%;
       height: 100%;
-      z-index: 1;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      transition: all 0.3s ease;
-      will-change: transform, -webkit-transform;
-
-      .preview-item {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        left: 0;
-        top: 0;
-        background-position: 50% 50%;
-        background-size: contain;
-        background-repeat: no-repeat;
-      }
-    }
-    .preview-index {
-      position: absolute;
-      z-index: 2;
       left: 0;
-      top: 1em;
-      width: 100%;
-      text-align: center;
-      color: #fff;
-      text-shadow: 0 0 2px #999;
+      top: 0;
+      background-position: 50% 50%;
+      background-size: contain;
+      background-repeat: no-repeat;
     }
+  }
+  .preview-index {
+    position: absolute;
+    z-index: 2;
+    left: 0;
+    top: 1em;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    text-shadow: 0 0 2px #999;
   }
 }
 </style>

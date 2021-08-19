@@ -67,18 +67,18 @@ export default {
   justify-content: center;
   background-color: #fff;
   &.center {
-    width: 10em;
-    height: 10em;
+    width: 50%;
+    height: 30%;
   }
   &.left,
   &.right {
-    width: 70vw;
+    width: 70%;
     height: 100%;
   }
   &.top,
   &.bottom {
     width: 100%;
-    height: 50vh;
+    height: 50%;
   }
 }
 </style>

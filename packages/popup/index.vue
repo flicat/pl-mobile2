@@ -1,10 +1,12 @@
 <template>
-  <div class="pl-popup" :class="[isOpen ? 'pl-popup--open' : 'pl-popup--close', visible ? '' : 'pl-popup--hide', 'pl-popup--' + position]">
-    <div class="pl-popup-content">
-      <slot></slot>
+  <teleport to='body'>
+    <div class="pl-popup" :class="[isOpen ? 'pl-popup--open' : 'pl-popup--close', visible ? '' : 'pl-popup--hide', 'pl-popup--' + position]">
+      <div class="pl-popup-content" @click.self="close">
+        <slot></slot>
+      </div>
+      <div class="pl-popup-layer"></div>
     </div>
-    <div class="pl-popup-layer" @click="close"></div>
-  </div>
+  </teleport>
 </template>
 
 <script>
@@ -59,19 +61,17 @@ export default {
   z-index: 99;
   left: 0;
   top: 0;
-  display: flex;
-  flex-direction: column-reverse;
   width: 100%;
   height: 100%;
-
-  * {
-    box-sizing: border-box;
-  }
 
   &-content {
     position: relative;
     z-index: 1;
     .font-size(16);
+    display: flex;
+    flex-direction: column-reverse;
+    width: 100%;
+    height: 100%;
     transition: all 0.3s ease;
     will-change: transform, -webkit-transform;
   }
@@ -86,46 +86,41 @@ export default {
     background-color: rgba(0, 0, 0, 0.5);
   }
   &--top {
-    justify-content: flex-end;
-    align-items: center;
     .pl-popup-content {
-      width: 100%;
+      justify-content: flex-end;
+      align-items: center;
       transform: translate(0, -100%);
     }
   }
   &--bottom {
-    justify-content: flex-start;
-    align-items: center;
     .pl-popup-content {
-      width: 100%;
+      justify-content: flex-start;
+      align-items: center;
       transform: translate(0, 100%);
     }
   }
   &--right {
-    justify-content: center;
-    align-items: flex-end;
     .pl-popup-content {
-      height: 100%;
+      justify-content: center;
+      align-items: flex-end;
       transform: translate(100%, 0);
     }
   }
   &--left {
-    justify-content: center;
-    align-items: flex-start;
     .pl-popup-content {
-      height: 100%;
+      justify-content: center;
+      align-items: flex-start;
       transform: translate(-100%, 0);
     }
   }
   &--center {
-    justify-content: center;
-    align-items: center;
     .pl-popup-content {
+      justify-content: center;
+      align-items: center;
       transform: scale(0);
     }
   }
   &--open {
-    display: flex;
     .pl-popup-content {
       transform: none;
     }
@@ -135,8 +130,6 @@ export default {
   }
 
   &--close {
-    // .pl-popup-content {
-    // }
     .pl-popup-layer {
       opacity: 0;
     }

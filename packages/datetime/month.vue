@@ -1,23 +1,25 @@
 <template>
-  <div :class="['pl-datetime-popup', show ? '' : 'hidden']">
-    <div class="year-wrap">
-      <div class="year-list">
-        <div class="year-item" v-for="month in yearList" :key="month.title">
-          <div class="title-date">{{month.title}}</div>
-          <div class="month-list">
-            <div v-for="date in month.dateArr" :key="date.timeStamp" @click="onTapDate(date)" :class="['month-item', date.status, date.disabled ? 'disabled' : '']">
-              <span class="sup-label">{{date.supLabel}}</span>
-              <span class="month-label">{{date.label}}月</span>
-              <span class="sub-label">{{date.subLabel}}</span>
+  <teleport to='body'>
+    <div :class="['pl-datetime-popup', show ? '' : 'hidden']">
+      <div class="year-wrap">
+        <div class="year-list">
+          <div class="year-item" v-for="month in yearList" :key="month.title">
+            <div class="title-date">{{month.title}}</div>
+            <div class="month-list">
+              <div v-for="date in month.dateArr" :key="date.timeStamp" @click="onTapDate(date)" :class="['month-item', date.status, date.disabled ? 'disabled' : '']">
+                <span class="sup-label">{{date.supLabel}}</span>
+                <span class="month-label">{{date.label}}月</span>
+                <span class="sub-label">{{date.subLabel}}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
+      <div class="btn-wrap">
+        <button class="btn-submit" type="primary" @click="submit">选择月份</button>
+      </div>
     </div>
-    <div class="btn-wrap">
-      <button class="btn-submit" type="primary" @click="submit">选择月份</button>
-    </div>
-  </div>
+  </teleport>
 </template>
 
 <script>

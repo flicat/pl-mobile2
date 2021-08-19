@@ -1,32 +1,34 @@
 <template>
-  <div :class="['pl-datetime-popup', show ? '' : 'hidden']">
-    <div class="top-week">
-      <span class="week-item">日</span>
-      <span class="week-item">一</span>
-      <span class="week-item">二</span>
-      <span class="week-item">三</span>
-      <span class="week-item">四</span>
-      <span class="week-item">五</span>
-      <span class="week-item">六</span>
-    </div>
-    <div class="month-wrap">
-      <div class="month-list">
-        <div class="month-item" v-for="month in monthList" :key="month.title">
-          <div class="title-date">{{month.title}}</div>
-          <div class="date-list">
-            <div v-for="date in month.dateArr" :key="date.timeStamp" @click="onTapDate(date)" :class="['date-item', date.status, date.disabled ? 'disabled' : '']">
-              <span class="sup-label">{{date.supLabel}}</span>
-              <span class="date-label">{{date.label}}</span>
-              <span class="sub-label">{{date.subLabel}}</span>
+  <teleport to='body'>
+    <div :class="['pl-datetime-popup', show ? '' : 'hidden']">
+      <div class="top-week">
+        <span class="week-item">日</span>
+        <span class="week-item">一</span>
+        <span class="week-item">二</span>
+        <span class="week-item">三</span>
+        <span class="week-item">四</span>
+        <span class="week-item">五</span>
+        <span class="week-item">六</span>
+      </div>
+      <div class="month-wrap">
+        <div class="month-list">
+          <div class="month-item" v-for="month in monthList" :key="month.title">
+            <div class="title-date">{{month.title}}</div>
+            <div class="date-list">
+              <div v-for="date in month.dateArr" :key="date.timeStamp" @click="onTapDate(date)" :class="['date-item', date.status, date.disabled ? 'disabled' : '']">
+                <span class="sup-label">{{date.supLabel}}</span>
+                <span class="date-label">{{date.label}}</span>
+                <span class="sub-label">{{date.subLabel}}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
+      <div class="btn-wrap">
+        <button class="btn-submit" type="primary" @click="submit">选择日期</button>
+      </div>
     </div>
-    <div class="btn-wrap">
-      <button class="btn-submit" type="primary" @click="submit">选择日期</button>
-    </div>
-  </div>
+  </teleport>
 </template>
 
 <script>
