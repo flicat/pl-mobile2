@@ -1,6 +1,6 @@
 <template>
   <teleport to='body'>
-    <div :class="['pl-watch-popup', show ? '' : 'hidden']" @click.self="close">
+    <div v-bind="$attrs" :class="['pl-watch-popup', show ? '' : 'hidden']" @click.self="close">
       <svg class="watch-content" viewBox="0 0 250 370" @touchstart.stop.prevent="touchHandler" @touchmove.stop.prevent="touchHandler">
         <defs>
           <circle id="watch-bg" cx="125" cy="125" r="110" class="watch-bg"></circle>

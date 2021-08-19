@@ -1,6 +1,6 @@
 <template>
   <teleport to='body'>
-    <div :class="['pl-datetime-popup', show ? '' : 'hidden']">
+    <div v-bind="$attrs" :class="['pl-datetime-popup', show ? '' : 'hidden']">
       <div class="year-wrap">
         <div class="year-list">
           <div class="year-item" v-for="month in yearList" :key="month.title">

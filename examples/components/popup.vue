@@ -17,19 +17,19 @@
       <pl-button type="primary" @click="open(popupBottom)">下面弹出</pl-button>
     </p>
 
-    <pl-popup position="center" ref="popupCenter">
+    <pl-popup position="center" ref="popupCenter" class="popup-center" @close="onClose">
       <div class="popup-inner center">这是一个弹框</div>
     </pl-popup>
-    <pl-popup position="left" ref="popupLeft">
+    <pl-popup position="left" ref="popupLeft" class="popup-left" @close="onClose">
       <div class="popup-inner left">这是一个弹框</div>
     </pl-popup>
-    <pl-popup position="right" ref="popupRight">
+    <pl-popup position="right" ref="popupRight" class="popup-right" @close="onClose">
       <div class="popup-inner right">这是一个弹框</div>
     </pl-popup>
-    <pl-popup position="top" ref="popupTop">
+    <pl-popup position="top" ref="popupTop" class="popup-top" @close="onClose">
       <div class="popup-inner top">这是一个弹框</div>
     </pl-popup>
-    <pl-popup position="bottom" ref="popupBottom">
+    <pl-popup position="bottom" ref="popupBottom" class="popup-bottom" @close="onClose">
       <div class="popup-inner bottom">这是一个弹框</div>
     </pl-popup>
   </div>
@@ -48,13 +48,17 @@ export default {
       target.open()
     }
 
+    const onClose = e => {
+      console.log('onClose:', e)
+    }
     return {
       popupCenter,
       popupLeft,
       popupRight,
       popupTop,
       popupBottom,
-      open
+      open,
+      onClose
     }
   }
 }

@@ -1,6 +1,6 @@
 <template>
   <teleport to='body'>
-    <div :class="['pl-datetime-popup', show ? '' : 'hidden']">
+    <div v-bind="$attrs" :class="['pl-datetime-popup', show ? '' : 'hidden']">
       <div class="top-week">
         <span class="week-item">日</span>
         <span class="week-item">一</span>
