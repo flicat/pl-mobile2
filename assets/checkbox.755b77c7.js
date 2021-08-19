@@ -1,5 +1,5 @@
 import { g as getCurrentInstance, q as ref, Q as pushScopeId, R as popScopeId, r as resolveComponent, o as openBlock, d as createElementBlock, I as createVNode, O as withCtx, C as createTextVNode, t as toDisplayString, e as createBaseVNode } from "./vendor.f40c224e.js";
-var checkbox_vue_vue_type_style_index_0_scoped_true_lang = ".pl-checkbox[data-v-685c4edf] {\n  border-bottom: 1px solid #ddd;\n}\n";
+var checkbox_vue_vue_type_style_index_0_scoped_true_lang = ".pl-checkbox[data-v-14da3ced] {\n  border-bottom: 1px solid #ddd;\n}\n";
 const _sfc_main = {
   setup() {
     const app = getCurrentInstance();
@@ -33,7 +33,7 @@ const _sfc_main = {
     };
   }
 };
-pushScopeId("data-v-685c4edf");
+pushScopeId("data-v-14da3ced");
 const _hoisted_1 = { class: "content" };
 const _hoisted_2 = /* @__PURE__ */ createBaseVNode("h3", null, "\u57FA\u7840\u7528\u6CD5", -1);
 const _hoisted_3 = /* @__PURE__ */ createBaseVNode("h3", null, "\u5C3A\u5BF8\u5927\u5C0F", -1);
@@ -45,7 +45,7 @@ const _hoisted_8 = /* @__PURE__ */ createBaseVNode("h3", null, "\u5F00\u5173\u63
 const _hoisted_9 = /* @__PURE__ */ createTextVNode("\u5F00\u5173");
 const _hoisted_10 = /* @__PURE__ */ createTextVNode("\u5F00\u5173");
 const _hoisted_11 = /* @__PURE__ */ createBaseVNode("h3", null, "\u81EA\u5B9A\u4E49\u5B50\u9879", -1);
-const _hoisted_12 = /* @__PURE__ */ createBaseVNode("h3", null, "\u5FC5\u586B", -1);
+const _hoisted_12 = /* @__PURE__ */ createBaseVNode("h3", null, "\u8868\u5355\u6821\u9A8C", -1);
 const _hoisted_13 = /* @__PURE__ */ createTextVNode("\u8868\u5355\u6821\u9A8C");
 popScopeId();
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -243,5 +243,5 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   ]);
 }
 _sfc_main.render = _sfc_render;
-_sfc_main.__scopeId = "data-v-685c4edf";
+_sfc_main.__scopeId = "data-v-14da3ced";
 export { _sfc_main as default };

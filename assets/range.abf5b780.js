@@ -1,5 +1,5 @@
 import { g as getCurrentInstance, q as ref, Q as pushScopeId, R as popScopeId, r as resolveComponent, o as openBlock, d as createElementBlock, I as createVNode, O as withCtx, C as createTextVNode, t as toDisplayString, e as createBaseVNode } from "./vendor.f40c224e.js";
-var range_vue_vue_type_style_index_0_scoped_true_lang = ".thumb[data-v-6c9e9701] {\n  padding: 0.2em 0.5em;\n  border-radius: 0.5rem;\n  text-align: center;\n  background-color: #5fd3ff;\n  color: #fff;\n  transform: translate(-50%, -50%);\n}\n";
+var range_vue_vue_type_style_index_0_scoped_true_lang = ".thumb[data-v-9cb7b09a] {\n  padding: 0.2em 0.5em;\n  border-radius: 0.5rem;\n  text-align: center;\n  background-color: #5fd3ff;\n  color: #fff;\n  transform: translate(-50%, -50%);\n}\n";
 const _sfc_main = {
   setup() {
     const app = getCurrentInstance();
@@ -29,7 +29,7 @@ const _sfc_main = {
     };
   }
 };
-pushScopeId("data-v-6c9e9701");
+pushScopeId("data-v-9cb7b09a");
 const _hoisted_1 = { class: "content" };
 const _hoisted_2 = /* @__PURE__ */ createBaseVNode("h3", null, "\u57FA\u7840\u7528\u6CD5", -1);
 const _hoisted_3 = /* @__PURE__ */ createBaseVNode("h3", null, "\u5C3A\u5BF8\u5927\u5C0F", -1);
@@ -38,7 +38,7 @@ const _hoisted_5 = /* @__PURE__ */ createBaseVNode("h3", null, "\u7981\u7528", -
 const _hoisted_6 = /* @__PURE__ */ createBaseVNode("h3", null, "\u56FE\u6807\u586B\u5145", -1);
 const _hoisted_7 = /* @__PURE__ */ createBaseVNode("h3", null, "\u81EA\u5B9A\u4E49\u6ED1\u5757", -1);
 const _hoisted_8 = { class: "thumb" };
-const _hoisted_9 = /* @__PURE__ */ createBaseVNode("h3", null, "\u5FC5\u586B", -1);
+const _hoisted_9 = /* @__PURE__ */ createBaseVNode("h3", null, "\u8868\u5355\u6821\u9A8C", -1);
 const _hoisted_10 = /* @__PURE__ */ createTextVNode("\u8868\u5355\u6821\u9A8C");
 popScopeId();
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -211,5 +211,5 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   ]);
 }
 _sfc_main.render = _sfc_render;
-_sfc_main.__scopeId = "data-v-6c9e9701";
+_sfc_main.__scopeId = "data-v-9cb7b09a";
 export { _sfc_main as default };

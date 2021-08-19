@@ -759,11 +759,11 @@ function __variableDynamicImportRuntime1__(path) {
     case "../components/cell.vue":
       return __vitePreload(() => import("./cell.09f2f5a8.js"), true ? ["assets/cell.09f2f5a8.js","assets/cell.04262a34.css","assets/vendor.f40c224e.js"] : void 0);
     case "../components/checkbox.vue":
-      return __vitePreload(() => import("./checkbox.ed71aa72.js"), true ? ["assets/checkbox.ed71aa72.js","assets/checkbox.4c9c1f9a.css","assets/vendor.f40c224e.js"] : void 0);
+      return __vitePreload(() => import("./checkbox.755b77c7.js"), true ? ["assets/checkbox.755b77c7.js","assets/checkbox.b8c79146.css","assets/vendor.f40c224e.js"] : void 0);
     case "../components/collapse.vue":
       return __vitePreload(() => import("./collapse.bf945d32.js"), true ? ["assets/collapse.bf945d32.js","assets/collapse.34cec252.css","assets/vendor.f40c224e.js"] : void 0);
     case "../components/datetime.vue":
-      return __vitePreload(() => import("./datetime.f61ea2bb.js"), true ? ["assets/datetime.f61ea2bb.js","assets/datetime.b2af16f6.css","assets/vendor.f40c224e.js"] : void 0);
+      return __vitePreload(() => import("./datetime.4c8ba0d8.js"), true ? ["assets/datetime.4c8ba0d8.js","assets/datetime.2c3074b3.css","assets/vendor.f40c224e.js"] : void 0);
     case "../components/fetch.vue":
       return __vitePreload(() => import("./fetch.65d52bfa.js"), true ? ["assets/fetch.65d52bfa.js","assets/fetch.44224fdc.css","assets/vendor.f40c224e.js"] : void 0);
     case "../components/form.vue":
@@ -773,7 +773,7 @@ function __variableDynamicImportRuntime1__(path) {
     case "../components/icon.vue":
       return __vitePreload(() => import("./icon.948de8dc.js"), true ? ["assets/icon.948de8dc.js","assets/icon.b0128907.css","assets/vendor.f40c224e.js"] : void 0);
     case "../components/input.vue":
-      return __vitePreload(() => import("./input.4fe740e7.js"), true ? ["assets/input.4fe740e7.js","assets/input.fcf7d530.css","assets/vendor.f40c224e.js"] : void 0);
+      return __vitePreload(() => import("./input.98503883.js"), true ? ["assets/input.98503883.js","assets/input.cab0e2f7.css","assets/vendor.f40c224e.js"] : void 0);
     case "../components/list.vue":
       return __vitePreload(() => import("./list.196c88d8.js"), true ? ["assets/list.196c88d8.js","assets/list.ac5b04b7.css","assets/vendor.f40c224e.js"] : void 0);
     case "../components/loading.vue":
@@ -781,15 +781,15 @@ function __variableDynamicImportRuntime1__(path) {
     case "../components/message.vue":
       return __vitePreload(() => import("./message.acbefd5c.js"), true ? ["assets/message.acbefd5c.js","assets/message.6c9c3fba.css","assets/swipe.efdea9dc.js","assets/swipe.8cf2c07b.css","assets/vendor.f40c224e.js"] : void 0);
     case "../components/picker.vue":
-      return __vitePreload(() => import("./picker.908f0c46.js"), true ? ["assets/picker.908f0c46.js","assets/vendor.f40c224e.js"] : void 0);
+      return __vitePreload(() => import("./picker.76cc1391.js"), true ? ["assets/picker.76cc1391.js","assets/vendor.f40c224e.js"] : void 0);
     case "../components/popup.vue":
       return __vitePreload(() => import("./popup.80c838e7.js"), true ? ["assets/popup.80c838e7.js","assets/popup.b209d0aa.css","assets/vendor.f40c224e.js"] : void 0);
     case "../components/progress.vue":
       return __vitePreload(() => import("./progress.4c4da67e.js"), true ? ["assets/progress.4c4da67e.js","assets/progress.36ebef21.css","assets/vendor.f40c224e.js"] : void 0);
     case "../components/radio.vue":
-      return __vitePreload(() => import("./radio.00bee91a.js"), true ? ["assets/radio.00bee91a.js","assets/radio.9ae38c91.css","assets/vendor.f40c224e.js"] : void 0);
+      return __vitePreload(() => import("./radio.20cc2b6f.js"), true ? ["assets/radio.20cc2b6f.js","assets/radio.3495928c.css","assets/vendor.f40c224e.js"] : void 0);
     case "../components/range.vue":
-      return __vitePreload(() => import("./range.1e01d3a5.js"), true ? ["assets/range.1e01d3a5.js","assets/range.78e9d190.css","assets/vendor.f40c224e.js"] : void 0);
+      return __vitePreload(() => import("./range.abf5b780.js"), true ? ["assets/range.abf5b780.js","assets/range.e92ff105.css","assets/vendor.f40c224e.js"] : void 0);
     case "../components/select.vue":
       return __vitePreload(() => import("./select.17ebe63b.js"), true ? ["assets/select.17ebe63b.js","assets/select.c2e48b22.css","assets/vendor.f40c224e.js"] : void 0);
     case "../components/steps.vue":
@@ -925,7 +925,7 @@ var router = createRouter({
           path: "/examples",
           name: "examples",
           redirect: { name: `examples_${components[0].name}` },
-          component: () => __vitePreload(() => import("./examples.7c9093cd.js"), true ? ["assets/examples.7c9093cd.js","assets/examples.26fb543f.css","assets/vendor.f40c224e.js"] : void 0),
+          component: () => __vitePreload(() => import("./examples.c9054e39.js"), true ? ["assets/examples.c9054e39.js","assets/examples.5da1484c.css","assets/vendor.f40c224e.js"] : void 0),
           children: components.map((router2) => {
             return {
               path: `/examples/${router2.name}`,
@@ -6983,7 +6983,7 @@ var PlMobile = {
 };
 if (platform.isFromAndroid || platform.isFromIos) {
   let script = document.createElement("script");
-  script.setAttribute("src", "//wechatfe.github.io/vconsole/lib/vconsole.min.js?v=3.3.0");
+  script.setAttribute("src", "//unpkg.com/vconsole/dist/vconsole.min.js");
   document.head.appendChild(script);
   script.onload = script.onreadystatechange = function() {
     script = null;

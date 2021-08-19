@@ -1,18 +1,14 @@
 import { g as getCurrentInstance, q as ref, Q as pushScopeId, R as popScopeId, r as resolveComponent, o as openBlock, d as createElementBlock, I as createVNode, O as withCtx, e as createBaseVNode, C as createTextVNode } from "./vendor.f40c224e.js";
-var input_vue_vue_type_style_index_0_scoped_true_lang = ".pl-input[data-v-6640077d] .pl-input-cell {\n  border-bottom: 1px solid #ddd;\n}\n";
+var input_vue_vue_type_style_index_0_scoped_true_lang = ".pl-input[data-v-4db2133c] .pl-input-cell {\n  border-bottom: 1px solid #ddd;\n}\n";
 const _sfc_main = {
   setup() {
     const app = getCurrentInstance();
     const value = ref("");
-    const input1 = ref(null);
-    const input2 = ref(null);
-    const input3 = ref(null);
+    const input = ref(null);
     const { $toast } = app.appContext.config.globalProperties;
     const validate = async () => {
       try {
-        await input1.value.validate();
-        await input2.value.validate();
-        await input3.value.validate();
+        await input.value.validate();
         $toast("\u6821\u9A8C\u6210\u529F\uFF01");
       } catch (e) {
         $toast("\u6821\u9A8C\u5931\u8D25: " + e);
@@ -20,24 +16,21 @@ const _sfc_main = {
     };
     return {
       value,
-      input1,
-      input2,
-      input3,
+      input,
       validate,
       rules: [{ required: true, message: "\u8BF7\u8F93\u5165", trigger: "blur" }]
     };
   }
 };
-pushScopeId("data-v-6640077d");
+pushScopeId("data-v-4db2133c");
 const _hoisted_1 = { class: "content" };
 const _hoisted_2 = /* @__PURE__ */ createBaseVNode("h3", null, "\u57FA\u7840\u7528\u6CD5", -1);
 const _hoisted_3 = /* @__PURE__ */ createBaseVNode("h3", null, "\u5C3A\u5BF8\u5927\u5C0F", -1);
 const _hoisted_4 = /* @__PURE__ */ createBaseVNode("h3", null, "\u7981\u7528", -1);
 const _hoisted_5 = /* @__PURE__ */ createBaseVNode("h3", null, "\u6807\u9898\u6298\u884C", -1);
 const _hoisted_6 = /* @__PURE__ */ createBaseVNode("h3", null, "\u56FE\u6807\u586B\u5145", -1);
-const _hoisted_7 = /* @__PURE__ */ createBaseVNode("h3", null, "\u5FC5\u586B", -1);
-const _hoisted_8 = /* @__PURE__ */ createBaseVNode("h3", null, "\u8868\u5355\u9A8C\u8BC1", -1);
-const _hoisted_9 = /* @__PURE__ */ createTextVNode("\u8868\u5355\u6821\u9A8C");
+const _hoisted_7 = /* @__PURE__ */ createBaseVNode("h3", null, "\u8868\u5355\u6821\u9A8C", -1);
+const _hoisted_8 = /* @__PURE__ */ createTextVNode("\u8868\u5355\u6821\u9A8C");
 popScopeId();
 function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_pl_input = resolveComponent("pl-input");
@@ -176,31 +169,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
       value: $setup.value,
       "onUpdate:value": _cache[10] || (_cache[10] = ($event) => $setup.value = $event),
       rules: $setup.rules,
-      ref: "input1",
-      required: "",
-      clearable: ""
-    }, null, 8, ["value", "rules"]),
-    createVNode(_component_pl_input, {
-      label: "\u8BF7\u8F93\u5165\uFF1A",
-      placeholder: "\u59D3\u540D\u3001\u624B\u673A\u3001\u7535\u8BDD",
-      type: "textarea",
-      rows: "5",
-      value: $setup.value,
-      "onUpdate:value": _cache[11] || (_cache[11] = ($event) => $setup.value = $event),
-      rules: $setup.rules,
-      ref: "input2",
-      required: "",
-      clearable: ""
-    }, null, 8, ["value", "rules"]),
-    _hoisted_8,
-    createVNode(_component_pl_input, {
-      label: "\u8BF7\u8F93\u5165\uFF1A",
-      placeholder: "\u59D3\u540D\u3001\u624B\u673A\u3001\u7535\u8BDD",
-      type: "text",
-      value: $setup.value,
-      "onUpdate:value": _cache[12] || (_cache[12] = ($event) => $setup.value = $event),
-      rules: $setup.rules,
-      ref: "input3",
+      ref: "input",
       required: "",
       clearable: ""
     }, null, 8, ["value", "rules"]),
@@ -211,7 +180,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
           onClick: $setup.validate
         }, {
           default: withCtx(() => [
-            _hoisted_9
+            _hoisted_8
           ]),
           _: 1
         }, 8, ["onClick"])
@@ -221,5 +190,5 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
   ]);
 }
 _sfc_main.render = _sfc_render;
-_sfc_main.__scopeId = "data-v-6640077d";
+_sfc_main.__scopeId = "data-v-4db2133c";
 export { _sfc_main as default };
