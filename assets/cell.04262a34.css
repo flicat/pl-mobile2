@@ -1,0 +1,9 @@
+.content p[data-v-5a846f6f] {
+  margin: 0;
+}
+.content p[data-v-5a846f6f]:nth-child(even) {
+  background-color: #67c23a;
+}
+.content p[data-v-5a846f6f]:nth-child(odd) {
+  background-color: #f56c6c;
+}
