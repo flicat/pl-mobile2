@@ -1,7 +1,7 @@
 <template>
   <teleport to='body'>
     <div v-bind="$attrs" class="pl-popup" :class="[isOpen ? 'pl-popup--open' : 'pl-popup--close', visible ? '' : 'pl-popup--hide', 'pl-popup--' + position]">
-      <div class="pl-popup-content" @click.self="close">
+      <div class="pl-popup-content" @click.self="clickClose ? close() : null">
         <slot></slot>
       </div>
       <div class="pl-popup-layer"></div>
@@ -18,6 +18,10 @@ export default {
     position: {
       type: String,
       default: 'center' // top bottom right left center
+    },
+    clickClose: {
+      type: Boolean,
+      default: true // 点击背景关闭弹窗
     }
   },
   setup(props, { emit }) {

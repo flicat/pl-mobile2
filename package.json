@@ -1,6 +1,6 @@
 {
   "name": "pl-mobile2",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "a mobile component library for Vue.js.",
   "keywords": [
     "vue",
@@ -17,6 +17,7 @@
   "scripts": {
     "start": "npm run build & npm run build:docs",
     "dev": "vite --host",
+    "serve": "vite preview --host",
     "build:docs": "vite build",
     "build": "node build.js"
   },
@@ -37,7 +38,7 @@
     "highlight.js": "^11.2.0",
     "less": "^4.1.1",
     "qrious": "^4.0.2",
-    "vite": "^2.5.0",
+    "vite": "^2.4.4",
     "vite-plugin-md2vue": "^1.0.0",
     "vite-svg-loader": "^2.1.1",
     "vue": "^3.2.2",
