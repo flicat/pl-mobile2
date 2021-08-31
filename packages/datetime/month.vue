@@ -16,6 +16,7 @@
         </div>
       </div>
       <div class="btn-wrap">
+        <button class="btn-cancel" type="primary" @click="cancel">取消</button>
         <button class="btn-submit" type="primary" @click="submit">选择月份</button>
       </div>
     </div>
@@ -177,6 +178,13 @@ export default {
         dateValue.value = timeStamp
       }
     }
+    // 取消
+    const cancel = () => {
+      if (typeof options.callback === 'function') {
+        options.callback()
+      }
+      close()
+    }
     // 提交结果
     const submit = () => {
       let { isRange, format } = options
@@ -204,6 +212,7 @@ export default {
       show,
       yearList,
       onTapDate,
+      cancel,
       submit
     }
   }
@@ -292,25 +301,37 @@ export default {
     }
   }
   .btn-wrap {
+    box-sizing: border-box;
     width: 100%;
     .height(60);
-    display: flex;
+    .padding(8, 12);
+    display: grid;
+    grid-gap: 1rem;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: (44 / @rem);
     border-top: 1px solid var(--datetime-button-top-border);
 
+    .btn-cancel,
     .btn-submit {
-      .width(320);
+      width: 100%;
       .height(44);
       .line-height(44);
       text-align: center;
       .font-size(15);
       font-weight: normal;
-      color: var(--datetime-button-text-color);
       margin: auto;
       padding: 0;
-      background: var(--datetime-button-bg);
       .border-radius(5);
       border: 0 none;
       outline: 0 none;
+    }
+    .btn-cancel {
+      color: var(--datetime-cancel-button-color);
+      background: var(--datetime-cancel-button-bg);
+    }
+    .btn-submit {
+      color: var(--datetime-submit-button-color);
+      background: var(--datetime-submit-button-bg);
     }
   }
 }

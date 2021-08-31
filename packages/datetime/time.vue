@@ -68,7 +68,7 @@
         <!-- 提交按钮 -->
         <g @touchstart.stop.prevent @touchmove.stop.prevent>
           <use xlink:href="#text-bg" x="0" y="310"></use>
-          <text class="btn-text" x="63" y="347" @touchstart="close">取消</text>
+          <text class="btn-text" x="63" y="347" @touchstart="cancel">取消</text>
           <text class="btn-text" x="125" y="347">|</text>
           <text class="btn-text" x="187" y="347" @touchstart="submit">确定</text>
         </g>
@@ -279,6 +279,13 @@ export default {
           break;
       }
     }
+    // 取消
+    const cancel = () => {
+      if (typeof options.callback === 'function') {
+        options.callback()
+      }
+      close()
+    }
     // 提交结果
     const submit = () => {
       let { isRange, format } = options
@@ -321,6 +328,7 @@ export default {
       currentTime,
       currentStartTime,
       currentEndTime,
+      cancel,
       submit
     }
   }
