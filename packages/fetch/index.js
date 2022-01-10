@@ -19,7 +19,7 @@ const handler = async function (option) {
   let response = request(option)
 
   for (let i = afterHandlerArr.length; i--;) {
-    await afterHandlerArr[i](response)
+    response = await afterHandlerArr[i](response)
   }
   return response
 }

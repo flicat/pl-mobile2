@@ -82,9 +82,7 @@ export default function ({ url = '', baseUrl = '', method = 'POST', data, header
       if (res.status >= 200 && res.status < 300) {
         return res
       }
-      const error = new Error(res.statusText)
-      error.response = res
-      throw error
+      return Promise.reject(res)
     }).then(res => {
       // 进度回调
       if (typeof onDownload === 'function') {
