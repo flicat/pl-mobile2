@@ -13,9 +13,9 @@
         method: 'get',
         type: 'blob'
       }).then(data => {
-        // blob
+        // 返回 blob
       })
-      // https://www.test.com/image.png
+      // 请求结果： GET:https://www.test.com/image.png
     }
   }
 </script>
@@ -33,9 +33,9 @@
       })
 
       request.get('/image.png').then(data => {
-        // blob
+        // 返回 blob
       })
-      // https://www.test.com/image.png
+      // 请求结果： GET:https://www.test.com/image.png
     }
   }
 </script>
@@ -51,16 +51,16 @@
       })
 
       request.headers({
-        token: 'sjkdfgiuysdnjksndkjvnslkdv'
+        token: 'xxxxxxxxxxxxxxxxxx'
       })
 
       request.post('/login', {
         username: 'test',
         password: 'test'
       }).then(data => {
-        // json
+        // 返回请求结果 json
       })
-      // https://www.test.com/login
+      // 请求结果： POST:https://www.test.com/login
     }
   }
 </script>
@@ -78,9 +78,9 @@
       request.url('id', 1)
 
       request.post().then(data => {
-        // json
+        // 返回请求结果 json
       })
-      // https://www.test.com/data/id/1
+      // 请求结果： POST:https://www.test.com/data/id/1
     }
   }
 </script>
@@ -91,16 +91,35 @@
 <script>
   export default {
     created() {
+      // 前置钩子
       this.$fetch.before(options => {
-        options.headers.token = 'xdgdgdxsedfswfsdf'
+        if (token) {
+          // 同步修改
+          options.headers.token = token
+        } else {
+          // 异步修改
+          return new Promise((res, rej) => {
+            getToken().then(token => {
+              options.headers.token = token
+            }).then(res).catch(rej)
+          })
+        }
       })
+
+      // 后置钩子
       this.$fetch.after(res => {
-        res.then(data => {
-          if (data.code === 500) {
-            // error
-          }
+        return res.then(data => {
+          // 对正确返回的结果进行处理
+          return data.result
+        }).catch(res => {
+          // 错误处理
+          return Promise.reject({
+            status: res.status
+            message: res.statusText
+          })
         })
       })
+
       this.$fetch({
         baseUrl: 'https://www.test.com',
         url: '/login',
@@ -109,13 +128,42 @@
           password: 'test'
         }
       }).then(data => {
-        // json
+        // 返回请求结果 json
       })
-      // https://www.test.com/login
+      // 请求结果： GET:https://www.test.com/login
     }
   }
 </script>
 ```
+
+
+#### 链式调用
+```html
+<script>
+  export default {
+    created() {
+      this.$fetch.options({
+        baseUrl: 'https://www.test.com',
+        url: '/login',
+        data: {
+          username: 'test',
+          password: 'test'
+        }
+      })
+      .url('path', 'user')
+      .headers({
+        token: 'xxxxxxxxxxxxxxxxxxxxxx'
+      })
+      .post()
+      .then(data => {
+        // 返回请求结果 json
+      })
+      // 请求结果： POST:https://www.test.com/login/path/user
+    }
+  }
+</script>
+```
+
 
 ### Methods
 | 方法名 | 说明 | 参数  |返回值 |
