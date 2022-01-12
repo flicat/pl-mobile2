@@ -96,11 +96,6 @@ export default {
     const formUpdateItems = inject('updateItems', () => { })
     const formRemoveItem = inject('removeItem', () => { })
 
-    console.log('formSize:', formSize, ' / props.size:', props.size)
-    console.log('formLabelWidth:', formLabelWidth, ' / props.labelWidth:', props.labelWidth)
-    console.log('formDisabled:', formDisabled, ' / props.disabled:', props.disabled)
-    console.log('formShowError:', formShowError, ' / props.showError:', props.showError)
-
     const ruleMessage = ref('')     // 验证错误提示信息
     const currentValue = computed({
       get: () => {
