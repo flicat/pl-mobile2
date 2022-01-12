@@ -1,9 +1,9 @@
 <template>
   <div class="pl-range" :class="[
-    calcSize ? 'pl-range--' + calcSize : '',
+    formSize ? 'pl-range--' + formSize : '',
     {
-      'is-disabled': calcDisabled,
-      'pl-range--error': ruleMessage
+      'is-disabled': formDisabled,
+      'pl-range--error': ruleMessage && formShowError
     }
     ]">
     <div class="pl-range-cell" :class="{'pl-range-cell--label': (label || $slots.label) && !wrap, 'pl-range-cell--wrap': (label || $slots.label) && wrap}">
@@ -11,7 +11,7 @@
         <div class="pl-range-prepend" v-if="$slots.prepend">
           <slot name="prepend"></slot>
         </div>
-        <div class="pl-range-label" :class="{'pl-range-label--require': required}" v-if="label || $slots.label" :style="{width: calcLabelWidth}">
+        <div class="pl-range-label" :class="{'pl-range-label--require': required}" v-if="label || $slots.label" :style="{width: formLabelWidth}">
           <slot name="label">{{label}}</slot>
         </div>
       </div>
@@ -32,13 +32,14 @@
         </div>
       </div>
     </div>
-    <div class="pl-range-error" v-if="ruleMessage">{{ruleMessage}}</div>
+    <div class="pl-range-error" v-if="ruleMessage && formShowError">{{ruleMessage}}</div>
   </div>
 </template>
 
 <script>
 import { ref, computed, onMounted, getCurrentInstance, inject, onUnmounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import validate from '../../src/assets/utils/validate'
+import { nullish } from '../../src/assets/utils/index'
 
 export default {
   name: 'plRange',
@@ -68,8 +69,15 @@ export default {
       default: 1,
     },
     wrap: Boolean,            // label与value换行显示
-    disabled: Boolean,            // 禁用
+    disabled: {                 // 禁用
+      type: Boolean,
+      default: undefined
+    },
     required: Boolean,            // 必填 *号
+    showError: {            // 是否在组件显示错误信息
+      type: Boolean,
+      default: undefined
+    },
     label: String,                // 左侧 label
     labelWidth: String            // label 宽度
   },
@@ -93,9 +101,10 @@ export default {
     let transStart = 0
     let transEnd = 0
 
-    const formSize = inject('size', props.size)
-    const formLabelWidth = inject('labelWidth', props.labelWidth)
-    const formDisabled = inject('disabled', props.disabled)
+    const formSize = nullish(props.size, inject('size', null), 'normal')
+    const formLabelWidth = nullish(props.labelWidth, inject('labelWidth', null))
+    const formDisabled = nullish(props.disabled, inject('disabled', null), false)
+    const formShowError = nullish(props.showError, inject('showError', null), true)
     const formUpdateItems = inject('updateItems', () => { })
     const formRemoveItem = inject('removeItem', () => { })
 
@@ -112,15 +121,6 @@ export default {
         'transform': `translateX(${diff.value}px)`,
         '-webkit-transform': `translateX(${diff.value}px)`
       }
-    })
-    const calcSize = computed(() => {
-      return props.size || formSize && formSize.value || 'normal'
-    })
-    const calcLabelWidth = computed(() => {
-      return props.labelWidth || formLabelWidth && formLabelWidth.value || null
-    })
-    const calcDisabled = computed(() => {
-      return props.disabled !== undefined ? props.disabled : formDisabled && formDisabled.value !== undefined ? formDisabled.value : false
     })
 
     // 手动验证方法
@@ -141,7 +141,7 @@ export default {
       ruleMessage.value = ''
     }
     const touchEvent = (e) => {
-      if (calcDisabled.value) {
+      if (formDisabled) {
         return false
       }
       let moveValue = 0
@@ -184,15 +184,16 @@ export default {
 
     return {
       track,
-      calcSize,
-      calcDisabled,
+      formSize,
+      formDisabled,
       ruleMessage,
-      calcLabelWidth,
+      formLabelWidth,
       progressStyle,
       thumbStyle,
       touchEvent,
       validate: validateField,
-      clearValidate
+      clearValidate,
+      formShowError
     }
   }
 }

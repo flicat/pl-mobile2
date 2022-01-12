@@ -1,9 +1,9 @@
 <template>
   <div class="pl-datetime" :class="[
-    calcSize ? 'pl-datetime--' + calcSize : '',
+    formSize ? 'pl-datetime--' + formSize : '',
     {
-      'is-disabled': calcDisabled,
-      'pl-datetime--error': ruleMessage
+      'is-disabled': formDisabled,
+      'pl-datetime--error': ruleMessage && formShowError
     }
     ]">
     <div class="pl-datetime-cell" :class="{'pl-datetime-cell--label': (label || $slots.label) && !wrap, 'pl-datetime-cell--wrap': (label || $slots.label) && wrap}">
@@ -11,7 +11,7 @@
         <div class="pl-datetime-prepend" v-if="$slots.prepend">
           <slot name="prepend"></slot>
         </div>
-        <div class="pl-datetime-label" :class="{'pl-datetime-label--require': required}" v-if="label || $slots.label" :style="{width: calcLabelWidth}">
+        <div class="pl-datetime-label" :class="{'pl-datetime-label--require': required}" v-if="label || $slots.label" :style="{width: formLabelWidth}">
           <slot name="label">{{label}}</slot>
         </div>
       </div>
@@ -37,7 +37,7 @@
         </div>
       </div>
     </div>
-    <div class="pl-datetime-error" v-if="ruleMessage">{{ruleMessage}}</div>
+    <div class="pl-datetime-error" v-if="ruleMessage && formShowError">{{ruleMessage}}</div>
 
     <pl-month ref="month" @submit="submit"></pl-month>
     <pl-time ref="time" @submit="submit"></pl-time>
@@ -52,6 +52,7 @@ import plTime from './time.vue'
 import plDate from './datetime.vue'
 import validate from '../../src/assets/utils/validate'
 import iconClose from '../../src/assets/images/icon-close.svg'
+import { getType, nullish } from '../../src/assets/utils'
 
 export default {
   name: 'plDatetime',
@@ -84,9 +85,16 @@ export default {
     format: String,              // 日期显示格式
     valueFormat: String,         // 日期返回值格式，Y-M-D H:I:S 不传则返回日期对象
     wrap: Boolean,            // label与value换行显示
-    disabled: Boolean,           // 禁用
+    disabled: {                 // 禁用
+      type: Boolean,
+      default: undefined
+    },
     readonly: Boolean,           // 只读
     required: Boolean,           // 必填 *号
+    showError: {            // 是否在组件显示错误信息
+      type: Boolean,
+      default: undefined
+    },
     label: String,               // 左侧 label
     labelWidth: String,          // label 宽度
     clearable: Boolean           // 清除按钮
@@ -110,28 +118,18 @@ export default {
       }
     })
 
-    const formSize = inject('size', props.size)
-    const formLabelWidth = inject('labelWidth', props.labelWidth)
-    const formDisabled = inject('disabled', props.disabled)
+    const formSize = nullish(props.size, inject('size', null), 'normal')
+    const formLabelWidth = nullish(props.labelWidth, inject('labelWidth', null))
+    const formDisabled = nullish(props.disabled, inject('disabled', null), false)
+    const formShowError = nullish(props.showError, inject('showError', null), true)
     const formUpdateItems = inject('updateItems', () => { })
     const formRemoveItem = inject('removeItem', () => { })
 
     // 清除按钮
     const showClear = computed(() => {
-      return props.clearable && !calcDisabled.value && (calcIsRange.value ? emitValue.value && emitValue.value.length : emitValue.value)
+      return props.clearable && !formDisabled && (calcIsRange.value ? emitValue.value && emitValue.value.length : emitValue.value)
     })
-    // 计算后的size
-    const calcSize = computed(() => {
-      return props.size || formSize && formSize.value || 'normal'
-    })
-    // 计算后的labelWidth
-    const calcLabelWidth = computed(() => {
-      return props.labelWidth || formLabelWidth && formLabelWidth.value || null
-    })
-    // 计算后的disabled
-    const calcDisabled = computed(() => {
-      return props.disabled !== undefined ? props.disabled : formDisabled && formDisabled.value !== undefined ? formDisabled.value : false
-    })
+
     const calcType = computed(() => {
       return props.type || props.options && props.options.type || 'date'
     })
@@ -161,7 +159,7 @@ export default {
     }
     // 打开选择框
     const open = () => {
-      if (calcDisabled.value || props.readonly) {
+      if (formDisabled || props.readonly) {
         return false
       }
 
@@ -221,10 +219,10 @@ export default {
       time,
       datetime,
       emitValue,
-      calcSize,
-      calcDisabled,
+      formSize,
+      formDisabled,
       ruleMessage,
-      calcLabelWidth,
+      formLabelWidth,
       calcIsRange,
       open,
       clear,
@@ -232,7 +230,8 @@ export default {
       ruleMessage,
       submit,
       validate: validateField,
-      clearValidate
+      clearValidate,
+      formShowError
     }
   }
 }

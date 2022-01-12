@@ -1,10 +1,10 @@
 <template>
   <div class="pl-radio" :class="[
-    calcSize ? 'pl-radio--' + calcSize : '',
+    formSize ? 'pl-radio--' + formSize : '',
     {
       'is-vertical': vertical,
-      'is-disabled': calcDisabled,
-      'pl-radio--error': ruleMessage
+      'is-disabled': formDisabled,
+      'pl-radio--error': ruleMessage && formShowError
     }
     ]">
     <div class="pl-radio-cell" :class="{'pl-radio-cell--label': (label || $slots.label) && !wrap, 'pl-radio-cell--wrap': (label || $slots.label) && wrap}">
@@ -12,15 +12,15 @@
         <div class="pl-radio-prepend" v-if="$slots.prepend">
           <slot name="prepend"></slot>
         </div>
-        <div class="pl-radio-label" v-if="label || $slots.label" :style="{width: calcLabelWidth}">
+        <div class="pl-radio-label" v-if="label || $slots.label" :style="{width: formLabelWidth}">
           <slot name="label">{{label}}</slot>
         </div>
       </div>
       <div class="pl-radio-value">
         <div class="pl-radio-inner">
-          <div class="pl-radio-item" v-for="(item, i) in options" :key="i" :class="{'is-active': item[prop.value] === currentValue, 'is-disabled': calcDisabled || item[prop.disabled], 'is-button': button, 'is-vertical': vertical}" @click="!(calcDisabled || item[prop.disabled]) && emit(item[prop.value])">
-            <iconCicleChoose v-if="!button" v-show="item[prop.value] === currentValue" :class="['pl-radio-icon', 'icon-checked', (calcDisabled || item[prop.disabled]) ? 'disabled' : '' ]"></iconCicleChoose>
-            <iconCicleUnchoose v-if="!button" v-show="item[prop.value] !== currentValue" :class="['pl-radio-icon', 'icon-unchecked', (calcDisabled || item[prop.disabled]) ? 'disabled' : '' ]"></iconCicleUnchoose>
+          <div class="pl-radio-item" v-for="(item, i) in options" :key="i" :class="{'is-active': item[prop.value] === currentValue, 'is-disabled': formDisabled || item[prop.disabled], 'is-button': button, 'is-vertical': vertical}" @click="!(formDisabled || item[prop.disabled]) && emit(item[prop.value])">
+            <iconCicleChoose v-if="!button" v-show="item[prop.value] === currentValue" :class="['pl-radio-icon', 'icon-checked', (formDisabled || item[prop.disabled]) ? 'disabled' : '' ]"></iconCicleChoose>
+            <iconCicleUnchoose v-if="!button" v-show="item[prop.value] !== currentValue" :class="['pl-radio-icon', 'icon-unchecked', (formDisabled || item[prop.disabled]) ? 'disabled' : '' ]"></iconCicleUnchoose>
             <span>
               <slot :item="item">{{item[prop.label]}}</slot>
             </span>
@@ -28,7 +28,7 @@
         </div>
       </div>
     </div>
-    <div class="pl-radio-error" v-if="ruleMessage">{{ruleMessage}}</div>
+    <div class="pl-radio-error" v-if="ruleMessage && formShowError">{{ruleMessage}}</div>
   </div>
 </template>
 
@@ -37,7 +37,7 @@ import { ref, computed, onMounted, getCurrentInstance, inject, onUnmounted, onBe
 import validate from '../../src/assets/utils/validate'
 import iconCicleChoose from '../../src/assets/images/icon-cicle-choose.svg'
 import iconCicleUnchoose from '../../src/assets/images/icon-cicle-unchoose.svg'
-import { getType } from '../../src/assets/utils'
+import { getType, nullish } from '../../src/assets/utils'
 
 // radio
 export default {
@@ -70,20 +70,28 @@ export default {
     value: {
       default: null
     },
-    wrap: Boolean,            // label与value换行显示
-    disabled: Boolean,            // 禁用
+    wrap: Boolean,               // label与value换行显示
+    disabled: {                 // 禁用
+      type: Boolean,
+      default: undefined
+    },
     required: Boolean,            // 必填 *号
     button: Boolean,              // 是否是按钮样式
     vertical: Boolean,            // 是否是竖向排列
+    showError: {            // 是否在组件显示错误信息
+      type: Boolean,
+      default: undefined
+    },
     label: String,                // 左侧 label
     labelWidth: String            // label 宽度
   },
   setup(props, context) {
     const app = getCurrentInstance()
 
-    const formSize = inject('size', props.size)
-    const formLabelWidth = inject('labelWidth', props.labelWidth)
-    const formDisabled = inject('disabled', props.disabled)
+    const formSize = nullish(props.size, inject('size', null), 'normal')
+    const formLabelWidth = nullish(props.labelWidth, inject('labelWidth', null))
+    const formDisabled = nullish(props.disabled, inject('disabled', null), false)
+    const formShowError = nullish(props.showError, inject('showError', null), true)
     const formUpdateItems = inject('updateItems', () => { })
     const formRemoveItem = inject('removeItem', () => { })
 
@@ -96,16 +104,6 @@ export default {
         context.emit('update:value', val)
         context.emit('change', val)
       }
-    })
-
-    const calcSize = computed(() => {
-      return props.size || formSize && formSize.value || 'normal'
-    })
-    const calcLabelWidth = computed(() => {
-      return props.labelWidth || formLabelWidth && formLabelWidth.value || null
-    })
-    const calcDisabled = computed(() => {
-      return props.disabled !== undefined ? props.disabled : formDisabled && formDisabled.value !== undefined ? formDisabled.value : false
     })
 
     // 手动验证方法
@@ -151,16 +149,17 @@ export default {
     })
 
     return {
-      calcSize,
-      calcDisabled,
+      formSize,
+      formDisabled,
       ruleMessage,
-      calcLabelWidth,
+      formLabelWidth,
       currentValue,
-      calcDisabled,
+      formDisabled,
       ruleMessage,
       emit,
       validate: validateField,
-      clearValidate
+      clearValidate,
+      formShowError
     }
   }
 }

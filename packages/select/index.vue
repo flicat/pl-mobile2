@@ -1,10 +1,10 @@
 <template>
   <div class="pl-select" :class="[
-    calcSize ? 'pl-select--' + calcSize : '',
+    formSize ? 'pl-select--' + formSize : '',
     multiple ? 'pl-select--multiple' : '',
     {
-      'is-disabled': calcDisabled,
-      'pl-select--error': ruleMessage
+      'is-disabled': formDisabled,
+      'pl-select--error': ruleMessage && formShowError
     }
     ]">
     <div class="pl-select-cell" :class="{'pl-select-cell--label': (label || $slots.label) && !wrap, 'pl-select-cell--wrap': wrap && (label || $slots.label)}">
@@ -12,7 +12,7 @@
         <div class="pl-select-prepend" v-if="$slots.prepend">
           <slot name="prepend"></slot>
         </div>
-        <div class="pl-select-label" v-if="label || $slots.label" :style="{width: calcLabelWidth}">
+        <div class="pl-select-label" v-if="label || $slots.label" :style="{width: formLabelWidth}">
           <slot name="label">{{label}}</slot>
         </div>
       </div>
@@ -35,7 +35,7 @@
         </div>
       </div>
     </div>
-    <div class="pl-select-error" v-if="ruleMessage">{{ruleMessage}}</div>
+    <div class="pl-select-error" v-if="ruleMessage && formShowError">{{ruleMessage}}</div>
 
     <popup ref="picker" position="bottom">
       <div class="pl-select-popup-content">
@@ -67,7 +67,7 @@ import iconHook from '../../src/assets/images/icon-hook.svg'
 import iconUnfold from '../../src/assets/images/icon-unfold.svg'
 import popup from '../popup/index.vue'
 import validate from '../../src/assets/utils/validate'
-import { getType } from '../../src/assets/utils'
+import { getType, nullish } from '../../src/assets/utils'
 
 export default {
   name: 'plSelect',
@@ -104,9 +104,16 @@ export default {
     },
     wrap: Boolean,            // label与value换行显示
     multiple: Boolean,        // 多选
-    disabled: Boolean,        // 禁用
+    disabled: {                 // 禁用
+      type: Boolean,
+      default: undefined
+    },
     readonly: Boolean,        // 只读
     required: Boolean,        // 必填 *号
+    showError: {            // 是否在组件显示错误信息
+      type: Boolean,
+      default: undefined
+    },
     label: String,            // 左侧 label
     labelWidth: String,       // label 宽度
     clearable: {              // 清除按钮
@@ -118,9 +125,10 @@ export default {
     const app = getCurrentInstance()
 
     const picker = ref(null)
-    const formSize = inject('size', props.size)
-    const formLabelWidth = inject('labelWidth', props.labelWidth)
-    const formDisabled = inject('disabled', props.disabled)
+    const formSize = nullish(props.size, inject('size', null), 'normal')
+    const formLabelWidth = nullish(props.labelWidth, inject('labelWidth', null))
+    const formDisabled = nullish(props.disabled, inject('disabled', null), false)
+    const formShowError = nullish(props.showError, inject('showError', null), true)
     const formUpdateItems = inject('updateItems', () => { })
     const formRemoveItem = inject('removeItem', () => { })
 
@@ -137,19 +145,10 @@ export default {
     })
 
     const showClear = computed(() => {
-      return props.clearable && !calcDisabled.value && (!props.multiple ? currentValue.value : currentValue.value && currentValue.value.length)
+      return props.clearable && !formDisabled && (!props.multiple ? currentValue.value : currentValue.value && currentValue.value.length)
     })
     const calcOptions = computed(() => {
       return new Map(props.options.map(item => [getValue(item), getLabel(item)]))
-    })
-    const calcSize = computed(() => {
-      return props.size || formSize && formSize.value || 'normal'
-    })
-    const calcLabelWidth = computed(() => {
-      return props.labelWidth || formLabelWidth && formLabelWidth.value || null
-    })
-    const calcDisabled = computed(() => {
-      return props.disabled !== undefined ? props.disabled : formDisabled && formDisabled.value !== undefined ? formDisabled.value : false
     })
 
     // 手动验证方法
@@ -176,7 +175,7 @@ export default {
       ruleMessage.value = ''
     }
     const open = () => {
-      if (calcDisabled.value || props.readonly || !props.options.length) {
+      if (formDisabled || props.readonly || !props.options.length) {
         return false
       }
       if (Array.isArray(props.value)) {
@@ -221,10 +220,10 @@ export default {
 
     return {
       picker,
-      calcSize,
-      calcDisabled,
+      formSize,
+      formDisabled,
       ruleMessage,
-      calcLabelWidth,
+      formLabelWidth,
       open,
       close,
       currentValue,
@@ -235,7 +234,8 @@ export default {
       popupValue,
       getValue,
       validate: validateField,
-      clearValidate
+      clearValidate,
+      formShowError
     }
   }
 }

@@ -5,6 +5,7 @@
 </template>
 
 <script>
+// TODO 可选的禁止显示错误信息
 import { provide } from 'vue'
 // form
 export default {
@@ -13,7 +14,14 @@ export default {
   props: {
     size: String,        // 尺寸 可选值为 normal，large, small,
     labelWidth: String,  // label 宽度
-    disabled: Boolean    // 禁用
+    disabled: {                 // 禁用
+      type: Boolean,
+      default: undefined
+    },
+    showError: {            // 是否在组件显示错误信息
+      type: Boolean,
+      default: undefined
+    }
   },
   setup(props) {
     const children = []
@@ -46,6 +54,7 @@ export default {
     provide('size', props.size)
     provide('labelWidth', props.labelWidth)
     provide('disabled', props.disabled)
+    provide('showError', props.showError)
     provide('updateItems', updateItems)
     provide('removeItem', removeItem)
 

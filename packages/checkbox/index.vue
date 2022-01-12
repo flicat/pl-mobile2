@@ -1,10 +1,10 @@
 <template>
   <div class="pl-checkbox" :class="[
-    calcSize ? 'pl-checkbox--' + calcSize : '',
+    formSize ? 'pl-checkbox--' + formSize : '',
     {
       'is-vertical': vertical,
-      'is-disabled': calcDisabled,
-      'pl-checkbox--error': ruleMessage
+      'is-disabled': formDisabled,
+      'pl-checkbox--error': ruleMessage && formShowError
     }
     ]">
     <div class="pl-checkbox-cell" :class="{'pl-checkbox-cell--label': (label || $slots.label) && !wrap, 'pl-checkbox-cell--wrap': (label || $slots.label) && wrap}">
@@ -12,7 +12,7 @@
         <div class="pl-checkbox-prepend" v-if="$slots.prepend">
           <slot name="prepend"></slot>
         </div>
-        <div class="pl-checkbox-label" v-if="label || $slots.label" :style="{width: calcLabelWidth}">
+        <div class="pl-checkbox-label" v-if="label || $slots.label" :style="{width: formLabelWidth}">
           <slot name="label">{{label}}</slot>
         </div>
       </div>
@@ -20,7 +20,7 @@
         <div class="pl-checkbox-inner">
           <template v-if="options && options.length">
             <div v-for="(item, i) in options" :key="i" class="pl-checkbox-item" :class="{'is-button': button, 'is-vertical': vertical}">
-              <input type="checkbox" :disabled="calcDisabled || item[prop.disabled]" v-model="currentValue" :value="item[prop.value]">
+              <input type="checkbox" :disabled="formDisabled || item[prop.disabled]" v-model="currentValue" :value="item[prop.value]">
               <iconCheck v-if="!button" class="pl-checkbox-icon icon-checked"></iconCheck>
               <iconUnCheck v-if="!button" class="pl-checkbox-icon icon-unchecked"></iconUnCheck>
               <span class="pl-checkbox-text">
@@ -30,7 +30,7 @@
           </template>
           <template v-else>
             <div class="pl-checkbox-item pl-toggle-box" :class="{'is-toggle': button, 'is-vertical': !button && vertical}">
-              <input type="checkbox" :disabled="calcDisabled" v-model="currentValue" :true-value="trueValue" :false-value="falseValue">
+              <input type="checkbox" :disabled="formDisabled" v-model="currentValue" :true-value="trueValue" :false-value="falseValue">
               <iconCheck v-if="!button" class="pl-checkbox-icon icon-checked"></iconCheck>
               <iconUnCheck v-if="!button" class="pl-checkbox-icon icon-unchecked"></iconUnCheck>
               <span class="pl-checkbox-text">
@@ -41,7 +41,7 @@
         </div>
       </div>
     </div>
-    <div class="pl-checkbox-error" v-if="ruleMessage">{{ruleMessage}}</div>
+    <div class="pl-checkbox-error" v-if="ruleMessage && formShowError">{{ruleMessage}}</div>
   </div>
 </template>
 
@@ -50,6 +50,7 @@ import { ref, computed, onMounted, getCurrentInstance, inject, onUnmounted, watc
 import validate from '../../src/assets/utils/validate'
 import iconCheck from '../../src/assets/images/icon-check.svg'
 import iconUnCheck from '../../src/assets/images/icon-uncheck.svg'
+import { getType, nullish } from '../../src/assets/utils'
 
 // checkbox
 export default {
@@ -89,10 +90,17 @@ export default {
       default: null
     },
     wrap: Boolean,            // label与value换行显示
-    disabled: Boolean,            // 禁用
+    disabled: {                 // 禁用
+      type: Boolean,
+      default: undefined
+    },
     required: Boolean,            // 必填 *号
     button: Boolean,              // 是否是按钮样式
     vertical: Boolean,            // 是否是竖向排列
+    showError: {            // 是否在组件显示错误信息
+      type: Boolean,
+      default: undefined
+    },
     label: String,                // 左侧 label
     labelWidth: String            // label 宽度
   },
@@ -108,21 +116,12 @@ export default {
       }
     })
 
-    const formSize = inject('size', props.size)
-    const formLabelWidth = inject('labelWidth', props.labelWidth)
-    const formDisabled = inject('disabled', props.disabled)
+    const formSize = nullish(props.size, inject('size', null), 'normal')
+    const formLabelWidth = nullish(props.labelWidth, inject('labelWidth', null))
+    const formDisabled = nullish(props.disabled, inject('disabled', null), false)
+    const formShowError = nullish(props.showError, inject('showError', null), true)
     const formUpdateItems = inject('updateItems', () => { })
     const formRemoveItem = inject('removeItem', () => { })
-
-    const calcSize = computed(() => {
-      return props.size || formSize && formSize.value || 'normal'
-    })
-    const calcLabelWidth = computed(() => {
-      return props.labelWidth || formLabelWidth && formLabelWidth.value || null
-    })
-    const calcDisabled = computed(() => {
-      return props.disabled !== undefined ? props.disabled : formDisabled && formDisabled.value !== undefined ? formDisabled.value : false
-    })
 
     // 手动验证方法
     const validateField = async () => {
@@ -158,11 +157,12 @@ export default {
     return {
       currentValue,
       ruleMessage,
-      calcSize,
-      calcLabelWidth,
-      calcDisabled,
+      formSize,
+      formLabelWidth,
+      formDisabled,
       validate: validateField,
-      clearValidate
+      clearValidate,
+      formShowError
     }
   }
 }

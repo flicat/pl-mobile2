@@ -1,12 +1,12 @@
 <template>
   <div class="pl-input" :class="[
-    calcSize ? 'pl-input--' + calcSize : '',
+    formSize ? 'pl-input--' + formSize : '',
     {
-      'is-disabled': calcDisabled,
+      'is-disabled': formDisabled,
       'pl-input-group': $slots.prepend || $slots.append,
       'pl-input-group--append': $slots.append,
       'pl-input-group--prepend': $slots.prepend,
-      'pl-input--error': ruleMessage
+      'pl-input--error': ruleMessage && formShowError
     }
     ]">
     <div class="pl-input-cell" :class="{'pl-input-cell--label': (label || $slots.label) && !wrap, 'pl-input-cell--wrap': (label || $slots.label) && wrap}">
@@ -14,7 +14,7 @@
         <div class="pl-input-prepend" v-if="$slots.prepend">
           <slot name="prepend"></slot>
         </div>
-        <div class="pl-input-label" v-if="label || $slots.label" :style="{width: calcLabelWidth}">
+        <div class="pl-input-label" v-if="label || $slots.label" :style="{width: formLabelWidth}">
           <slot name="label">{{label}}</slot>
         </div>
       </div>
@@ -22,7 +22,7 @@
       <div class="pl-input-value">
         <template v-if="type !== 'textarea'">
           <div class="pl-input-inner">
-            <input v-bind="$attrs" v-on="{focus: emit, blur: emit}" v-if="type !== 'textarea'" :type="type" :disabled="calcDisabled" v-model="currentValue" ref="input">
+            <input v-bind="$attrs" v-on="{focus: emit, blur: emit}" v-if="type !== 'textarea'" :type="type" :disabled="formDisabled" v-model="currentValue" ref="input">
           </div>
           <div class="pl-input-clear" @touchstart="clear" @mousedown="clear" v-show="showClear">
             <iconClose class="pl-input-clear-icon"></iconClose>
@@ -32,12 +32,12 @@
           </div>
         </template>
         <div class="pl-input-inner" v-else>
-          <textarea v-bind="$attrs" :rows="rows" :cols="cols" v-on="{focus: emit, blur: emit}" v-model="currentValue" ref="input" :disabled="calcDisabled"></textarea>
+          <textarea v-bind="$attrs" :rows="rows" :cols="cols" v-on="{focus: emit, blur: emit}" v-model="currentValue" ref="input" :disabled="formDisabled"></textarea>
         </div>
       </div>
 
     </div>
-    <div class="pl-input-error" v-if="ruleMessage">{{ruleMessage}}</div>
+    <div class="pl-input-error" v-if="ruleMessage && formShowError">{{ruleMessage}}</div>
   </div>
 </template>
 
@@ -45,6 +45,7 @@
 import { ref, computed, onMounted, getCurrentInstance, inject, onUnmounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import iconClose from '../../src/assets/images/icon-close.svg'
 import validate from '../../src/assets/utils/validate'
+import { nullish } from '../../src/assets/utils/index'
 
 export default {
   name: 'plInput',
@@ -66,10 +67,17 @@ export default {
     },
     value: [String, Number],
     wrap: Boolean,            // label与value换行显示
-    disabled: Boolean,        // 禁用
+    disabled: {                 // 禁用
+      type: Boolean,
+      default: undefined
+    },
     required: Boolean,        // 必填 *号
     rows: String,            // textarea rows
     cols: String,            // textarea cols
+    showError: {            // 是否在组件显示错误信息
+      type: Boolean,
+      default: undefined
+    },
     label: String,            // 左侧 label
     labelWidth: String,       // label 宽度
     clearable: {              // 清除按钮
@@ -81,11 +89,17 @@ export default {
     const app = getCurrentInstance()
 
     const input = ref(null)
-    const formSize = inject('size', props.size)
-    const formLabelWidth = inject('labelWidth', props.labelWidth)
-    const formDisabled = inject('disabled', props.disabled)
+    const formSize = nullish(props.size, inject('size', null), 'normal')
+    const formLabelWidth = nullish(props.labelWidth, inject('labelWidth', null))
+    const formDisabled = nullish(props.disabled, inject('disabled', null), false)
+    const formShowError = nullish(props.showError, inject('showError', null), true)
     const formUpdateItems = inject('updateItems', () => { })
     const formRemoveItem = inject('removeItem', () => { })
+
+    console.log('formSize:', formSize, ' / props.size:', props.size)
+    console.log('formLabelWidth:', formLabelWidth, ' / props.labelWidth:', props.labelWidth)
+    console.log('formDisabled:', formDisabled, ' / props.disabled:', props.disabled)
+    console.log('formShowError:', formShowError, ' / props.showError:', props.showError)
 
     const ruleMessage = ref('')     // 验证错误提示信息
     const currentValue = computed({
@@ -100,16 +114,7 @@ export default {
     const handlers = []
 
     const showClear = computed(() => {
-      return props.clearable && !calcDisabled.value && currentValue.value !== '' && focused.value
-    })
-    const calcSize = computed(() => {
-      return props.size || formSize && formSize.value || 'normal'
-    })
-    const calcLabelWidth = computed(() => {
-      return props.labelWidth || formLabelWidth && formLabelWidth.value || null
-    })
-    const calcDisabled = computed(() => {
-      return props.disabled !== undefined ? props.disabled : formDisabled && formDisabled.value !== undefined ? formDisabled.value : false
+      return props.clearable && !formDisabled && currentValue.value !== '' && focused.value
     })
 
     // 手动验证方法
@@ -194,16 +199,17 @@ export default {
 
     return {
       input,
-      calcSize,
-      calcDisabled,
+      formSize,
+      formDisabled,
       ruleMessage,
-      calcLabelWidth,
+      formLabelWidth,
       emit,
       currentValue,
       clear,
       showClear,
       validate: validateField,
-      clearValidate
+      clearValidate,
+      formShowError
     }
   }
 }

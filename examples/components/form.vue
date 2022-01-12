@@ -39,12 +39,12 @@ export default {
       { label: '选项3', value: 3 }
     ]
     const rules = {
-      datetime: [{ required: true, message: '请输入', trigger: 'blur' }],
-      input: [{ required: true, message: '请输入', trigger: 'blur' }],
-      select: [{ required: true, message: '请输入', trigger: 'change' }],
-      range: [{ required: true, message: '请输入', trigger: 'change' }],
-      checkbox: [{ required: true, message: '请输入', trigger: 'change' }],
-      radio: [{ required: true, message: '请输入', trigger: 'change' }]
+      datetime: [{ required: true, message: '请选择日期', trigger: 'blur' }],
+      input: [{ required: true, message: '请输入名字', trigger: 'blur' }],
+      select: [{ required: true, message: '请选择', trigger: 'change' }],
+      range: [{ required: true, message: '请选择', trigger: 'change' }],
+      checkbox: [{ required: true, message: '请选择', trigger: 'change' }],
+      radio: [{ required: true, message: '请选择', trigger: 'change' }]
     }
 
     const reset = () => {
@@ -61,8 +61,7 @@ export default {
       form.value.validate().then(e => {
         $toast('校验成功')
       }).catch(e => {
-        console.log(e)
-        $toast('校验失败')
+        $toast('校验失败: ' + e)
       })
     }
 
