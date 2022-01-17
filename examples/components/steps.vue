@@ -1,6 +1,6 @@
 <template>
   <div class="content">
-    <pl-steps :active="active" showFold>
+    <pl-steps :active="active" activeColor="#67c23a" showFold>
       <pl-step-item>
         <h4>步骤一的标题</h4>
         <p>步骤一的描述</p>
@@ -15,7 +15,7 @@
       </pl-step-item>
     </pl-steps>
     <hr>
-    <pl-steps :active="active" direction="horizontal">
+    <pl-steps :active="active" activeColor="#67c23a" direction="horizontal">
       <pl-step-item>步骤一</pl-step-item>
       <pl-step-item>步骤二</pl-step-item>
       <pl-step-item>步骤三</pl-step-item>

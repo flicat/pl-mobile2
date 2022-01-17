@@ -9,8 +9,14 @@
       <h4>步骤一的标题</h4>
       <p>步骤一的描述</p>
     </pl-step-item>
-    <pl-step-item>步骤二</pl-step-item>
-    <pl-step-item>步骤三</pl-step-item>
+    <pl-step-item>
+      <h4>步骤二的标题</h4>
+      <p>步骤二的描述</p>
+    </pl-step-item>
+    <pl-step-item>
+      <h4>步骤三的标题</h4>
+      <p>步骤三的描述</p>
+    </pl-step-item>
   </pl-steps>
 </template>
 ```
@@ -31,7 +37,7 @@
 | 参数      | 说明    | 类型      | 可选值       | 默认值   |
 |---------- |-------- |---------- |-------------  |-------- |
 | active      | 当前步骤 | Number | —            |  0    |
-| activeColor | 当前激活的颜色 | String | —            |  #67c23a  |
+| activeColor | 当前激活的颜色 | String | —            |  —  |
 | direction   | 显示方向  | String | vertical / horizontal |  vertical  |
 | showFold    | 是否显示折叠按钮 | Boolean | —            |  false   |
 | fold        | 是否默认折叠 | Boolean | —            |  false   |

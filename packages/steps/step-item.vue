@@ -1,8 +1,8 @@
 <template>
-  <div class="pl-step" :class="['pl-step--' + direction]">
+  <div class="pl-step" :class="['pl-step--' + direction, isActive && 'pl-step--active']" :style="{color: currentColor}">
     <div class="pl-step-circle">
       <slot name="icon">
-        <iconCicleChoose v-if="isActive" class="pl-step-item-icon" :style="{color: currentColor}"></iconCicleChoose>
+        <iconCicleChoose v-if="isActive" class="pl-step-item-icon"></iconCicleChoose>
         <i class="icon-default" v-else></i>
       </slot>
       <div v-if="!isLast" class="pl-step-line"></div>
@@ -17,6 +17,7 @@
 import { inject, onMounted, onUnmounted, getCurrentInstance, computed } from 'vue'
 import iconCicleChoose from '../../src/assets/images/icon-cicle-choose.svg'
 // TODO icon图标跟随字体颜色
+// TODO 自定义图标对齐问题
 // step-item
 export default {
   name: 'plStepItem',
@@ -40,7 +41,7 @@ export default {
       return items.indexOf(app) === active.value
     })
     const currentColor = computed(() => {
-      return activeColor.value || 'currentColor'
+      return activeColor || 'currentColor'
     })
 
     onMounted(() => {
@@ -71,6 +72,8 @@ export default {
 
   .pl-step-circle {
     display: flex;
+    justify-content: flex-start;
+    align-items: center;
     position: absolute;
   }
   .icon-default {
@@ -92,9 +95,8 @@ export default {
       bottom: 0;
 
       .pl-step-line {
-        width: 0.6em;
+        width: 0;
         flex: 1;
-        margin-top: 0.2em;
         border-right: 1px solid var(--steps-line);
       }
       .icon-default {
@@ -123,9 +125,8 @@ export default {
       transform: translateX(calc(50% - 0.6em));
 
       .pl-step-line {
-        height: 0.6em;
+        height: 0;
         flex: 1;
-        margin-left: 0.2em;
         border-bottom: 1px solid var(--steps-line);
       }
       .icon-default {
@@ -134,7 +135,7 @@ export default {
         border-top: 1px solid var(--steps-icon);
         border-right: 1px solid var(--steps-icon);
         transform: rotate(45deg);
-        transform-origin: -50% 50%;
+        transform-origin: 50% 50%;
       }
     }
   }

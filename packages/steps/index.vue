@@ -34,7 +34,7 @@ export default {
     },
     activeColor: {              //  当前激活的颜色
       type: String,
-      default: '#67c23a'
+      default: ''
     },
     direction: {               // 显示方向，可选值为 vertical horizontal
       type: String,
@@ -57,11 +57,9 @@ export default {
     const items = reactive([])                                                        // 内容节点列表
     provide('items', items)
 
-    const direction = ref(props.direction)
-    provide('direction', direction)
+    provide('direction', props.direction)
 
-    const activeColor = ref(props.activeColor)
-    provide('activeColor', activeColor)
+    provide('activeColor', props.activeColor)
 
     const setCurrentItem = (value) => {
       if (currentItem.value === value) {
@@ -103,7 +101,6 @@ export default {
     })
 
     return {
-      direction,
       isFold,
       items,
       toggle
