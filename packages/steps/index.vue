@@ -1,9 +1,9 @@
 <template>
   <div class="pl-steps" :class="['pl-steps--' + direction]">
-    <div class="pl-steps-items" :class="{'pl-steps-fold': isFold}">
+    <div class="pl-steps-items" :class="{'pl-steps-fold': showFold && isFold}">
       <slot></slot>
     </div>
-    <div class="pl-steps-toggle" v-if="direction === 'vertical' && items.length > 1" @click="toggle">
+    <div class="pl-steps-toggle" v-if="showFold && direction === 'vertical' && items.length > 1" @click="toggle">
       <span v-if="isFold">
         <iconMoreDown class="pl-steps-icon"></iconMoreDown>展开
       </span>
@@ -18,7 +18,7 @@
 import { provide, ref, reactive, onMounted, watch } from 'vue'
 import iconMoreDown from '../../src/assets/images/icon-more-down.svg'
 import iconMoreUp from '../../src/assets/images/icon-more-up.svg'
-
+// TODO icon图标跟随字体颜色
 // steps
 export default {
   name: 'plSteps',
@@ -39,6 +39,10 @@ export default {
     direction: {               // 显示方向，可选值为 vertical horizontal
       type: String,
       default: 'vertical'
+    },
+    showFold: {          // 是否展示折叠按钮
+      type: Boolean,
+      default: false
     },
     fold: {                // 是否默认折叠
       type: Boolean,

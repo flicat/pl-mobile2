@@ -5,9 +5,12 @@
 ```html
 <template>
   <pl-steps :active="0">
-    <pl-step-item>步骤一</pl-step-item>  
-    <pl-step-item>步骤二</pl-step-item>  
-    <pl-step-item>步骤三</pl-step-item>  
+    <pl-step-item>
+      <h4>步骤一的标题</h4>
+      <p>步骤一的描述</p>
+    </pl-step-item>
+    <pl-step-item>步骤二</pl-step-item>
+    <pl-step-item>步骤三</pl-step-item>
   </pl-steps>
 </template>
 ```
@@ -17,9 +20,9 @@
 ```html
 <template>
   <pl-steps :active="0" direction="horizontal">
-    <pl-step-item>步骤一</pl-step-item>  
-    <pl-step-item>步骤二</pl-step-item>  
-    <pl-step-item>步骤三</pl-step-item>  
+    <pl-step-item>步骤一</pl-step-item>
+    <pl-step-item>步骤二</pl-step-item>
+    <pl-step-item>步骤三</pl-step-item>
   </pl-steps>
 </template>
 ```
@@ -30,10 +33,11 @@
 | active      | 当前步骤 | Number | —            |  0    |
 | activeColor | 当前激活的颜色 | String | —            |  #67c23a  |
 | direction   | 显示方向  | String | vertical / horizontal |  vertical  |
+| showFold    | 是否显示折叠按钮 | Boolean | —            |  false   |
 | fold        | 是否默认折叠 | Boolean | —            |  false   |
 
 ### StepItem Slots
-| name      | 说明    | 
+| name      | 说明    |
 |---------- |-------- |
 | (default)  |   列表子选项   |
 | icon       |   步骤图标   |
