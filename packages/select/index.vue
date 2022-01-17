@@ -68,7 +68,8 @@ import iconUnfold from '../../src/assets/images/icon-unfold.svg'
 import popup from '../popup/index.vue'
 import validate from '../../src/assets/utils/validate'
 import { getType, nullish } from '../../src/assets/utils'
-
+// TODO 元素去除上下左右padding空间，添加rowHeight
+// TODO icon图标跟随字体颜色
 export default {
   name: 'plSelect',
   componentName: 'plSelect',
@@ -88,6 +89,7 @@ export default {
     value: {
       default: ''
     },
+    // TODO size计算用根节点字体大小
     size: String,     // 尺寸 可选值为 normal，large, small,
     placeholder: String,
     options: {         // 下拉选项

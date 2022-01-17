@@ -14,10 +14,12 @@
 </template>
 
 <script>
+// TODO 添加form表单控制
 export default {
   name: 'plButton',
   componentName: 'plButton',
   props: {
+    // TODO size计算用根节点字体大小
     size: {         // 尺寸 可选值：normal，small，lager
       type: String,
       default: 'normal'

@@ -18,6 +18,8 @@
 
 <script>
 import { computed, h, nextTick, provide, reactive, ref, watch } from 'vue'
+// TODO 添加sub tab
+// TODO 样式重调，元素大小修改为依赖外部样式控制
 export default {
   name: 'plTabs',
   componentName: 'plTabs',

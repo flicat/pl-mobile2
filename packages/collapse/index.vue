@@ -19,6 +19,7 @@ import { ref, computed, watch } from 'vue'
 import iconEnter from '../../src/assets/images/icon-enter.svg'
 
 // 效果优化，样式调整
+// TODO icon图标跟随字体颜色
 export default {
   name: 'plCollapse',
   componentName: 'plCollapse',

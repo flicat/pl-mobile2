@@ -5,13 +5,15 @@
 </template>
 
 <script>
-// TODO 可选的禁止显示错误信息
+// TODO 表单元素样式重调，元素大小修改为依赖外部样式控制
+// TODO 元素去除上下左右padding空间，添加rowHeight
 import { provide } from 'vue'
 // form
 export default {
   name: 'plForm',
   componentName: 'plForm',
   props: {
+    // TODO size计算用根节点字体大小
     size: String,        // 尺寸 可选值为 normal，large, small,
     labelWidth: String,  // label 宽度
     disabled: {                 // 禁用

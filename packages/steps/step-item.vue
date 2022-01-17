@@ -16,7 +16,7 @@
 <script>
 import { inject, onMounted, onUnmounted, getCurrentInstance, computed } from 'vue'
 import iconCicleChoose from '../../src/assets/images/icon-cicle-choose.svg'
-
+// TODO icon图标跟随字体颜色
 // step-item
 export default {
   name: 'plStepItem',

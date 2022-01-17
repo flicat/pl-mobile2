@@ -50,9 +50,14 @@ import { ref, computed, onMounted, getCurrentInstance, inject, onUnmounted, watc
 import validate from '../../src/assets/utils/validate'
 import iconCheck from '../../src/assets/images/icon-check.svg'
 import iconUnCheck from '../../src/assets/images/icon-uncheck.svg'
-import { getType, nullish } from '../../src/assets/utils'
+import { nullish } from '../../src/assets/utils'
 
 // checkbox
+// TODO 元素去除上下左右padding空间，添加rowHeight
+// TODO 添加自定义icon：check/uncheck/indeterminate
+// TODO 添加全选
+// TODO 添加不确定状态：indeterminate
+// TODO icon图标跟随字体颜色
 export default {
   name: 'plCheckbox',
   componentName: 'plCheckbox',
@@ -67,6 +72,7 @@ export default {
         return []
       }
     },
+    // TODO size计算用根节点字体大小
     size: String,     // 尺寸 可选值为 normal，large, small,
     options: {          // 多选选项
       type: Array,

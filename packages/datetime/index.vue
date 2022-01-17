@@ -53,7 +53,8 @@ import plDate from './datetime.vue'
 import validate from '../../src/assets/utils/validate'
 import iconClose from '../../src/assets/images/icon-close.svg'
 import { getType, nullish } from '../../src/assets/utils'
-
+// TODO 元素去除上下左右padding空间，添加rowHeight
+// TODO icon图标跟随字体颜色
 export default {
   name: 'plDatetime',
   componentName: 'plDatetime',
@@ -71,6 +72,7 @@ export default {
       }
     },
     value: [Date, String, Number, Array],
+    // TODO size计算用根节点字体大小
     size: String,                // 尺寸 可选值为 normal，large, small,
     type: String,                // 日历类型：month，date，time，datetime
     isRange: Boolean,            // 是否是范围选择

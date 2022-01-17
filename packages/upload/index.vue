@@ -38,7 +38,7 @@
 import { computed, reactive, ref, watch } from 'vue'
 import iconClose from '../../src/assets/images/icon-close.svg'
 import iconPlus from '../../src/assets/images/icon-plus.svg'
-
+// TODO icon图标跟随字体颜色
 export default {
   name: 'plUpload',
   componentName: 'plUpload',
