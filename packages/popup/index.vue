@@ -1,7 +1,7 @@
 <template>
   <teleport to='body'>
     <div v-bind="$attrs" class="pl-popup" :class="[isOpen ? 'pl-popup--open' : 'pl-popup--close', visible ? '' : 'pl-popup--hide', 'pl-popup--' + position]">
-      <div class="pl-popup-content" @click.self="clickClose ? close() : null">
+      <div class="pl-popup-content" @click.self="clickClose ? close($event) : null">
         <slot></slot>
       </div>
       <div class="pl-popup-layer"></div>
