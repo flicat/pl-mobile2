@@ -34,7 +34,11 @@ export default {
     },
     activeColor: {              //  当前激活的颜色
       type: String,
-      default: ''
+      default: null
+    },
+    inactiveColor: {              //  不激活的颜色
+      type: String,
+      default: null
     },
     direction: {               // 显示方向，可选值为 vertical horizontal
       type: String,
@@ -58,8 +62,8 @@ export default {
     provide('items', items)
 
     provide('direction', props.direction)
-
     provide('activeColor', props.activeColor)
+    provide('inactiveColor', props.inactiveColor)
 
     const setCurrentItem = (value) => {
       if (currentItem.value === value) {

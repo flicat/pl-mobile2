@@ -1,5 +1,5 @@
 <template>
-  <div class="pl-step" :class="['pl-step--' + direction, isActive && 'pl-step--active']" :style="{color: currentColor}">
+  <div class="pl-step" :class="['pl-step--' + direction, isActive && 'pl-step--active']" :style="{color: isActive ? activeColor : inactiveColor}">
     <div class="pl-step-circle">
       <slot name="icon">
         <iconCicleChoose v-if="isActive" class="pl-step-item-icon"></iconCicleChoose>
@@ -7,7 +7,7 @@
       </slot>
       <div v-if="!isLast" class="pl-step-line"></div>
     </div>
-    <div class="pl-step-title" :style="{color: isActive ? currentColor : '#9898B6'}">
+    <div class="pl-step-title">
       <slot></slot>
     </div>
   </div>
@@ -30,7 +30,8 @@ export default {
     const active = inject('active')
     const items = inject('items')
     const direction = inject('direction')
-    const activeColor = inject('activeColor')
+    const activeColor = inject('activeColor', 'currentColor')
+    const inactiveColor = inject('inactiveColor', 'currentColor')
     const updateItems = inject('updateItems')
     const removeItem = inject('removeItem')
 
@@ -39,9 +40,6 @@ export default {
     })
     const isActive = computed(() => {
       return items.indexOf(app) === active.value
-    })
-    const currentColor = computed(() => {
-      return activeColor || 'currentColor'
     })
 
     onMounted(() => {
@@ -54,7 +52,8 @@ export default {
     return {
       direction,
       isActive,
-      currentColor,
+      activeColor,
+      inactiveColor,
       isLast
     }
   }
