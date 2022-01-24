@@ -83,7 +83,13 @@ export default {
     // 标题对象数组
     const titleArray = computed(() => {
       return children.map(item => {
+        let index = Number(item.proxy.index)
+        if (Number.isNaN(index)) {
+          const el = item.proxy.$el
+          index = Array.from(el.parentNode.children).indexOf(el)
+        }
         return {
+          index,
           name: item.proxy.name,
           label: item.proxy.label,
           titleSlot: {
@@ -93,7 +99,7 @@ export default {
           },
           disabled: item.proxy.disabled
         }
-      })
+      }).sort((a, b) => a.index - b.index)
     })
 
     // 当前标题index

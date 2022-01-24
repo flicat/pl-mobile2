@@ -97,6 +97,7 @@
 |---------- |-------- |---------- |-------------  |-------- |
 | label     | tab页标题 | String | —            |   —     |
 | name      | 与选项卡 value 对应的标识符 | [String, Number] | —            |   —     |
+| index      | 手动指定选项卡排序 | Number | —            |   —     |
 | disabled  | 标签是否可点击 | Boolean | —            |  false   |
 
 

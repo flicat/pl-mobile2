@@ -4,14 +4,15 @@
   </div>
 </template>
 <script>
-import { computed, getCurrentInstance, inject, onMounted, onUnmounted, watch } from 'vue';
+import { computed, getCurrentInstance, inject, onMounted, onUnmounted } from 'vue';
 export default {
   name: 'plTabItem',
   componentName: 'plTabItem',
   props: {
     label: String,
     name: [String, Number],
-    disabled: Boolean
+    disabled: Boolean,
+    index: Number
   },
   setup(props) {
     const app = getCurrentInstance()
