@@ -18,7 +18,6 @@
 import { provide, ref, reactive, onMounted, watch } from 'vue'
 import iconMoreDown from '../../src/assets/images/icon-more-down.svg'
 import iconMoreUp from '../../src/assets/images/icon-more-up.svg'
-// TODO icon图标跟随字体颜色
 // steps
 export default {
   name: 'plSteps',
@@ -116,7 +115,6 @@ export default {
 <style lang="less">
 @import "../../src/assets/less/mixin.less";
 .pl-steps {
-  overflow: hidden;
   width: 100%;
   box-sizing: border-box;
   padding: 0 1.2rem;

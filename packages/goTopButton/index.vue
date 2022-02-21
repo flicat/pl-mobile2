@@ -9,7 +9,6 @@
 <script>
 import { ref, watch, onUnmounted } from 'vue'
 import iconUp from '../../src/assets/images/icon-up.svg'
-// TODO icon图标跟随字体颜色
 export default {
   name: 'plGoTopButton',
   componentName: 'plGoTopButton',

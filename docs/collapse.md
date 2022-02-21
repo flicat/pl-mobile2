@@ -24,7 +24,10 @@
 ```html
 <template>
   <pl-collapse v-model:value="active">
-    <div slot="title">自定义标题</div>
+    <template #title>自定义标题</template>
+    <template #icon>
+      <pl-icon name="icon-roundright"></pl-icon>
+    </template>
     <p>面板内容</p>
   </pl-collapse>
 </template>
@@ -51,6 +54,7 @@
 |---------- |-------- |
 | (default) |   面板内容    |
 | title     |   面板标题   |
+| icon      |   面板图标   |
 
 ### Events
 | 事件名称      | 说明    | 回调参数      |

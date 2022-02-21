@@ -6,10 +6,15 @@
     <pl-upload v-model:value="files" accept="image/*" class="file-upload" @change="onChange">
       <template v-slot:tips><span>请选择图片，格式不限</span></template>
       <template v-slot="scope">
-        <pl-button class="home" @click="setHomePage(scope.file)" size="small">设为首页</pl-button>
+        <pl-button class="home" type="success" @click="setHomePage(scope.file)" size="small">
+          <pl-icon name="icon-unlock"></pl-icon>
+        </pl-button>
       </template>
       <template v-slot:button>
-        <pl-button size="small">添加图片</pl-button>
+        <pl-button class="add" type="primary" size="small">添加图片</pl-button>
+      </template>
+      <template v-slot:close>
+        <pl-button type="danger" size="small">关闭</pl-button>
       </template>
     </pl-upload>
   </div>
@@ -52,5 +57,8 @@ export default {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+}
+.add {
+  margin: auto;
 }
 </style>

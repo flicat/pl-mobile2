@@ -92,11 +92,18 @@
 ```html
 <template>
   <pl-upload v-model:value="files" accept="image/*" class="file-upload">
-    <span slot="tips">请选择图片，格式不限</span>
+    <template v-slot:tips><span>请选择图片，格式不限</span></template>
     <template v-slot="scope">
-      <pl-button class="home" @click="setHomePage(scope.file)" size="small">设为首页</pl-button>
+      <pl-button class="home" type="success" @click="setHomePage(scope.file)" size="small">
+        <pl-icon name="icon-unlock"></pl-icon>
+      </pl-button>
     </template>
-    <pl-button slot="button" size="small">添加图片</pl-button>
+    <template v-slot:button>
+      <pl-button class="add" type="primary" size="small">添加图片</pl-button>
+    </template>
+    <template v-slot:close>
+      <pl-button type="danger" size="small">关闭</pl-button>
+    </template>
   </pl-upload>
 </template>
 <script>
@@ -146,6 +153,7 @@
 | (default)  | 自定义内容 |
 | tips       | 提示文字 |
 | button     | 图片添加按钮 |
+| close      | 图片删除按钮 |
 
 ### Events
 | 事件名称      | 说明    | 回调参数      |

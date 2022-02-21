@@ -51,7 +51,7 @@ export default {
     const rowStyle = computed(() => {
       return {
         ...(templates.value ? { [props.direction === 'row' ? 'grid-template-columns' : 'grid-template-rows']: templates.value } : null),
-        ...(props.gap ? { [props.direction === 'row' ? 'grid-column-gap' : 'grid-row-gap']: props.gap } : null),
+        ...(props.gap ? { 'gap': props.gap } : null),
         ...(props.justifyItems ? { 'justify-items': props.justifyItems } : null),
         ...(props.alignItems ? { 'align-items': props.alignItems } : null),
         ...(props.justifyContent ? { 'justify-content': props.justifyContent } : null),

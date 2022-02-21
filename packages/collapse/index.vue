@@ -4,7 +4,11 @@
       <div class="pl-collapse-title">
         <slot name="title">{{title}}</slot>
       </div>
-      <iconEnter v-if="!disabled" :class="['icon-arrow', currentValue ? 'show' : 'hide']"></iconEnter>
+      <div v-if="!disabled" :class="['icon-arrow', currentValue ? 'show' : 'hide']">
+        <slot name="icon">
+          <iconEnter></iconEnter>
+        </slot>
+      </div>
     </div>
     <div class="pl-collapse-content" v-show="visible">
       <div :class="['pl-collapse-inner', currentValue ? 'show' : 'hide']">
@@ -19,7 +23,6 @@ import { ref, computed, watch } from 'vue'
 import iconEnter from '../../src/assets/images/icon-enter.svg'
 
 // 效果优化，样式调整
-// TODO icon图标跟随字体颜色
 export default {
   name: 'plCollapse',
   componentName: 'plCollapse',
@@ -100,6 +103,8 @@ export default {
       display: inline-block;
       color: #ccc;
       transition: all 150ms ease;
+      transform-origin: 50% 50%;
+      line-height: 0;
       &.show {
         transform: rotate(90deg);
       }

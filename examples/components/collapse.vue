@@ -7,7 +7,10 @@
 
     <h3>自定义标题</h3>
     <pl-collapse v-model:value="active2" @change="onChange">
-      <template v-slot:title>自定义标题</template>
+      <template #title>自定义标题</template>
+      <template #icon>
+        <pl-icon name="icon-roundright"></pl-icon>
+      </template>
       <p>面板内容</p>
       <p>面板内容</p>
       <p>面板内容</p>

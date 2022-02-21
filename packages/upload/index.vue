@@ -5,7 +5,9 @@
         <div class="pl-file-preview">
           <div class="pl-upload-img" :class="[file.type]" :style="file.preview ? {'background-image': `url(${file.preview})`} : null" @click="preview(file)"></div>
           <div class="pl-upload-del" v-if="!disabled" @click="delFile(i)">
-            <iconClose></iconClose>
+            <slot name="close">
+              <iconClose></iconClose>
+            </slot>
           </div>
           <slot :file="file"></slot>
         </div>
@@ -38,7 +40,7 @@
 import { computed, reactive, ref, watch } from 'vue'
 import iconClose from '../../src/assets/images/icon-close.svg'
 import iconPlus from '../../src/assets/images/icon-plus.svg'
-// TODO icon图标跟随字体颜色
+
 export default {
   name: 'plUpload',
   componentName: 'plUpload',
@@ -281,6 +283,7 @@ export default {
 
       .pl-file-preview,
       .pl-upload-button {
+        display: flex;
         position: absolute;
         width: 100%;
         height: 100%;
