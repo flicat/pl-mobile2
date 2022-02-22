@@ -113,6 +113,9 @@ export default {
       }
     }
   }
+  &-title {
+    flex: 1;
+  }
   &-content {
     overflow: hidden;
   }
