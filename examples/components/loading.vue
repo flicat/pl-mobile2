@@ -2,22 +2,41 @@
   <div class="content">
     <pl-loading>加载中...</pl-loading>
     <pl-loading vertical>加载中...</pl-loading>
+    <pl-cell :span="[1]" gap="1rem">
+      <pl-button type="primary" @click="showLoading">显示全局loading</pl-button>
+      <pl-button type="primary" @click="showPartLoading">显示局部loading</pl-button>
+    </pl-cell>
+    <div class="box" ref="loadingBox"></div>
   </div>
 </template>
 <script>
-import { getCurrentInstance } from 'vue'
+import { getCurrentInstance, ref } from 'vue'
 export default {
   setup() {
     const app = getCurrentInstance()
-    const { $loadingShow, $loadingHide } = app.appContext.config.globalProperties
+    const { $loading } = app.appContext.config.globalProperties
+
+    const loadingBox = ref(null)
 
     const showLoading = () => {
-      $loadingShow('加载中...')
+      let loading = $loading({ text: '加载中...' })
       setTimeout(() => {
-        $loadingHide()
+        loading.close()
       }, 2000)
     }
-    showLoading()
+
+    const showPartLoading = () => {
+      let loading = $loading({ text: '加载中...', target: loadingBox.value })
+      setTimeout(() => {
+        loading.close()
+      }, 2000)
+    }
+
+    return {
+      loadingBox,
+      showLoading,
+      showPartLoading
+    }
   }
 }
 </script>
@@ -26,6 +45,14 @@ export default {
 .content {
   .pl-loading {
     margin: 50px;
+  }
+  .box {
+    width: 100%;
+    height: 10rem;
+    margin-top: 1rem;
+  }
+  :deep(.pl-loading-wrap) {
+    position: relative;
   }
 }
 </style>
