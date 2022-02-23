@@ -4,7 +4,7 @@
 
 ```html
 <template>
-  <pl-loading>加载中...</pl-loading>
+  <pl-loading>加载中…</pl-loading>
 </template>
 ```
 
@@ -12,15 +12,78 @@
 
 ```html
 <script>
-  export default {
-    methods: {
-      getAsyncData () {
-        let loading = this.$loading({ text: '加载中...' })
-        // async data
+import { getCurrentInstance } from 'vue'
+export default {
+  setup() {
+    const app = getCurrentInstance()
+    const { $loading } = app.appContext.config.globalProperties
+
+    const showLoading = () => {
+      let loading = $loading({ text: '加载中…' })
+
+      setTimeout(() => {
         loading.close()
-      }
+      }, 2000)
+    }
+
+    return {
+      showLoading
     }
   }
+}
+</script>
+```
+
+### 局部调用
+
+```html
+<template>
+  <div class="box" ref="loadingBox"></div>
+</template>
+<script>
+import { getCurrentInstance, ref } from 'vue'
+export default {
+  setup() {
+    const app = getCurrentInstance()
+    const { $loading } = app.appContext.config.globalProperties
+
+    const loadingBox = ref(null)
+
+    const showPartLoading = () => {
+      let loading = $loading({ text: '加载中…', target: loadingBox.value })
+
+      setTimeout(() => {
+        loading.close()
+      }, 2000)
+    }
+
+    return {
+      loadingBox,
+      showPartLoading
+    }
+  }
+}
+</script>
+```
+
+### 指令调用
+
+```html
+<template>
+  <pl-button type="primary" @click="isShow=!isShow">{{isShow ? '关闭' : '打开'}}loading指令</pl-button>
+  <div class="box" v-loading:加载中…="isShow"></div>
+</template>
+<script>
+import { ref } from 'vue'
+export default {
+  setup() {
+    const isShow = ref(false)
+
+    return {
+      isShow
+    }
+  }
+}
 </script>
 ```
 

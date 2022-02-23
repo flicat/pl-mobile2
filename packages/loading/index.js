@@ -35,7 +35,7 @@ plLoading.install = function (App) {
     render(vNode, vNodeDom)
     return vNodeDom
   }
-
+  // loading控制class
   class LoadingClass {
     isPart = false
     target = null
@@ -78,6 +78,7 @@ plLoading.install = function (App) {
     }
   }
 
+  // loading对象控制函数
   const createLoading = (options) => {
     if (loadingMap.has(options.target)) {
       return loadingMap.get(options.target)
@@ -88,7 +89,8 @@ plLoading.install = function (App) {
     }
   }
 
-  App.config.globalProperties.$loading = function ({ text = '', vertical = true, target } = {}) {
+  // 显示loading
+  const showLoading = function ({ text = '', vertical = true, target } = {}) {
     const loading = createLoading({
       text,
       vertical,
@@ -98,6 +100,33 @@ plLoading.install = function (App) {
     loading.__show()
     return loading
   }
+
+  // 指令注册
+  App.directive('loading', {
+    mounted(el, binding) {
+      if (binding.value) {
+        showLoading({
+          text: binding.arg || '',
+          target: el
+        })
+      }
+    },
+    updated(el, binding) {
+      if (binding.value) {
+        showLoading({
+          text: binding.arg || '',
+          target: el
+        })
+      } else {
+        const loading = loadingMap.get(el)
+        if (loading) {
+          loading.close()
+        }
+      }
+    }
+  })
+
+  App.config.globalProperties.$loading = showLoading
 };
 
 export default plLoading;

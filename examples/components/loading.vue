@@ -5,8 +5,9 @@
     <pl-cell :span="[1]" gap="1rem">
       <pl-button type="primary" @click="showLoading">显示全局loading</pl-button>
       <pl-button type="primary" @click="showPartLoading">显示局部loading</pl-button>
+      <pl-button type="primary" @click="isShowLoading=!isShowLoading">{{isShowLoading ? '关闭' : '打开'}}loading指令</pl-button>
     </pl-cell>
-    <div class="box" ref="loadingBox"></div>
+    <div class="box" ref="loadingBox" v-loading:loading…="isShowLoading"></div>
   </div>
 </template>
 <script>
@@ -16,6 +17,7 @@ export default {
     const app = getCurrentInstance()
     const { $loading } = app.appContext.config.globalProperties
 
+    const isShowLoading = ref(false)
     const loadingBox = ref(null)
 
     const showLoading = () => {
@@ -35,7 +37,8 @@ export default {
     return {
       loadingBox,
       showLoading,
-      showPartLoading
+      showPartLoading,
+      isShowLoading
     }
   }
 }
