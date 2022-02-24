@@ -7,7 +7,7 @@
       <pl-button type="primary" @click="showPartLoading">显示局部loading</pl-button>
       <pl-button type="primary" @click="isShowLoading=!isShowLoading">{{isShowLoading ? '关闭' : '打开'}}loading指令</pl-button>
     </pl-cell>
-    <div class="box" ref="loadingBox" v-loading:loading…="isShowLoading"></div>
+    <div class="box" ref="loadingBox" v-loading:加载中…="isShowLoading"></div>
   </div>
 </template>
 <script>
@@ -31,7 +31,7 @@ export default {
       let loading = $loading({ text: '加载中...', target: loadingBox.value })
       setTimeout(() => {
         loading.close()
-      }, 2000)
+      }, 1000)
     }
 
     return {

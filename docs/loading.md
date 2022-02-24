@@ -71,7 +71,7 @@ export default {
 ```html
 <template>
   <pl-button type="primary" @click="isShow=!isShow">{{isShow ? '关闭' : '打开'}}loading指令</pl-button>
-  <div class="box" v-loading:加载中…="isShow"></div>
+  <div class="box" v-loading="isShow"></div>
 </template>
 <script>
 import { ref } from 'vue'
@@ -81,6 +81,30 @@ export default {
 
     return {
       isShow
+    }
+  }
+}
+</script>
+```
+
+### 多指令调用
+
+```html
+<template>
+  <pl-button type="primary" @click="isShow=!isShow">{{isShow ? '关闭' : '打开'}}指令1</pl-button>
+  <pl-button type="primary" @click="isShow2=!isShow2">{{isShow2 ? '关闭' : '打开'}}指令2</pl-button>
+  <div class="box" v-loading:登录中…="isShow" v-loading:加载中…="isShow2"></div>
+</template>
+<script>
+import { ref } from 'vue'
+export default {
+  setup() {
+    const isShow = ref(false)
+    const isShow2 = ref(false)
+
+    return {
+      isShow,
+      isShow2
     }
   }
 }

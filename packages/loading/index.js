@@ -8,32 +8,43 @@ plLoading.install = function (App) {
   const loadingMap = new WeakMap()
 
   // loading节点
-  const createLoadingNode = ({ vertical, text, isPart }) => {
-    const vNode = h('div', {
-      class: 'loading',
-      style: {
-        display: 'flex',
-        width: '100%',
-        height: '100%',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)'
-      }
-    }, [
-      h(plLoading, {
-        vertical: vertical,
-        style: {
-          color: '#fff',
-          margin: 'auto'
+  const createLoadingNode = (isPart) => {
+    const vNode = h({
+      data() {
+        return {
+          vertical: true,
+          isShow: false,
+          text: ''
         }
-      }, {
-        default: () => text
-      })
-    ])
+      },
+      render() {
+        return h('div', {
+          class: 'loading',
+          style: {
+            display: 'flex',
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)'
+          }
+        }, [
+          h(plLoading, {
+            vertical: this.vertical,
+            style: {
+              color: '#fff',
+              margin: 'auto'
+            }
+          }, {
+            default: () => this.text
+          })
+        ])
+      }
+    })
 
     const vNodeDom = document.createElement('div')
     vNodeDom.style.cssText = `left: 0;top: 0;right: 0;bottom: 0;z-index: 999;position: ${isPart ? 'absolute' : 'fixed'}`
     vNode.appContext = App._context
     render(vNode, vNodeDom)
-    return vNodeDom
+    return { el: vNodeDom, loading: vNode }
   }
   // loading控制class
   class LoadingClass {
@@ -41,12 +52,12 @@ plLoading.install = function (App) {
     target = null
     vNodeDom = null
     loadingCount = 0
-    constructor({ text, vertical, target, isPart }) {
+    constructor({ target, isPart }) {
       this.isPart = isPart
       this.target = target
-      this.vNodeDom = createLoadingNode({ text, vertical, isPart })
+      this.vNodeDom = createLoadingNode(isPart)
     }
-    __show() {
+    __show({ text, vertical = true } = {}) {
       if (!this.vNodeDom || !this.target) {
         return false
       }
@@ -54,11 +65,13 @@ plLoading.install = function (App) {
         if (this.isPart) {
           this.target.classList.add('pl-loading-wrap')
         }
-        this.target.appendChild(this.vNodeDom)
+        this.target.appendChild(this.vNodeDom.el)
         if (!loadingMap.has(this.target)) {
           loadingMap.set(this.target, this)
         }
       }
+      this.vNodeDom.loading.component.proxy.text = text
+      this.vNodeDom.loading.component.proxy.vertical = vertical
       this.loadingCount++
     }
     close() {
@@ -70,7 +83,7 @@ plLoading.install = function (App) {
         if (this.isPart) {
           this.target.classList.remove('pl-loading-wrap')
         }
-        this.target.removeChild(this.vNodeDom)
+        this.target.removeChild(this.vNodeDom.el)
         loadingMap.delete(this.target)
         this.target = null
         this.vNodeDom = null
@@ -92,37 +105,68 @@ plLoading.install = function (App) {
   // 显示loading
   const showLoading = function ({ text = '', vertical = true, target } = {}) {
     const loading = createLoading({
-      text,
-      vertical,
       target: target || document.body,
       isPart: target !== document.body
     })
-    loading.__show()
+    loading.__show({
+      text,
+      vertical
+    })
     return loading
   }
 
   // 指令注册
-  App.directive('loading', {
-    mounted(el, binding) {
-      if (binding.value) {
-        showLoading({
-          text: binding.arg || '',
-          target: el
-        })
-      }
-    },
-    updated(el, binding) {
-      if (binding.value) {
-        showLoading({
-          text: binding.arg || '',
-          target: el
-        })
+  const directiveMap = new Map()
+  class DirectiveLoading {
+    target = null
+    loading = null
+    argMap = new Map()
+    constructor(target) {
+      this.target = target
+    }
+    createLoading(text) {
+      if (this.loading) {
+        this.loading.__show({ text })
       } else {
-        const loading = loadingMap.get(el)
-        if (loading) {
-          loading.close()
-        }
+        this.loading = showLoading({
+          text,
+          target: this.target
+        })
       }
+      return this.loading
+    }
+    toggle(text, isShow) {
+      this.argMap.set(text, isShow)
+      const currentLoading = [...this.argMap].reverse().find(item => item[1])
+      if (currentLoading) {
+        this.createLoading(currentLoading[0])
+      } else if (this.loading) {
+        this.loading.loadingCount = 0
+        this.loading.close()
+        this.loading = null
+      }
+    }
+  }
+
+  const getDirectiveTarget = (el, arg, value) => {
+    let target
+    if (directiveMap.has(el)) {
+      target = directiveMap.get(el)
+    } else {
+      target = new DirectiveLoading(el, arg, value)
+      directiveMap.set(el, target)
+    }
+    return target
+  }
+
+  App.directive('loading', {
+    mounted(el, { arg = '', value }) {
+      let target = getDirectiveTarget(el)
+      target.toggle(arg, value)
+    },
+    updated(el, { arg = '', value }) {
+      let target = getDirectiveTarget(el)
+      target.toggle(arg, value)
     }
   })
 
