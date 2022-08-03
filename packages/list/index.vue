@@ -166,7 +166,7 @@ export default {
         if (!props.finished && !props.loading) {
           // 如果加载内容的高度不够则继续加载下一页
           nextTick(() => {
-            if (listRef.value && innerRef.value && innerRef.value.scrollHeight <= listRef.value.clientHeight) {
+            if (listRef.value && innerRef.value && listRef.value.clientHeight > 0 && innerRef.value.scrollHeight < listRef.value.clientHeight) {
               context.emit('load')
             }
           })
