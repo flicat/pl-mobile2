@@ -1,5 +1,5 @@
 <template>
-  <popup ref="popup" position="bottom" @close="cancel">
+  <popup ref="popupEl" position="bottom" @close="cancel">
     <div class="pl-picker-content">
       <div class="pl-picker-top">
         <div class="pl-picker-btn--cancel" @click="cancel">取消</div>
@@ -17,166 +17,147 @@
   </popup>
 </template>
 
-<script>
-import { computed, onMounted, reactive, ref } from 'vue'
+<script name="plPicker" setup>
+import { defineProps, computed, onMounted, reactive, ref } from 'vue'
 import { is } from '../../src/assets/utils'
 import popup from '../popup/index.vue'
 
-export default {
-  name: 'plPicker',
-  componentName: 'plPicker',
-  components: {
-    popup
+const props = defineProps({
+  title: String,        // 标题
+  defaultValue: Array,  // 默认选中值
+  options: {         // 下拉选项，回调式：[function() {}]，嵌套式：{children: [{children: []}]}
+    type: [Array, Object],
+    default() {
+      return []
+    }
   },
-  props: {
-    title: String,        // 标题
-    defaultValue: Array,  // 默认选中值
-    options: {         // 下拉选项，回调式：[function() {}]，嵌套式：{children: [{children: []}]}
-      type: [Array, Object],
-      default() {
-        return []
-      }
-    },
-    prop: {         // 显示的标签和返回的值 {label, value, children}
-      type: Object,
-      default() {
-        return {}
-      }
-    },
-    submit: Function,       // 成功回调
-    cancel: Function        // 取消回调
+  prop: {         // 显示的标签和返回的值 {label, value, children}
+    type: Object,
+    default() {
+      return {}
+    }
   },
-  setup(props) {
-    const popup = ref(null)
-    const pickerInner = ref(null)
-    const pickerHeight = ref(0)         // 子选项高度
-    const currentValue = reactive(Object.assign([], props.defaultValue))   // 默认值
-    const translate = reactive([])
-    const transition = ref('')
-    let transStart = 0
-    let transEnd = 0
+  submit: Function,       // 成功回调
+  cancel: Function        // 取消回调
+})
 
-    // 将树结构转成数组结构
-    const treeToArray = (target, arr = [], index = 0) => {
-      let children = getChildren(target)
-      if (children && children.length) {
-        arr.push(children)
-        let itemIndex = 0
-        if (currentValue[index]) {
-          itemIndex = children.findIndex(item => getValue(item) === currentValue[index])
-          if (itemIndex < 0) {
-            itemIndex = 0
-          }
-        }
-        treeToArray(children[itemIndex], arr, index++)
+const popupEl = ref(null)
+const pickerInner = ref(null)
+const pickerHeight = ref(0)         // 子选项高度
+const currentValue = reactive(Object.assign([], props.defaultValue))   // 默认值
+const translate = reactive([])
+const transition = ref('')
+let transStart = 0
+let transEnd = 0
+
+// 将树结构转成数组结构
+const treeToArray = (target, arr = [], index = 0) => {
+  let children = getChildren(target)
+  if (children && children.length) {
+    arr.push(children)
+    let itemIndex = 0
+    if (currentValue[index]) {
+      itemIndex = children.findIndex(item => getValue(item) === currentValue[index])
+      if (itemIndex < 0) {
+        itemIndex = 0
       }
-      return arr
     }
+    treeToArray(children[itemIndex], arr, index++)
+  }
+  return arr
+}
 
-    // 计算后的选项列表
-    const computedOption = computed(() => {
-      if (is(props.options, 'object')) {
-        return treeToArray(props.options)
-      } else if (Array.isArray(props.options) && props.options.every(item => typeof item === 'function')) {
-        return props.options.map((func, i) => {
-          return func.apply(null, currentValue.slice(0, i + 1))
-        })
-      }
+// 计算后的选项列表
+const computedOption = computed(() => {
+  if (is(props.options, 'object')) {
+    return treeToArray(props.options)
+  } else if (Array.isArray(props.options) && props.options.every(item => typeof item === 'function')) {
+    return props.options.map((func, i) => {
+      return func.apply(null, currentValue.slice(0, i + 1))
     })
+  }
+})
 
-    // 计算后的值index
-    const computedIndex = computed(() => {
-      return computedOption.value.map((options, i) => {
-        let index = 0
-        if (currentValue[i]) {
-          index = options.findIndex(item => getValue(item) === currentValue[i])
-          if (index < 0) {
-            index = 0
-          }
-        }
-        return index
-      })
-    })
-
-    // 计算后的ul偏移量
-    const computedPosition = computed(() => {
-      return computedOption.value.map((options, i) => {
-        return -((computedIndex.value[i] - 2) * pickerHeight.value) + Number(translate[i] || 0)
-      })
-    })
-
-    const cancel = async () => {
-      await popup.value.close()
-      if (typeof props.cancel === 'function') {
-        props.cancel()
+// 计算后的值index
+const computedIndex = computed(() => {
+  return computedOption.value.map((options, i) => {
+    let index = 0
+    if (currentValue[i]) {
+      index = options.findIndex(item => getValue(item) === currentValue[i])
+      if (index < 0) {
+        index = 0
       }
     }
-    const submit = async () => {
-      await popup.value.close()
-      if (typeof props.submit === 'function') {
-        props.submit(computedOption.value.map((options, i) => getValue(options[computedIndex.value[i]])))
-      }
-    }
+    return index
+  })
+})
 
-    const handlerTouch = (e, index) => {
-      switch (e.type) {
-        case 'touchstart':
-          transStart = e.touches[0].clientY
-          transition.value = 'none'
-          break;
-        case 'touchmove':
-          e.preventDefault()
-          e.stopPropagation()
+// 计算后的ul偏移量
+const computedPosition = computed(() => {
+  return computedOption.value.map((options, i) => {
+    return -((computedIndex.value[i] - 2) * pickerHeight.value) + Number(translate[i] || 0)
+  })
+})
 
-          // 当前滚动的位置具体数值
-          transEnd = e.touches[0].clientY
-          translate[index] = transEnd - transStart
-          break;
-        case 'touchend':
-        case 'touchcancel':
-          let itemIndex = computedIndex.value[index] - Math.round(translate[index] / pickerHeight.value)
-          if (itemIndex < 0) {
-            itemIndex = 0
-          }
-          if (itemIndex >= computedOption.value[index].length) {
-            itemIndex = computedOption.value[index].length - 1
-          }
-          transition.value = ''
-          currentValue[index] = getValue(computedOption.value[index][itemIndex])
-          translate[index] = 0
-          break;
-      }
-    }
-
-    const getLabel = target => {
-      return props.prop.label && is(target, 'object') ? target[props.prop.label] : target
-    }
-    const getValue = target => {
-      return props.prop.value && is(target, 'object') ? target[props.prop.value] : target
-    }
-    const getChildren = target => {
-      return props.prop.children && is(target, 'object') ? target[props.prop.children] : target
-    }
-
-    onMounted(() => {
-      popup.value.open()
-      pickerHeight.value = pickerInner.value.clientHeight / 5
-    })
-
-    return {
-      pickerInner,
-      pickerHeight,
-      popup,
-      computedOption,
-      computedPosition,
-      transition,
-      handlerTouch,
-      getLabel,
-      cancel,
-      submit
-    }
+const cancel = async () => {
+  await popupEl.value.close()
+  if (typeof props.cancel === 'function') {
+    props.cancel()
   }
 }
+const submit = async () => {
+  await popupEl.value.close()
+  if (typeof props.submit === 'function') {
+    props.submit(computedOption.value.map((options, i) => getValue(options[computedIndex.value[i]])))
+  }
+}
+
+const handlerTouch = (e, index) => {
+  switch (e.type) {
+    case 'touchstart':
+      transStart = e.touches[0].clientY
+      transition.value = 'none'
+      break;
+    case 'touchmove':
+      e.preventDefault()
+      e.stopPropagation()
+
+      // 当前滚动的位置具体数值
+      transEnd = e.touches[0].clientY
+      translate[index] = transEnd - transStart
+      break;
+    case 'touchend':
+    case 'touchcancel':
+      if (translate[index]) {
+        let itemIndex = computedIndex.value[index] - Math.round(translate[index] / pickerHeight.value)
+        if (itemIndex < 0) {
+          itemIndex = 0
+        }
+        if (itemIndex >= computedOption.value[index].length) {
+          itemIndex = computedOption.value[index].length - 1
+        }
+        currentValue[index] = getValue(computedOption.value[index][itemIndex])
+      }
+      transition.value = ''
+      translate[index] = 0
+      break;
+  }
+}
+
+const getLabel = target => {
+  return props.prop.label && is(target, 'object') ? target[props.prop.label] : target
+}
+const getValue = target => {
+  return props.prop.value && is(target, 'object') ? target[props.prop.value] : target
+}
+const getChildren = target => {
+  return props.prop.children && is(target, 'object') ? target[props.prop.children] : target
+}
+
+onMounted(() => {
+  popupEl.value.open()
+  pickerHeight.value = pickerInner.value.clientHeight / 5
+})
 </script>
 
 <style lang="less">
