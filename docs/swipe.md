@@ -74,14 +74,21 @@
 | indicatorSize         | 指示器大小          | String | — | 0.5em |
 | vertical              | 是否为纵向滚动        | Boolean | — | — |
 | touchable             | 是否可以通过手势滑动     | Boolean | — | true |
+| pageSize              | 每页展示的轮播图数量  | Number    | 1      |
+| scrollSize            | 每页滚动的轮播图数量  | Number    | 1      |
+| reverse               | 是否反向滚动         | Boolean   | false   |
 
+### Swipe Slots
+| name       | 说明    |
+|----------  |-------- |
+| indicators | 轮播指示器 |
 
 ### SwipeItem Slots
-| name      | 说明    | 
+| name      | 说明    |
 |---------- |-------- |
 | (default) | 轮播内容 |
 
 ### Swipe Events
 | 事件名称      | 说明    | 回调参数      |
 |---------- |-------- |---------- |
-| scroll     |   轮播事件   | 当前轮播图index | 
+| scroll     |   轮播事件   | 当前轮播图index |
