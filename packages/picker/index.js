@@ -18,7 +18,6 @@ export default function (App) {
     data() {
       return {
         display: false,
-
         title: '请选择',
         defaultValue: [],
         options: [],
@@ -46,7 +45,18 @@ export default function (App) {
   vNode.appContext = App._context
   render(vNode, vNodeDom)
 
-  App.config.globalProperties.$picker = async function ({ title, defaultValue, options, prop, submit, cancel }) {
+  App.config.globalProperties.$picker = async function ({
+    title = '请选择',
+    defaultValue = [],
+    options = [],
+    prop = {
+      label: 'label',
+      value: 'value',
+      children: 'children'
+    },
+    submit,
+    cancel
+  }) {
     if (is(title, 'string')) {
       vNode.component.proxy.title = title
     }
