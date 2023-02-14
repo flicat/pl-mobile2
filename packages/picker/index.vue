@@ -136,7 +136,11 @@ const handlerTouch = (e, index) => {
         if (itemIndex >= computedOption.value[index].length) {
           itemIndex = computedOption.value[index].length - 1
         }
+        // 更新当前滑动的节点和子节点
         currentValue[index] = getValue(computedOption.value[index][itemIndex])
+        for (let i = index + 1; i < currentValue.length; i++) {
+          currentValue[i] = getValue(computedOption.value[i][computedIndex.value[i]])
+        }
       }
       transition.value = ''
       translate[index] = 0

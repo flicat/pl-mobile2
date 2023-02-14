@@ -1,42 +1,63 @@
 <template>
   <div class="content">
-    <pl-button @click="picker" type="primary">{{result.length ? getDateString(result.join('-'), 'Y年M月D日') : '打开日期选择器'}}</pl-button>
+    <pl-button @click="picker" type="primary">{{result ? getDateString(result, 'Y年M月D日') : '打开日期选择器'}}</pl-button>
   </div>
 </template>
 <script>
 // TODO 值为false的bug
 import { getCurrentInstance, ref } from 'vue'
-import { getMonthDays, getDateString } from '../../src/assets/utils/index.js'
+import { getMonthDays, getDateString, getDateFromString, getRangeDate } from '../../src/assets/utils/index.js'
+
+function getDatePickerOption(startDate, endDate, defaultDate) {
+  const maxTime = getDateFromString(endDate || new Date())
+  const maxYear = maxTime.getFullYear()
+  const maxMonth = maxTime.getMonth() + 1
+  const maxDate = maxTime.getDate()
+
+  const minTime = getDateFromString(startDate || '1970/1/1')
+  const minYear = minTime.getFullYear()
+  const minMonth = minTime.getMonth() + 1
+  const minDate = minTime.getDate()
+
+  const defaultDataVal = getDateFromString(defaultDate)
+
+  return {
+    defaultValue: defaultDataVal ? [defaultDataVal.getFullYear(), defaultDataVal.getMonth() + 1, defaultDataVal.getDate()] : [],
+    options: [
+      function () {
+        return Array.from({ length: maxYear - minYear + 1 }).map((i, index) => ({ label: index + minYear + '年', value: index + minYear }))
+      },
+      function (year) {
+        let min = (!year.value || year.value === minYear) ? minMonth - 1 : 0
+        let max = year.value === maxYear ? maxMonth : 12
+        return Array.from({ length: max - min }).map((i, index) => ({ label: index + min + 1 + '月', value: index + min + 1 }))
+      },
+      function (year, month) {
+        let min = ((!year.value || year.value === minYear) && (!month.value || month.value === minMonth)) ? minDate : 1
+        let max = (year.value === maxYear && month.value === maxMonth) ? maxDate + 1 : getMonthDays(year.value, month.value) + 1
+        return Array.from({ length: max - min }).map((i, index) => ({ label: index + min + '日', value: index + min }))
+      }
+    ],
+    prop: {
+      label: 'label',
+      value: 'value'
+    }
+  }
+}
+
 export default {
   setup() {
-    const result = ref([])
+    const result = ref(null)
     const app = getCurrentInstance()
     const { $picker } = app.appContext.config.globalProperties
 
     async function picker() {
       try {
-        result.value = await $picker({
+        const date = await $picker({
           title: '请选择',          // 弹框标题
-          defaultValue: result.value,   // 默认值
-          // 弹框选项列表
-          options: [
-            function () {
-              return new Array(20).fill('').map((i, index) => ({ label: index + 1990 + '年', value: index + 1990 }))
-            },
-            function () {
-              return new Array(12).fill('').map((i, index) => ({ label: index + 1 + '月', value: index + 1 }))
-            },
-            function (year, month) {
-              return new Array(getMonthDays(year, month)).fill('').map((i, index) => ({ label: index + 1 + '日', value: index + 1 }))
-            }
-          ],
-          // 弹框取值key
-          prop: {
-            label: 'label',
-            value: 'value',
-            children: 'children'
-          }
+          ...getDatePickerOption(getRangeDate(-500), getRangeDate(500), result.value)
         })
+        result.value = date.join('-')
         console.log(result.value)
       } catch (e) {
         console.log(e)
