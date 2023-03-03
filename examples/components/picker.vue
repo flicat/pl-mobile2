@@ -28,13 +28,13 @@ function getDatePickerOption(startDate, endDate, defaultDate) {
         return Array.from({ length: maxYear - minYear + 1 }).map((i, index) => ({ label: index + minYear + '年', value: index + minYear }))
       },
       function (year) {
-        let min = (!year.value || year.value === minYear) ? minMonth - 1 : 0
-        let max = year.value === maxYear ? maxMonth : 12
+        let min = (!year || year === minYear) ? minMonth - 1 : 0
+        let max = year === maxYear ? maxMonth : 12
         return Array.from({ length: max - min }).map((i, index) => ({ label: index + min + 1 + '月', value: index + min + 1 }))
       },
       function (year, month) {
-        let min = ((!year.value || year.value === minYear) && (!month.value || month.value === minMonth)) ? minDate : 1
-        let max = (year.value === maxYear && month.value === maxMonth) ? maxDate + 1 : getMonthDays(year.value, month.value) + 1
+        let min = ((!year || year === minYear) && (!month || month === minMonth)) ? minDate : 1
+        let max = (year === maxYear && month === maxMonth) ? maxDate + 1 : getMonthDays(year, month) + 1
         return Array.from({ length: max - min }).map((i, index) => ({ label: index + min + '日', value: index + min }))
       }
     ],
@@ -47,7 +47,7 @@ function getDatePickerOption(startDate, endDate, defaultDate) {
 
 export default {
   setup() {
-    const result = ref(null)
+    const result = ref('2022-1-1')
     const app = getCurrentInstance()
     const { $picker } = app.appContext.config.globalProperties
 
