@@ -47,10 +47,10 @@ import { getCurrentInstance, ref } from 'vue'
 export default {
   setup() {
     const app = getCurrentInstance()
-    const value1 = ref(null)
+    const value1 = ref('')
     const value2 = ref([])
-    const select1 = ref(null)
-    const select2 = ref(null)
+    const select1 = ref('')
+    const select2 = ref('')
     const { $toast } = app.appContext.config.globalProperties
 
     const validate = async () => {
@@ -80,12 +80,12 @@ export default {
       rules1: [{ required: true, message: '请选择', trigger: 'change' }],
       rules2: [{ required: true, message: '请选择', trigger: 'change' }],
       data: [
-        { label: '选项1', value: 1, disabled: false },
-        { label: '选项2', value: 2, disabled: false },
-        { label: '选项3', value: 3, disabled: true },
-        { label: '选项4', value: 4, disabled: false },
-        { label: '选项5', value: 5, disabled: false },
-        { label: '选项6', value: 6, disabled: false }
+        { label: '选项1', value: '1', disabled: false },
+        { label: '选项2', value: '2', disabled: false },
+        { label: '选项3', value: '3', disabled: true },
+        { label: '选项4', value: '4', disabled: false },
+        { label: '选项5', value: '5', disabled: false },
+        { label: '选项6', value: '6', disabled: false }
       ]
     }
   }

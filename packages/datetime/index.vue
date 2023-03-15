@@ -200,7 +200,7 @@ export default {
 
     // 清除方法
     const clear = () => {
-      emitValue.value = null
+      emitValue.value = calcIsRange.value ? [] : ''
       context.emit('clear')
     }
 
