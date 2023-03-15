@@ -1,29 +1,29 @@
 <template>
   <div class="content">
     <h3>基础用法</h3>
-    <pl-select v-model:value="value1" :options="data"></pl-select>
-    <pl-select v-model:value="value2" :options="data" multiple></pl-select>
+    <pl-select v-model:value="value1" :options="data" @change="change"></pl-select>
+    <pl-select v-model:value="value2" :options="data" @change="change2" multiple></pl-select>
 
     <h3>尺寸选择</h3>
-    <pl-select placeholder="请选择选项" v-model:value="value1" :options="data" size="large" clearable></pl-select>
-    <pl-select placeholder="请选择选项" v-model:value="value2" :options="data" size="small" multiple clearable></pl-select>
+    <pl-select placeholder="请选择选项" v-model:value="value1" :options="data" @change="change" size="large" clearable></pl-select>
+    <pl-select placeholder="请选择选项" v-model:value="value2" :options="data" @change="change2" size="small" multiple clearable></pl-select>
 
     <h3>禁用</h3>
     <pl-select v-model:value="value1" :options="data" disabled></pl-select>
 
     <h3>折行显示</h3>
-    <pl-select label="请选择请选择请选择请选择请选择请选择请选择请选择请选择：" placeholder="请选择选项" v-model:value="value1" :options="data" clearable wrap></pl-select>
-    <pl-select label="请选择：" placeholder="请选择选项" v-model:value="value2" :options="data" multiple clearable wrap required></pl-select>
+    <pl-select label="请选择请选择请选择请选择请选择请选择请选择请选择请选择：" placeholder="请选择选项" v-model:value="value1" :options="data" @change="change" clearable wrap></pl-select>
+    <pl-select label="请选择：" placeholder="请选择选项" v-model:value="value2" :options="data" @change="change2" multiple clearable wrap required></pl-select>
 
     <h3>自定义选项</h3>
-    <pl-select label="请选择：" placeholder="请选择" v-model:value="value1" :options="data" clearable required>
+    <pl-select label="请选择：" placeholder="请选择" v-model:value="value1" @change="change" :options="data" clearable required>
       <template v-slot="scope">
         <span>{{scope.item.label}}-{{scope.item.value}}</span>
       </template>
     </pl-select>
 
     <h3>前后图标</h3>
-    <pl-select label="请选择：" placeholder="请选择" v-model:value="value1" :options="data" clearable required>
+    <pl-select label="请选择：" placeholder="请选择" v-model:value="value1" :options="data" @change="change" clearable required>
       <template v-slot:prepend>
         <pl-icon name="icon-dingwei" fill="#999"></pl-icon>
       </template>
