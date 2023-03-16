@@ -24,13 +24,13 @@ plLoading.install = function (App) {
             display: 'flex',
             width: '100%',
             height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)'
+            backgroundColor: 'var(--loading-bg)'
           }
         }, [
           h(plLoading, {
             vertical: this.vertical,
             style: {
-              color: '#fff',
+              color: '#var(--loading-text)',
               margin: 'auto'
             }
           }, {
