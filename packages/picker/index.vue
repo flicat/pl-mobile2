@@ -34,7 +34,11 @@ const props = defineProps({
   prop: {         // 显示的标签和返回的值 {label, value, children}
     type: Object,
     default() {
-      return {}
+      return {
+        label: 'label',
+        value: 'value',
+        children: 'children'
+      }
     }
   },
   submit: Function,       // 成功回调
@@ -73,7 +77,11 @@ const computedOption = computed(() => {
     return treeToArray(props.options)
   } else if (Array.isArray(props.options) && props.options.every(item => typeof item === 'function')) {
     return props.options.map((func, i) => {
-      return func.apply(null, currentValue.slice(0, i + 1))
+      const options = func.apply(null, currentValue.slice(0, i + 1))
+      if (options && options.length && !currentValue[i]) {
+        currentValue[i] = getValue(options[0])
+      }
+      return options
     })
   }
 })
