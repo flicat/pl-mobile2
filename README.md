@@ -130,6 +130,9 @@ import {
   --tag-bg: #9898B6;
   --input-bg: #fff;
 
+  --horizontal-size: 1.2rem;
+  --asterisk-size: 0.6rem;
+
   /* message */
   --title-color: #333;
   --content-color: #666;
@@ -227,6 +230,7 @@ import {
   --steps-toggle-text: #9898B6;
   --steps-line: #F2F3F5;
   --steps-icon: #DCDEE0;
+  --step-icon-size: 1.2rem;
 
   /* tab */
   --tab-card-border: #e4e7ed;

@@ -215,7 +215,7 @@ export default {
 <style lang="less">
 .pl-input {
   background-color: var(--input-bg);
-  padding: 0 1.2rem;
+  padding: 0 var(--horizontal-size);
   line-height: normal;
 
   * {
@@ -263,10 +263,10 @@ export default {
     &--require {
       &::before {
         display: inline-block;
-        width: 0.6rem;
+        width: var(--asterisk-size);
         content: "*";
         color: var(--danger);
-        margin-left: -0.6rem;
+        margin-left: -var(--asterisk-size);
       }
     }
   }

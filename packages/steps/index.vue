@@ -117,7 +117,7 @@ export default {
 .pl-steps {
   width: 100%;
   box-sizing: border-box;
-  padding: 0 1.2rem;
+  padding: 0 var(--horizontal-size);
 
   * {
     box-sizing: border-box;

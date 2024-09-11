@@ -79,8 +79,8 @@ export default {
       .pl-step-icon {
         position: relative;
         z-index: 1;
-        width: 1.2rem;
-        height: 1.2rem;
+        width: var(--step-icon-size);
+        height: var(--step-icon-size);
         display: flex;
         align-items: center;
         justify-content: center;
