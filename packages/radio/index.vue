@@ -229,7 +229,9 @@ export default {
     flex: 1;
   }
   &-prepend {
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding-right: 0.4em;
   }
 

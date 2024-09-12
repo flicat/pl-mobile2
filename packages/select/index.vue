@@ -351,7 +351,9 @@ export default {
   }
   &-append,
   &-prepend {
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   &-append {
     padding-left: 0.4em;
