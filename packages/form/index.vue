@@ -57,8 +57,8 @@ export default {
     provide('labelWidth', props.labelWidth)
     provide('disabled', props.disabled)
     provide('showError', props.showError)
-    provide('updateItems', updateItems)
-    provide('removeItem', removeItem)
+    provide('updateFormItems', updateItems)
+    provide('removeFormItem', removeItem)
 
     return {
       validate,

@@ -15,7 +15,7 @@ const setTransform = (index, vertical) => {
   itemStyle.transform = vertical ? `translateY(${index * 100}%)` : `translateX(${index * 100}%)`
 }
 
-const updateItems = inject('updateItems')
+const updateItems = inject('updateSwipeItems')
 const item = ref(null)
 
 onMounted(() => {

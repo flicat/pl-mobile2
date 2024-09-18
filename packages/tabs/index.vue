@@ -155,7 +155,7 @@ export default {
         children.push(item)
       }
     }
-    provide('updateItems', updateItems)
+    provide('updateTabItems', updateItems)
 
     // 删除标题节点
     const removeItem = (item) => {
@@ -164,7 +164,7 @@ export default {
         children.splice(index, 1);
       }
     }
-    provide('removeItem', removeItem)
+    provide('removeTabItem', removeItem)
 
     let transDiff = 0
     let transStart = 0

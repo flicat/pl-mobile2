@@ -76,7 +76,7 @@ export default {
         items.push(child)
       }
     }
-    provide('updateItems', updateItems)
+    provide('updateStepItems', updateItems)
 
     // 删除内容节点
     const removeItem = (item) => {
@@ -85,7 +85,7 @@ export default {
         items.splice(index, 1);
       }
     }
-    provide('removeItem', removeItem)
+    provide('removeStepItem', removeItem)
 
     // 展开/收起
     const toggle = () => {

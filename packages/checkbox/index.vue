@@ -126,8 +126,8 @@ export default {
     const formLabelWidth = nullish(props.labelWidth, inject('labelWidth', null))
     const formDisabled = nullish(props.disabled, inject('disabled', null), false)
     const formShowError = nullish(props.showError, inject('showError', null), true)
-    const formUpdateItems = inject('updateItems', () => { })
-    const formRemoveItem = inject('removeItem', () => { })
+    const formUpdateItems = inject('updateFormItems', () => { })
+    const formRemoveItem = inject('removeFormItem', () => { })
 
     // 手动验证方法
     const validateField = async () => {

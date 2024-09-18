@@ -33,8 +33,8 @@ export default {
     const direction = inject('direction')
     const activeColor = inject('activeColor', 'currentColor')
     const inactiveColor = inject('inactiveColor', 'currentColor')
-    const updateItems = inject('updateItems')
-    const removeItem = inject('removeItem')
+    const updateItems = inject('updateStepItems')
+    const removeItem = inject('removeStepItem')
 
     const isLast = computed(() => {
       return items.indexOf(app) === items.length - 1

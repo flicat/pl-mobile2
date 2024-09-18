@@ -94,7 +94,7 @@ const updateItems = child => {
     child.setTransform(child.index, props.vertical)
   }
 }
-provide('updateItems', updateItems)
+provide('updateSwipeItems', updateItems)
 
 // 滚动的视窗
 const scrollWrap = ref(null)

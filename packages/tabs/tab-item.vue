@@ -17,8 +17,8 @@ export default {
   setup(props) {
     const app = getCurrentInstance()
     const currentName = inject('currentName', '')
-    const updateItems = inject('updateItems', () => { })
-    const removeItem = inject('removeItem', () => { })
+    const updateItems = inject('updateTabItems', () => { })
+    const removeItem = inject('removeTabItem', () => { })
 
     const active = computed(() => {
       return currentName.value === props.name;
